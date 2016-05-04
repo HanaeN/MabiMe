@@ -74,7 +74,7 @@ bool MabiPackReader::ReadPackageHeader() {
 bool MabiPackReader::ReadPackageInfos() {
     if (!fileOpen) return false;
     try {
-        char infoHeader[headers.packageHeader.InfoHeaderSize];
+        char* infoHeader = (char*)malloc(headers.packageHeader.InfoHeaderSize);
         io.readRawData(infoHeader, headers.packageHeader.InfoHeaderSize);
         int ptr = 0;
         for (int i = 0; i < headers.packageHeader.EntryCount; i++) {
@@ -103,6 +103,7 @@ bool MabiPackReader::ReadPackageInfos() {
             }
             ptr += sizeof(MabiPack::PackageItemInfo);
         }
+        free(infoHeader);
     } catch (...) {
         qDebug() << "failed to read package info";
         return false;

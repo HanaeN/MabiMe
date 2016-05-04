@@ -16,12 +16,14 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     PackReader/mabipackreader.cpp \
     PackReader/mabimt.cpp \
-    mabimeglwidget.cpp
+    mabimeglwidget.cpp \
+    PackReader/pmgreader.cpp
 
 HEADERS  += mainwindow.h \
     PackReader/mabipackreader.h \
     PackReader/mabimt.h \
-    mabimeglwidget.h
+    mabimeglwidget.h \
+    PackReader/pmgreader.h
 
 FORMS    += mainwindow.ui
 

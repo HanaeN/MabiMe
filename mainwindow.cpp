@@ -10,7 +10,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     qApp->setQuitOnLastWindowClosed(true);
     ui->setupUi(this);
-    //QTimer::singleShot(1, this, SLOT(startTimer()));
+    QTimer::singleShot(1, this, SLOT(startTimer()));
 }
 
 MainWindow::~MainWindow()
@@ -25,9 +25,9 @@ void MainWindow::show() {
 
 void MainWindow::startTimer() {
     MabiPackReader *p = new MabiPackReader();
-    if (p->OpenPackage("C:/Nexon/Library/mabinogi/appdata/package/language.pack")) {
-        QByteArray file = p->ExtractFile("world.english.txt");
-        QFile f("D:\\Coding\\tmp.txt");
+    if (p->OpenPackage("C:/Nexon/Library/mabinogi/appdata/package/183_full.pack")) {
+        QByteArray file = p->ExtractFile("gfx\\char\\human\\female\\face\\female_default_f00.pmg");
+        QFile f("D:\\Coding\\tmp.pmg");
         f.open(QFile::ReadWrite);
         f.write(file);
         f.close();
