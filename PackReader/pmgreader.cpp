@@ -49,7 +49,6 @@ bool PMGReader::LoadPMG(QByteArray stream) {
                         pos += 32;
                         memcpy(&mesh.meshName, &data[pos], 128);
                         pos += 256;
-                        qDebug() << mesh.boneName << mesh.meshName;
                         memcpy(mesh.minorMatrix.data(), &data[pos], 64);
                         pos += 64;
                         memcpy(mesh.majorMatrix.data(), &data[pos], 64);
@@ -58,7 +57,6 @@ bool PMGReader::LoadPMG(QByteArray stream) {
                         pos += 12;
                         memcpy(mesh.textureName, &data[pos], 32);
                         pos += 72;
-                        qDebug() << mesh.textureName;
                         mesh.faceVertexCount = *(int*)&data[pos];
                         pos += 4;
                         mesh.faceCount = *(int*)&data[pos];
@@ -71,7 +69,6 @@ bool PMGReader::LoadPMG(QByteArray stream) {
                         pos += 4;
                         mesh.skinCount = *(int*)&data[pos];
                         pos += 124;
-                        qDebug() << mesh.faceVertexCount;
                         for (int i = 0; i < mesh.faceVertexCount; i++) {
                             short *v = (short*)malloc(2);
                             memcpy(v, &data[pos], 2);
@@ -84,13 +81,25 @@ bool PMGReader::LoadPMG(QByteArray stream) {
                             pos += 2;
                             mesh.stripVertexList.append(v);
                         }
+                        mesh.cleanVertices = (GLfloat*)malloc(4 * mesh.vertexCount * 3);
                         for (int i = 0; i < mesh.vertexCount; i++) {
-
+                            PMG::Vertex *v = new PMG::Vertex();
+                            memcpy(v, &data[pos], sizeof(PMG::Vertex));
+                            pos += sizeof(PMG::Vertex);
+                            mesh.vertices.append(v);
+                            mesh.cleanVertices[i * 3] = v->x;
+                            mesh.cleanVertices[i * 3 + 1] = v->y;
+                            mesh.cleanVertices[i * 3 + 2] = v->z;
                         }
-                        //IM GOING TO SCREAM
+                        for (int i = 0; i < mesh.skinCount; i++) {
+                            PMG::Skin *s = new PMG::Skin();
+                            memcpy(s, &data[pos], sizeof(PMG::Skin));
+                            pos += sizeof(PMG::Skin);
+                            mesh.skins.append(s);
+                        }
                     }
                     if (pmVersion == 2) {
-
+// DO LATER.
                     }
                     return true;
                 }

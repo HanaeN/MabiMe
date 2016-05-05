@@ -3,6 +3,7 @@
 
 #include <QByteArray>
 #include <QtOpenGL>
+#include <GL/gl.h>;
 
 namespace PMG {
     #pragma pack(1)
@@ -13,10 +14,11 @@ namespace PMG {
         char meshName[128];
         int meshType;
     };
+    #pragma pack(1)
     struct Vertex {
         float x, y, z;
         float nx, ny, nz;
-        float r,g,b,a;
+        unsigned int rgba;
         float u,v;
     };
     struct Skin {
@@ -41,6 +43,7 @@ namespace PMG {
         QList<short*> vertexList = QList<short*>();
         QList<short*> stripVertexList = QList<short*>();
         QList<Vertex*> vertices = QList<Vertex*>();
+        GLfloat *cleanVertices;
         QList<Skin*> skins = QList<Skin*>();
     };
 }

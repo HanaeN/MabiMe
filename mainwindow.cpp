@@ -22,7 +22,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::show() {
     // suppress show
-//    QMainWindow::show();
+    QMainWindow::show();
 }
 
 void MainWindow::startTimer() {
@@ -39,5 +39,5 @@ void MainWindow::startTimer() {
         // opened so do  things
         p->ClosePackage();
     }
-    this->close();
+    //this->close();
 }
