@@ -57,7 +57,7 @@ private:
     QDataStream io;
     int64_t pos;
     MabiPack::Headers headers;
-    QList<MabiPack::PackageEntry> packageEntries;
+    QList<MabiPack::PackageEntry*> packageEntries;
     bool fileOpen = false;
     bool ReadFileHeader();
     bool ReadPackageHeader();

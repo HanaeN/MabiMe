@@ -38,8 +38,10 @@ namespace PMG {
         int stripFaceCount       = 0;
         int vertexCount          = 0;
         int skinCount            = 0;
-        QList<Vertex> vertices = QList<Vertex>();
-        QList<Skin> skins = QList<Skin>();
+        QList<short*> vertexList = QList<short*>();
+        QList<short*> stripVertexList = QList<short*>();
+        QList<Vertex*> vertices = QList<Vertex*>();
+        QList<Skin*> skins = QList<Skin*>();
     };
 }
 

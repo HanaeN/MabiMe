@@ -6,7 +6,7 @@
 
 MabiPackReader::MabiPackReader()
 {
-    packageEntries = QList<MabiPack::PackageEntry>();
+    packageEntries = QList<MabiPack::PackageEntry*>();
 }
 
 bool MabiPackReader::OpenPackage(QString filename) {
@@ -31,6 +31,12 @@ bool MabiPackReader::OpenPackage(QString filename) {
 void MabiPackReader::ClosePackage() {
     if (fileOpen) {
         packFile->close();
+        if (packageEntries.count() > 0) {
+            for (int i = 0; i < packageEntries.count(); i++) {
+                delete packageEntries[0];
+                packageEntries.removeAt(0);
+            }
+        }
         delete packFile;
         fileOpen = false;
         qDebug() << "pack has been closed.";
@@ -96,9 +102,9 @@ bool MabiPackReader::ReadPackageInfos() {
             if (info.Zero != 0) {
                 qDebug () << "Entry " + name + " is corrupted!";
             } else {
-                MabiPack::PackageEntry e;
-                e.info = info;
-                e.name = name;
+                MabiPack::PackageEntry *e = new MabiPack::PackageEntry();
+                e->info = info;
+                e->name = name;
                 packageEntries.append(e);
             }
             ptr += sizeof(MabiPack::PackageItemInfo);
@@ -130,8 +136,8 @@ QByteArray MabiPackReader::ExtractFile(MabiPack::PackageEntry file) {
 
 QByteArray MabiPackReader::ExtractFile(QString filename) {
     for (int i = 0; i < packageEntries.count(); i++) {
-        if (packageEntries[i].name == filename) {
-            return ExtractFile(packageEntries.at(i));
+        if (packageEntries[i]->name == filename) {
+            return ExtractFile(*packageEntries.at(i));
         }
     }
     return QByteArray();

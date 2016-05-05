@@ -48,8 +48,46 @@ bool PMGReader::LoadPMG(QByteArray stream) {
                         memcpy(&mesh.boneName, &data[pos], 32);
                         pos += 32;
                         memcpy(&mesh.meshName, &data[pos], 128);
+                        pos += 256;
                         qDebug() << mesh.boneName << mesh.meshName;
-                        // CONTINUE HERE // LOADPM17
+                        memcpy(mesh.minorMatrix.data(), &data[pos], 64);
+                        pos += 64;
+                        memcpy(mesh.majorMatrix.data(), &data[pos], 64);
+                        pos += 64;
+                        mesh.partNo = *(int*)&data[pos];
+                        pos += 12;
+                        memcpy(mesh.textureName, &data[pos], 32);
+                        pos += 72;
+                        qDebug() << mesh.textureName;
+                        mesh.faceVertexCount = *(int*)&data[pos];
+                        pos += 4;
+                        mesh.faceCount = *(int*)&data[pos];
+                        pos += 4;
+                        mesh.stripFaceVertexCount = *(int*)&data[pos];
+                        pos += 4;
+                        mesh.stripFaceCount = *(int*)&data[pos];
+                        pos += 4;
+                        mesh.vertexCount = *(int*)&data[pos];
+                        pos += 4;
+                        mesh.skinCount = *(int*)&data[pos];
+                        pos += 124;
+                        qDebug() << mesh.faceVertexCount;
+                        for (int i = 0; i < mesh.faceVertexCount; i++) {
+                            short *v = (short*)malloc(2);
+                            memcpy(v, &data[pos], 2);
+                            pos += 2;
+                            mesh.vertexList.append(v);
+                        }
+                        for (int i = 0; i < mesh.stripFaceVertexCount; i++) {
+                            short *v = (short*)malloc(2);
+                            memcpy(v, &data[pos], 2);
+                            pos += 2;
+                            mesh.stripVertexList.append(v);
+                        }
+                        for (int i = 0; i < mesh.vertexCount; i++) {
+
+                        }
+                        //IM GOING TO SCREAM
                     }
                     if (pmVersion == 2) {
 
