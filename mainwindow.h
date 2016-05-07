@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include "mabimeglwidget.h"
 
 namespace Ui {
 class MainWindow;
@@ -17,6 +18,7 @@ public:
     void show();
 private slots:
     void startTimer();
+    void cameraChange(CameraInfo camera);
 private:
     Ui::MainWindow *ui;
 };

@@ -50,15 +50,10 @@ MabiMeGLWidget::MabiMeGLWidget(QWidget *parent) : QGLWidget(QGLFormat(QGL::Sampl
 void MabiMeGLWidget::paintGL() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
-//    glTranslatef(5.0, -32, 10);
-    glTranslatef(0, 8, -50);
-    ti += 0.4;
+    glTranslatef(camera.x, camera.y, camera.zoom);
     for (int n = 0; n < meshes.count(); n++) {
         renderPMGMesh(*meshes[n]);
     }
-    //glRotatef(ti, 1.0, 0.0, 0.0);
-    //glRotatef(ti, 0.0, 1.0, 0.0);
-    //glRotatef(0, 0.0, 0.0, 1.0);
     qglColor(Qt::red);
 
 }
@@ -106,25 +101,18 @@ void MabiMeGLWidget::initializeGL() {
 
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_COLOR_ARRAY);
+    glEnableClientState(GL_NORMAL_ARRAY);
 
 
-//    glEnable(GL_LIGHTING);
-//      glEnable(GL_LIGHT0);
+    glEnable(GL_LIGHTING);
+    glEnable(GL_LIGHT0);
 
-//      static GLfloat lightPosition[4] = { 0, 0, 10, 1.0 };
-//      glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
+    static GLfloat lightPosition[4] = { 0, 0, 10, 1.0 };
+    glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
 
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    QTimer *q = new QTimer(this);
-    connect(q, SIGNAL(timeout()), SLOT(renderTimer()));
-    q->setInterval(10);
-    q->start();
+    emit cameraChange(camera);
 }
-
-void MabiMeGLWidget::renderTimer() {
-    this->repaint();
-}
-
 
 void Perspective( GLdouble fov, GLdouble aspect, GLdouble zNear, GLdouble zFar )
 {
@@ -152,33 +140,85 @@ void MabiMeGLWidget::resizeGL(int width, int height) {
     glViewport(0, 0, width, height);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    Perspective(60, (GLfloat)width / (GLfloat)height, 1.0, 1000.0);
+    Perspective(60, (GLfloat)width / (GLfloat)height, 1.0, 4000.0);
     glMatrixMode(GL_MODELVIEW);
 }
 
 void MabiMeGLWidget::renderPMGMesh(PMG::Mesh mesh) {
     qglColor(Qt::red);
-    /* WORKS
-      glBegin(GL_QUADS);
-          glNormal3f(0,0,-1);
-          glVertex3f(-1,-1,0);
-          glVertex3f(-1,1,0);
-          glVertex3f(1,1,0);
-          glVertex3f(1,-1,0);
-
-      glEnd();
-      */
-    // doesnt ????
     glPushMatrix();
-    glRotatef(ti, 0.0, 4.0, 0.0);
-    for (int n = 0; n < mesh.faceVertexCount; n++) {
-//        qDebug() << mesh.cleanVertices[n] << mesh.cleanVertices[n + 1] << mesh.cleanVertices[n + 2];
+    QMatrix4x4 m;
+    int n = 0;
+    for (int y = 0; y < 4; y++) {
+        for (int x = 0; x < 4; x++) {
+            m.data()[n] = mesh.majorMatrix.data()[x * 4 + y];
+            n++;
+        }
     }
+    glRotatef(camera.rotation.pitch, 1.0, 0.0, 0.0);
+    glRotatef(camera.rotation.yaw, 0.0, 1.0, 0.0);
+    glMultMatrixf(m.data());
+
     glVertexPointer(3, GL_FLOAT, 0, mesh.cleanVertices);
     CheckError("glVertexPointer");
     glColorPointer(4, GL_FLOAT, 0, mesh.cleanColours);
     CheckError("glColorPointer");
-    glDrawArrays(GL_TRIANGLES, 0, mesh.faceVertexCount);
+    glNormalPointer(GL_FLOAT, 0, mesh.cleanNormals);
+    glDrawArrays(GL_TRIANGLES, 0, mesh.cleanVertexCount);
     CheckError("glDrawArrays");
     glPopMatrix();
+}
+
+void MabiMeGLWidget::mousePressEvent(QMouseEvent *event) {
+    if (isLeftDragging || isRightDragging) return;
+    if (event->buttons() == Qt::LeftButton) {
+        isLeftDragging = true;
+        drag = QPoint(event->x(), event->y());
+        oldCameraPos = QPoint(camera.x, camera.y);
+        return;
+    } else {
+        isLeftDragging = false;
+    }
+    if (event->buttons() == Qt::RightButton) {
+        isRightDragging = true;
+        drag = QPoint(event->x(), event->y());
+        oldCameraRotation = camera.rotation;
+        return;
+    } else {
+        isLeftDragging = false;
+    }
+}
+void MabiMeGLWidget::mouseReleaseEvent(QMouseEvent *event) {
+    if (event->buttons() != Qt::LeftButton) isLeftDragging = false;
+    if (event->buttons() != Qt::RightButton) isRightDragging = false;
+}
+void MabiMeGLWidget::mouseMoveEvent(QMouseEvent *event) {
+    if (isLeftDragging) {
+        camera.x = oldCameraPos.x() + ((event->x() - drag.x()) / 4);
+        camera.y = oldCameraPos.y() - ((event->y() - drag.y()) / 4);
+    }
+    if (isRightDragging) {
+        camera.rotation.pitch = oldCameraRotation.pitch + (event->y() - drag.y());
+        camera.rotation.yaw = oldCameraRotation.yaw + (event->x() - drag.x());
+        camera.rotation.pitch = camera.rotation.pitch % 360;
+        if (camera.rotation.pitch < 0) camera.rotation.pitch += 360;
+        camera.rotation.yaw = camera.rotation.yaw % 360;
+        if (camera.rotation.yaw < 0) camera.rotation.yaw += 360;
+    }
+    if (event->x() != drag.x() || event->y() != drag.y()) {
+        this->repaint();
+        emit cameraChange(camera);
+    }
+}
+
+void MabiMeGLWidget::wheelEvent(QWheelEvent *event) {
+    if (event->angleDelta().y() > 0) {
+        camera.zoom += 10;
+        this->repaint();
+        emit cameraChange(camera);
+    } else if(event->angleDelta().y() < 0) {
+        camera.zoom -= 10;
+        this->repaint();
+        emit cameraChange(camera);
+    }
 }
