@@ -90,20 +90,20 @@ bool PMGReader::LoadPMG(QByteArray stream) {
                         pos += length;
                         length = *(int*)&data[pos];
                         pos += 4;
-                        mesh->meshName = QString::fromLatin1(&data[pos], length);;
+                        mesh->meshName = QString::fromLatin1(&data[pos], length);
                         pos += length;
                         length = *(int*)&data[pos];
                         pos += 4;
-                        mesh->boneName2 = QString::fromLatin1(&data[pos], length);;
+                        mesh->boneName2 = QString::fromLatin1(&data[pos], length);
                         pos += length;
                         length = *(int*)&data[pos];
                         pos += 4;
-                        mesh->boneName3 = QString::fromLatin1(&data[pos], length);;
+                        mesh->boneName3 = QString::fromLatin1(&data[pos], length);
                         pos += length;
                         pos += 4;
                         length = *(int*)&data[pos];
                         pos += 4;
-                        mesh->colourMap = QString::fromLatin1(&data[pos], length);;
+                        mesh->colourMap = QString::fromLatin1(&data[pos], length);
                         pos += length;
                         length = *(int*)&data[pos];
                         pos += 4;
@@ -132,6 +132,7 @@ bool PMGReader::LoadPMG(QByteArray stream) {
                     mesh->cleanVertices = (GLfloat*)malloc(4 * (mesh->faceVertexCount + mesh->stripFaceVertexCount) * 3);
                     mesh->cleanColours = (GLfloat*)malloc(4 * (mesh->faceVertexCount + mesh->stripFaceVertexCount) * 4);
                     mesh->cleanNormals = (GLfloat*)malloc(4 * (mesh->faceVertexCount + mesh->stripFaceVertexCount) * 3);
+                    mesh->cleanTextureCoords = (GLfloat*)malloc(4 * (mesh->faceVertexCount + mesh->stripFaceVertexCount) * 2);
                     mesh->cleanVertexCount = mesh->faceVertexCount + mesh->stripFaceVertexCount;
                     for (int n = 0; n < mesh->faceVertexCount; n++) {
                         short off = *mesh->vertexList[n];
@@ -146,6 +147,8 @@ bool PMGReader::LoadPMG(QByteArray stream) {
                         mesh->cleanNormals[n * 3] = v->nx;
                         mesh->cleanNormals[n * 3 + 1] = v->ny;
                         mesh->cleanNormals[n * 3 + 2] = v->nz;
+                        mesh->cleanTextureCoords[n * 2] = v->u;
+                        mesh->cleanTextureCoords[n * 2 + 1] = v->v;
                     }
                     for (int n = 0; n < mesh->stripFaceVertexCount; n++) {
                         short off = *mesh->stripVertexList[n];
@@ -160,6 +163,8 @@ bool PMGReader::LoadPMG(QByteArray stream) {
                         mesh->cleanNormals[(n + mesh->faceVertexCount) * 3] = v->x;
                         mesh->cleanNormals[(n + mesh->faceVertexCount) * 3 + 1] = v->y;
                         mesh->cleanNormals[(n + mesh->faceVertexCount) * 3 + 2] = v->z;
+                        mesh->cleanTextureCoords[(n + mesh->faceVertexCount) * 2] = v->u;
+                        mesh->cleanTextureCoords[(n + mesh->faceVertexCount) * 2 + 1] = v->v;
                     }
 
                     for (int n = 0; n < mesh->skinCount; n++) {
