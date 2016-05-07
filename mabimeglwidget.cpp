@@ -54,8 +54,6 @@ void MabiMeGLWidget::paintGL() {
     for (int n = 0; n < meshes.count(); n++) {
         renderPMGMesh(*meshes[n]);
     }
-    qglColor(Qt::red);
-
 }
 
 void MabiMeGLWidget::initializeGL() {
@@ -135,7 +133,6 @@ void Perspective( GLdouble fov, GLdouble aspect, GLdouble zNear, GLdouble zFar )
 }
 
 void MabiMeGLWidget::resizeGL(int width, int height) {
-    // viewport things
     int side = qMin(width, height);
     glViewport(0, 0, width, height);
     glMatrixMode(GL_PROJECTION);
@@ -147,17 +144,9 @@ void MabiMeGLWidget::resizeGL(int width, int height) {
 void MabiMeGLWidget::renderPMGMesh(PMG::Mesh mesh) {
     qglColor(Qt::red);
     glPushMatrix();
-    QMatrix4x4 m;
-    int n = 0;
-    for (int y = 0; y < 4; y++) {
-        for (int x = 0; x < 4; x++) {
-            m.data()[n] = mesh.majorMatrix.data()[x * 4 + y];
-            n++;
-        }
-    }
     glRotatef(camera.rotation.pitch, 1.0, 0.0, 0.0);
     glRotatef(camera.rotation.yaw, 0.0, 1.0, 0.0);
-    glMultMatrixf(m.data());
+    glMultMatrixf(mesh.majorMatrix.data());
 
     glVertexPointer(3, GL_FLOAT, 0, mesh.cleanVertices);
     glColorPointer(4, GL_FLOAT, 0, mesh.cleanColours);
