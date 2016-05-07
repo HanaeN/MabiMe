@@ -29,9 +29,9 @@ namespace PMG {
     };
     struct Mesh {
         int size;
-        char boneName[32];
-        char meshName[128];
-        char textureName[32];
+        QString boneName, boneName2, boneName3, meshName, textureName, colourMap;
+        char parts2Length;
+        int count;
         QMatrix4x4 minorMatrix, majorMatrix;
         int partNo               = 0;
         int faceVertexCount      = 0;
@@ -45,6 +45,7 @@ namespace PMG {
         QList<Vertex*> vertices = QList<Vertex*>();
         GLfloat *cleanVertices;
         GLfloat *cleanColours;
+        GLfloat *cleanNormals;
         int cleanVertexCount;
         QList<Skin*> skins = QList<Skin*>();
     };
