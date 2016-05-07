@@ -3,7 +3,7 @@
 
 #include <QByteArray>
 #include <QtOpenGL>
-#include <GL/gl.h>;
+#include <GL/gl.h>
 
 namespace PMG {
     #pragma pack(1)
@@ -44,6 +44,8 @@ namespace PMG {
         QList<short*> stripVertexList = QList<short*>();
         QList<Vertex*> vertices = QList<Vertex*>();
         GLfloat *cleanVertices;
+        GLfloat *cleanColours;
+        int cleanVertexCount;
         QList<Skin*> skins = QList<Skin*>();
     };
 }
@@ -52,8 +54,8 @@ class PMGReader
 {
 private:
     PMG::FileHeader header;
-    QList<PMG::Mesh> meshes;
 public:
+    QList<PMG::Mesh*> meshes;
     PMGReader();
     bool LoadPMG(QByteArray stream);
 };

@@ -30,7 +30,11 @@ void MainWindow::startTimer() {
     if (p->OpenPackage("C:/Nexon/Library/mabinogi/appdata/package/183_full.pack")) {
         PMGReader r;
         r.LoadPMG(p->ExtractFile("gfx\\char\\human\\female\\hair\\female_hair01_t01.pmg"));
-/*
+        qDebug() << r.meshes.count();
+        ui->glSurface->meshes.append(r.meshes[0]);
+        ui->glSurface->repaint();
+
+        /*
         QFile f("D:\\Coding\\tmp.pmg");
         f.open(QFile::ReadWrite);
         f.write(file);
