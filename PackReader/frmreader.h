@@ -6,10 +6,6 @@ class FRMReader
 {
 public:
     FRMReader();
-
-signals:
-
-public slots:
 };
 
 #endif // FRMREADER_H
