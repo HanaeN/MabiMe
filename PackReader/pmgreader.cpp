@@ -44,20 +44,17 @@ bool PMGReader::LoadPMG(QByteArray stream) {
                 int meshCount = *(int*)&data[pos];
                 pos = header.headSize;
                 for (int i = 0; i < meshCount; i++) {
-                    char pmMagic[4];
-                    memcpy(&pmMagic, &data[pos], 4);
-                    char pmVersion[4];
-                    memcpy(&pmVersion, &data[pos + 4], 4);
-                    pos += 6;
-                    if (strcmp(pmMagic, "pm!\x00") != 0) {
+                    if (memcmp(&data[pos], "pm!\x00", 4) != 0) {
                         qDebug() << "pm type not supported";
                         return false;
                     }
+                    char pmVersion[2];
+                    memcpy(&pmVersion, &data[pos + 4], 2);
                     if ((pmVersion[0] != 1 && pmVersion[1] != 7) && (pmVersion[0] != 2 && pmVersion[1] != 0)) {
                         qDebug() << "pm version not supported:" << pmVersion;
                         return false;
                     }
-                    // read mesh
+                    pos += 6;
                     PMG::Mesh *mesh = new PMG::Mesh();
                     if (pmVersion[0] == 1 && pmVersion[1] == 7) {
                         mesh->size = *(int*)&data[pos];
