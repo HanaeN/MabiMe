@@ -160,39 +160,23 @@ bool PMGReader::LoadPMG(QByteArray stream) {
                     mesh->cleanNormals = (GLfloat*)malloc(4 * (mesh->faceVertexCount + mesh->stripFaceVertexCount) * 3);
                     mesh->cleanTextureCoords = (GLfloat*)malloc(4 * (mesh->faceVertexCount + mesh->stripFaceVertexCount) * 2);
                     mesh->cleanVertexCount = mesh->faceVertexCount + mesh->stripFaceVertexCount;
-                    for (int n = 0; n < mesh->faceVertexCount; n++) {
-                        short off = *mesh->vertexList[n];
+                    QVector2D uv;
+                    QVector3D xyz;
+                    QVector4D rgba;
+                    for (int n = 0; n < mesh->faceVertexCount + mesh->stripFaceVertexCount; n++) {
+                        short off;
+                        if (n < mesh->faceVertexCount) off = *mesh->vertexList[n];
+                            else off = *mesh->stripVertexList[n - mesh->faceVertexCount];
                         PMG::Vertex *v = mesh->vertices[off];
-                        mesh->cleanVertices[n * 3] = v->x;
-                        mesh->cleanVertices[n * 3 + 1] = v->y;
-                        mesh->cleanVertices[n * 3 + 2] = v->z;
-                        mesh->cleanColours[n * 4] = ((GLfloat)v->r / 255.0);
-                        mesh->cleanColours[n * 4 + 1] = ((GLfloat)v->g / 255.0);
-                        mesh->cleanColours[n * 4 + 2] = ((GLfloat)v->b / 255.0);
-                        mesh->cleanColours[n * 4 + 3] = ((GLfloat)v->a / 255.0);
-                        mesh->cleanNormals[n * 3] = v->nx;
-                        mesh->cleanNormals[n * 3 + 1] = v->ny;
-                        mesh->cleanNormals[n * 3 + 2] = v->nz;
-                        mesh->cleanTextureCoords[n * 2] = v->u;
-                        mesh->cleanTextureCoords[n * 2 + 1] = v->v;
+                        xyz = QVector3D(v->x, v->y, v->z);
+                        memcpy(&mesh->cleanVertices[n * 3], &xyz, 12);
+                        rgba = QVector4D((GLfloat)v->r / 255.0, (GLfloat)v->g / 255.0, (GLfloat)v->b / 255.0, (GLfloat)v->a / 255.0);
+                        memcpy(&mesh->cleanColours[n * 4], &rgba, 16);
+                        xyz = QVector3D(v->nx, v->ny, v->nz);
+                        memcpy(&mesh->cleanNormals[n * 3], &xyz, 12);
+                        uv = QVector2D(v->u, v->v);
+                        memcpy(&mesh->cleanTextureCoords[n * 2], &uv, 8);
                     }
-                    for (int n = 0; n < mesh->stripFaceVertexCount; n++) {
-                        short off = *mesh->stripVertexList[n];
-                        PMG::Vertex *v = mesh->vertices[off];
-                        mesh->cleanVertices[(n + mesh->faceVertexCount) * 3] = v->x;
-                        mesh->cleanVertices[(n + mesh->faceVertexCount) * 3 + 1] = v->y;
-                        mesh->cleanVertices[(n + mesh->faceVertexCount) * 3 + 2] = v->z;
-                        mesh->cleanColours[(n + mesh->faceVertexCount) * 4] = ((GLfloat)v->r / 255.0);
-                        mesh->cleanColours[(n + mesh->faceVertexCount) * 4 + 1] = ((GLfloat)v->g / 255.0);
-                        mesh->cleanColours[(n + mesh->faceVertexCount) * 4 + 2] = ((GLfloat)v->b / 255.0);
-                        mesh->cleanColours[(n + mesh->faceVertexCount) * 4 + 3] = ((GLfloat)v->a / 255.0);
-                        mesh->cleanNormals[(n + mesh->faceVertexCount) * 3] = v->x;
-                        mesh->cleanNormals[(n + mesh->faceVertexCount) * 3 + 1] = v->y;
-                        mesh->cleanNormals[(n + mesh->faceVertexCount) * 3 + 2] = v->z;
-                        mesh->cleanTextureCoords[(n + mesh->faceVertexCount) * 2] = v->u;
-                        mesh->cleanTextureCoords[(n + mesh->faceVertexCount) * 2 + 1] = v->v;
-                    }
-
                     for (int n = 0; n < mesh->skinCount; n++) {
                         PMG::Skin *s = new PMG::Skin();
                         memcpy(s, &data[pos], sizeof(PMG::Skin));
