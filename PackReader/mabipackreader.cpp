@@ -129,7 +129,7 @@ QByteArray MabiPackReader::ExtractFile(MabiPack::PackageEntry file) {
     }
     *(uint32_t*)&data[0] = qToBigEndian(file.info.DecompressedSize);
     QByteArray bytes(data, fileSize + (file.info.IsCompressed == 0 ? 0 : 4));
-    bytes = qUncompress(bytes);
+    if (file.info.IsCompressed != 0) bytes = qUncompress(bytes);
     free(data);
     return bytes;
 }
