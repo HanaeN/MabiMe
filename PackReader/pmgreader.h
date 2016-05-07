@@ -57,8 +57,11 @@ class PMGReader
 private:
     PMG::FileHeader header;
 public:
+    void FreePMG();
+    QStringList textures;
     QList<PMG::Mesh*> meshes;
     PMGReader();
+    ~PMGReader();
     bool LoadPMG(QByteArray stream);
 };
 

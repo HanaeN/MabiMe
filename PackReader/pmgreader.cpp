@@ -5,9 +5,35 @@
 PMGReader::PMGReader()
 {
     meshes = QList<PMG::Mesh*>();
+    textures = QStringList();
+}
+
+void PMGReader::FreePMG() {
+    for (int n = 0; n < meshes.count(); n++) {
+        PMG::Mesh *m = meshes[n];
+        free(m->cleanColours);
+        free(m->cleanNormals);
+        free(m->cleanTextureCoords);
+        free(m->cleanVertices);
+        for (int i = 0; i < m->skins.count(); i++) {
+            delete m->skins[i];
+        }
+        for (int i = 0; i < m->stripVertexList.count(); i++) {
+            delete m->stripVertexList[i];
+        }
+        for (int i = 0; i < m->vertexList.count(); i++) {
+            delete m->vertexList[i];
+        }
+        for (int i = 0; i < m->vertices.count(); i++) {
+            delete m->vertices[i];
+        }
+        delete m;
+    }
+    meshes.clear();
 }
 
 bool PMGReader::LoadPMG(QByteArray stream) {
+    FreePMG();
     char *data = stream.data();
     try {
         qDebug() << stream.length();
@@ -186,4 +212,8 @@ bool PMGReader::LoadPMG(QByteArray stream) {
         return false;
     }
     return true;
+}
+
+PMGReader::~PMGReader() {
+    this->FreePMG();
 }
