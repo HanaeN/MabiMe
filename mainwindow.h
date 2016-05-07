@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include "mabimeglwidget.h"
+#include "PackReader/pmgreader.h"
 
 namespace Ui {
 class MainWindow;
@@ -20,6 +21,7 @@ private slots:
     void startTimer();
     void cameraChange(CameraInfo camera);
 private:
+    PMGReader r;
     Ui::MainWindow *ui;
 };
 

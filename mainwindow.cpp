@@ -29,11 +29,16 @@ void MainWindow::show() {
 void MainWindow::startTimer() {
     MabiPackReader *p = new MabiPackReader();
     if (p->OpenPackage("C:/Nexon/Library/mabinogi/appdata/package/183_full.pack")) {
-        PMGReader r;
 //        QString PMGpath = "gfx\\char\\item\\mesh\\item_treasurechest01_i.pmg";
         QString PMGpath = "gfx\\char\\monster\\mesh\\tabhartas\\tabhartas_mesh.pmg";
         this->setWindowTitle("MM:" + PMGpath);
         r.LoadPMG(p->ExtractFile(PMGpath));
+//        qDebug() << p->FindTexture("hair01");
+        QImage img = QPixmap(p->ExtractFile("gfx\\image\\advanced_play_service3.dds")).toImage();
+        img.save("D:/Coding/tmp.png");
+
+
+
         for (int i = 0; i < r.meshes.count(); i++) {
             ui->glSurface->meshes.append(r.meshes[i]);
         }
