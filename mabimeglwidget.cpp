@@ -21,20 +21,26 @@ void MabiMeGLWidget::CheckError(QString error) {
 
 }
 
-
-void *GetAnyGLFuncAddress(const char *name)
-{
-  void *p = (void *)wglGetProcAddress(name);
-  if(p == 0 ||
-    (p == (void*)0x1) || (p == (void*)0x2) || (p == (void*)0x3) ||
-    (p == (void*)-1) )
-  {
-    HMODULE module = LoadLibraryA("opengl32.dll");
-    p = (void *)GetProcAddress(module, name);
-  }
-
-  return p;
-}
+#if defined(Q_OS_WIN)
+    void *GetAnyGLFuncAddress(const char *name)
+    {
+        void *p = (void *)wglGetProcAddress(name);
+        if(p == 0 ||
+            (p == (void*)0x1) || (p == (void*)0x2) || (p == (void*)0x3) ||
+            (p == (void*)-1) )
+        {
+            HMODULE module = LoadLibraryA("opengl32.dll");
+            p = (void *)GetProcAddress(module, name);
+        }
+        return p;
+    }
+#elif defined (Q_OS_LINUX)
+    void *GetAnyGLFuncAddress(const char *name)
+    {
+        void *p = (void *)glXGetProcAddress(name);
+        return p;
+    }
+#endif
 
 MabiMeGLWidget::MabiMeGLWidget(QWidget *parent) : QGLWidget(QGLFormat(QGL::SampleBuffers), parent)
 {
@@ -56,67 +62,37 @@ void MabiMeGLWidget::paintGL() {
 }
 
 void MabiMeGLWidget::initializeGL() {
-    #if defined(Q_OS_WIN)           // load extensions
-        glEnableVertexAttribArray   = (PFNGLENABLEVERTEXATTRIBARRAYPROC)GetAnyGLFuncAddress("glEnableVertexAttribArray");
-        glVertexAttribPointer       = (PFNGLVERTEXATTRIBPOINTERPROC)GetAnyGLFuncAddress("glVertexAttribPointer");
-        glGetAttribLocation         = (PFNGLGETATTRIBLOCATIONPROC)GetAnyGLFuncAddress("glGetAttribLocation");
-        glGetShaderInfoLog          = (PFNGLGETSHADERINFOLOGPROC)GetAnyGLFuncAddress("glGetShaderInfoLog");
-        glGetProgramInfoLog         = (PFNGLGETPROGRAMINFOLOGPROC)GetAnyGLFuncAddress("glGetProgramInfoLog");
-        glCreateProgram             = (PFNGLCREATEPROGRAMPROC)GetAnyGLFuncAddress("glCreateProgram");
-        glCreateShader              = (PFNGLCREATESHADERPROC)GetAnyGLFuncAddress("glCreateShader");
-        glShaderSource              = (PFNGLSHADERSOURCEPROC)GetAnyGLFuncAddress("glShaderSource");
-        glCompileShader             = (PFNGLCOMPILESHADERPROC)GetAnyGLFuncAddress("glCompileShader");
-        glAttachShader              = (PFNGLATTACHSHADERPROC)GetAnyGLFuncAddress("glAttachObjectARB");
-        glLinkProgram               = (PFNGLLINKPROGRAMPROC)GetAnyGLFuncAddress("glLinkProgram");
-        glUseProgram                = (PFNGLUSEPROGRAMPROC)GetAnyGLFuncAddress("glUseProgramObjectARB");
-        glGetUniformLocation        = (PFNGLGETUNIFORMLOCATIONPROC)GetAnyGLFuncAddress("glGetUniformLocation");
-        glUniform1i                 = (PFNGLUNIFORM1IPROC)GetAnyGLFuncAddress("glUniform1i");
-        glUniform1iv                = (PFNGLUNIFORM1IVPROC)GetAnyGLFuncAddress("glUniform1iv");
-        glUniform1f                 = (PFNGLUNIFORM1FPROC)GetAnyGLFuncAddress("glUniform1f");
-        glUniform2f                 = (PFNGLUNIFORM2FPROC)GetAnyGLFuncAddress("glUniform2f");
-        glUniform3f                 = (PFNGLUNIFORM3FPROC)GetAnyGLFuncAddress("glUniform3f");
-        glUniform4f                 = (PFNGLUNIFORM4FPROC)GetAnyGLFuncAddress("glUniform4f");
-        glUniform4fv                = (PFNGLUNIFORM4FVPROC)GetAnyGLFuncAddress("glUniform4fv");
-        glBindAttribLocation        = (PFNGLBINDATTRIBLOCATIONPROC)GetAnyGLFuncAddress("glBindAttribLocation");
-        glGenFramebuffers           = (PFNGLGENFRAMEBUFFERSEXTPROC)GetAnyGLFuncAddress("glGenFramebuffersEXT");
-        glBindFramebuffer           = (PFNGLBINDFRAMEBUFFEREXTPROC)GetAnyGLFuncAddress("glBindFramebufferEXT");
-        glFramebufferTexture2D      = (PFNGLFRAMEBUFFERTEXTURE2DPROC)GetAnyGLFuncAddress("glFramebufferTexture2D");
-        glBlendFuncSeparate         = (PFNGLBLENDFUNCSEPARATEPROC)GetAnyGLFuncAddress("glBlendFuncSeparate");
-        glBindBuffer                = (PFNGLBINDBUFFERPROC)GetAnyGLFuncAddress("glBindBuffer");
-        glBufferData                = (PFNGLBUFFERDATAPROC)GetAnyGLFuncAddress("glBufferData");
-        glGenBuffers                = (PFNGLGENBUFFERSPROC)GetAnyGLFuncAddress("glGenBuffers");
-        glActiveTexture             = (PFNGLACTIVETEXTUREPROC)GetAnyGLFuncAddress("glActiveTexture");
-    #elif defined(Q_OS_LINUX)
-        glEnableVertexAttribArray   = (PFNGLENABLEVERTEXATTRIBARRAYPROC)glXGetProcAddress("glEnableVertexAttribArray");
-        glVertexAttribPointer       = (PFNGLVERTEXATTRIBPOINTERPROC)glXGetProcAddress("glVertexAttribPointer");
-        glGetAttribLocation         = (PFNGLGETATTRIBLOCATIONPROC)glXGetProcAddress("glGetAttribLocation");
-        glGetShaderInfoLog          = (PFNGLGETSHADERINFOLOGPROC)glXGetProcAddress("glGetShaderInfoLog");
-        glGetProgramInfoLog         = (PFNGLGETPROGRAMINFOLOGPROC)glXGetProcAddress("glGetProgramInfoLog");
-        glCreateProgram             = (PFNGLCREATEPROGRAMPROC)glXGetProcAddress("glCreateProgram");
-        glCreateShader              = (PFNGLCREATESHADERPROC)glXGetProcAddress("glCreateShader");
-        glShaderSource              = (PFNGLSHADERSOURCEPROC)glXGetProcAddress("glShaderSource");
-        glCompileShader             = (PFNGLCOMPILESHADERPROC)glXGetProcAddress("glCompileShader");
-        glAttachShader              = (PFNGLATTACHSHADERPROC)glXGetProcAddress("glAttachObjectARB");
-        glLinkProgram               = (PFNGLLINKPROGRAMPROC)glXGetProcAddress("glLinkProgram");
-        glUseProgram                = (PFNGLUSEPROGRAMPROC)glXGetProcAddress("glUseProgramObjectARB");
-        glGetUniformLocation        = (PFNGLGETUNIFORMLOCATIONPROC)glXGetProcAddress("glGetUniformLocation");
-        glUniform1i                 = (PFNGLUNIFORM1IPROC)glXGetProcAddress("glUniform1i");
-        glUniform1iv                = (PFNGLUNIFORM1IVPROC)glXGetProcAddress("glUniform1iv");
-        glUniform1f                 = (PFNGLUNIFORM1FPROC)glXGetProcAddress("glUniform1f");
-        glUniform2f                 = (PFNGLUNIFORM2FPROC)glXGetProcAddress("glUniform2f");
-        glUniform3f                 = (PFNGLUNIFORM3FPROC)glXGetProcAddress("glUniform3f");
-        glUniform4f                 = (PFNGLUNIFORM4FPROC)glXGetProcAddress("glUniform4f");
-        glUniform4fv                = (PFNGLUNIFORM4FVPROC)glXGetProcAddress("glUniform4fv");
-        glBindAttribLocation        = (PFNGLBINDATTRIBLOCATIONPROC)glXGetProcAddress("glBindAttribLocation");
-        glGenFramebuffers           = (PFNGLGENFRAMEBUFFERSEXTPROC)glXGetProcAddress("glGenFramebuffersEXT");
-        glBindFramebuffer           = (PFNGLBINDFRAMEBUFFEREXTPROC)glXGetProcAddress("glBindFramebufferEXT");
-        glFramebufferTexture2D      = (PFNGLFRAMEBUFFERTEXTURE2DPROC)glXGetProcAddress("glFramebufferTexture2D");
-        glBlendFuncSeparate         = (PFNGLBLENDFUNCSEPARATEPROC)glXGetProcAddress("glBlendFuncSeparate");
-        glBindBuffer                = (PFNGLBINDBUFFERPROC)glXGetProcAddress("glBindBuffer");
-        glBufferData                = (PFNGLBUFFERDATAPROC)glXGetProcAddress("glBufferData");
-        glGenBuffers                = (PFNGLGENBUFFERSPROC)glXGetProcAddress("glGenBuffers");
-        glActiveTexture             = (PFNGLACTIVETEXTUREPROC)glXGetProcAddress("glActiveTexture");
-    #endif
+    // load extensions
+    glEnableVertexAttribArray   = (PFNGLENABLEVERTEXATTRIBARRAYPROC)GetAnyGLFuncAddress("glEnableVertexAttribArray");
+    glVertexAttribPointer       = (PFNGLVERTEXATTRIBPOINTERPROC)GetAnyGLFuncAddress("glVertexAttribPointer");
+    glGetAttribLocation         = (PFNGLGETATTRIBLOCATIONPROC)GetAnyGLFuncAddress("glGetAttribLocation");
+    glGetShaderInfoLog          = (PFNGLGETSHADERINFOLOGPROC)GetAnyGLFuncAddress("glGetShaderInfoLog");
+    glGetProgramInfoLog         = (PFNGLGETPROGRAMINFOLOGPROC)GetAnyGLFuncAddress("glGetProgramInfoLog");
+    glCreateProgram             = (PFNGLCREATEPROGRAMPROC)GetAnyGLFuncAddress("glCreateProgram");
+    glCreateShader              = (PFNGLCREATESHADERPROC)GetAnyGLFuncAddress("glCreateShader");
+    glShaderSource              = (PFNGLSHADERSOURCEPROC)GetAnyGLFuncAddress("glShaderSource");
+    glCompileShader             = (PFNGLCOMPILESHADERPROC)GetAnyGLFuncAddress("glCompileShader");
+    glAttachShader              = (PFNGLATTACHSHADERPROC)GetAnyGLFuncAddress("glAttachObjectARB");
+    glLinkProgram               = (PFNGLLINKPROGRAMPROC)GetAnyGLFuncAddress("glLinkProgram");
+    glUseProgram                = (PFNGLUSEPROGRAMPROC)GetAnyGLFuncAddress("glUseProgramObjectARB");
+    glGetUniformLocation        = (PFNGLGETUNIFORMLOCATIONPROC)GetAnyGLFuncAddress("glGetUniformLocation");
+    glUniform1i                 = (PFNGLUNIFORM1IPROC)GetAnyGLFuncAddress("glUniform1i");
+    glUniform1iv                = (PFNGLUNIFORM1IVPROC)GetAnyGLFuncAddress("glUniform1iv");
+    glUniform1f                 = (PFNGLUNIFORM1FPROC)GetAnyGLFuncAddress("glUniform1f");
+    glUniform2f                 = (PFNGLUNIFORM2FPROC)GetAnyGLFuncAddress("glUniform2f");
+    glUniform3f                 = (PFNGLUNIFORM3FPROC)GetAnyGLFuncAddress("glUniform3f");
+    glUniform4f                 = (PFNGLUNIFORM4FPROC)GetAnyGLFuncAddress("glUniform4f");
+    glUniform4fv                = (PFNGLUNIFORM4FVPROC)GetAnyGLFuncAddress("glUniform4fv");
+    glBindAttribLocation        = (PFNGLBINDATTRIBLOCATIONPROC)GetAnyGLFuncAddress("glBindAttribLocation");
+    glGenFramebuffers           = (PFNGLGENFRAMEBUFFERSEXTPROC)GetAnyGLFuncAddress("glGenFramebuffersEXT");
+    glBindFramebuffer           = (PFNGLBINDFRAMEBUFFEREXTPROC)GetAnyGLFuncAddress("glBindFramebufferEXT");
+    glFramebufferTexture2D      = (PFNGLFRAMEBUFFERTEXTURE2DPROC)GetAnyGLFuncAddress("glFramebufferTexture2D");
+    glBlendFuncSeparate         = (PFNGLBLENDFUNCSEPARATEPROC)GetAnyGLFuncAddress("glBlendFuncSeparate");
+    glBindBuffer                = (PFNGLBINDBUFFERPROC)GetAnyGLFuncAddress("glBindBuffer");
+    glBufferData                = (PFNGLBUFFERDATAPROC)GetAnyGLFuncAddress("glBufferData");
+    glGenBuffers                = (PFNGLGENBUFFERSPROC)GetAnyGLFuncAddress("glGenBuffers");
+    glActiveTexture             = (PFNGLACTIVETEXTUREPROC)GetAnyGLFuncAddress("glActiveTexture");
+
     qglClearColor(Qt::black);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
@@ -164,7 +140,7 @@ void MabiMeGLWidget::renderPMGMesh(PMG::Mesh mesh) {
     CheckError("glVertexPointer");
     glColorPointer(4, GL_FLOAT, 0, mesh.cleanColours);
     CheckError("glColorPointer");
-    glDrawArrays(GL_QUADS, 0, 1);
+    glDrawArrays(GL_QUADS, 0, 4);
     CheckError("glDrawArrays");
     glPopMatrix();
 }
