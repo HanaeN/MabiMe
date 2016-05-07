@@ -94,10 +94,10 @@ void MabiMeGLWidget::initializeGL() {
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
     glShadeModel(GL_SMOOTH);
+    glEnable(GL_TEXTURE_2D);
 
     glEnable (GL_BLEND);
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
 
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_COLOR_ARRAY);
@@ -160,12 +160,10 @@ void MabiMeGLWidget::renderPMGMesh(PMG::Mesh mesh) {
     glMultMatrixf(m.data());
 
     glVertexPointer(3, GL_FLOAT, 0, mesh.cleanVertices);
-    CheckError("glVertexPointer");
     glColorPointer(4, GL_FLOAT, 0, mesh.cleanColours);
-    CheckError("glColorPointer");
     glNormalPointer(GL_FLOAT, 0, mesh.cleanNormals);
+    glTexCoordPointer(2, GL_FLOAT, 0, mesh.cleanTextureCoords);
     glDrawArrays(GL_TRIANGLES, 0, mesh.cleanVertexCount);
-    CheckError("glDrawArrays");
     glPopMatrix();
 }
 
