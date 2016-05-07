@@ -30,6 +30,7 @@ void PMGReader::FreePMG() {
         delete m;
     }
     meshes.clear();
+    textures.clear();
 }
 
 bool PMGReader::LoadPMG(QByteArray stream) {
@@ -152,6 +153,7 @@ bool PMGReader::LoadPMG(QByteArray stream) {
                         pos += sizeof(PMG::Vertex);
                         mesh->vertices.append(v);
                     }
+                    if (!textures.contains(mesh->textureName)) textures.append(mesh->textureName);
                     mesh->cleanVertices = (GLfloat*)malloc(4 * (mesh->faceVertexCount + mesh->stripFaceVertexCount) * 3);
                     mesh->cleanColours = (GLfloat*)malloc(4 * (mesh->faceVertexCount + mesh->stripFaceVertexCount) * 4);
                     mesh->cleanNormals = (GLfloat*)malloc(4 * (mesh->faceVertexCount + mesh->stripFaceVertexCount) * 3);

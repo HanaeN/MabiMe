@@ -33,7 +33,8 @@ void MainWindow::startTimer() {
         QString PMGpath = "gfx\\char\\monster\\mesh\\tabhartas\\tabhartas_mesh.pmg";
         this->setWindowTitle("MM:" + PMGpath);
         r.LoadPMG(p->ExtractFile(PMGpath));
-//        qDebug() << p->FindTexture("hair01");
+        qDebug() << r.textures;
+        qDebug() << p->FindTexture("hair01") << "texture";
         QImage img = QPixmap(p->ExtractFile("gfx\\image\\advanced_play_service3.dds")).toImage();
         img.save("D:/Coding/tmp.png");
 
