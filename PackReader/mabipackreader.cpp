@@ -145,7 +145,7 @@ QByteArray MabiPackReader::ExtractFile(QString filename) {
 
 QString MabiPackReader::FindTexture(QString texture) {
     for (int n = 0; n < packageEntries.count(); n++) {
-        if (packageEntries[n]->name.startsWith("gfx\\image") || packageEntries[n]->name.startsWith("gfx\\gui")) {
+        if (packageEntries[n]->name.endsWith(".dds")) {
             if (packageEntries[n]->name.split("\\", QString::SkipEmptyParts).last() == texture + ".dds") {
                 return packageEntries[n]->name;
             }
