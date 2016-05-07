@@ -51,6 +51,7 @@ protected:
 signals:
 
 public slots:
+    void renderTimer();
 };
 
 #endif // MABIMEGLWIDGET_H

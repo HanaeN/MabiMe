@@ -81,22 +81,38 @@ bool PMGReader::LoadPMG(QByteArray stream) {
                             pos += 2;
                             mesh->stripVertexList.append(v);
                         }
-                        mesh->cleanVertices = (GLfloat*)malloc(4 * mesh->vertexCount * 3);
-                        mesh->cleanColours = (GLfloat*)malloc(4 * mesh->vertexCount * 4);
-                        mesh->cleanVertexCount = mesh->vertexCount;
+//                        mesh->cleanVertices = (GLfloat*)malloc(4 * mesh->vertexCount * 3);
+//                        mesh->cleanColours = (GLfloat*)malloc(4 * mesh->vertexCount * 4);
+//                        mesh->cleanVertexCount = mesh->vertexCount;
                         for (int i = 0; i < mesh->vertexCount; i++) {
                             PMG::Vertex *v = new PMG::Vertex();
                             memcpy(v, &data[pos], sizeof(PMG::Vertex));
                             pos += sizeof(PMG::Vertex);
                             mesh->vertices.append(v);
+//                            mesh->cleanVertices[i * 3] = v->x;
+//                            mesh->cleanVertices[i * 3 + 1] = v->y;
+//                            mesh->cleanVertices[i * 3 + 2] = v->z;
+//                            mesh->cleanColours[i * 3] = 1;
+//                            mesh->cleanColours[i * 3 + 1] = 1;
+//                            mesh->cleanColours[i * 3 + 2] = 1;
+//                            mesh->cleanColours[i * 3 + 3] = 1;
+                        }
+
+                        mesh->cleanVertices = (GLfloat*)malloc(4 * mesh->faceVertexCount * 3);
+                        mesh->cleanColours = (GLfloat*)malloc(4 * mesh->faceVertexCount * 4);
+                        mesh->cleanVertexCount = mesh->faceVertexCount;
+                        for (int i = 0; i < mesh->faceVertexCount; i++) {
+                            short off = *mesh->vertexList[i];
+                            PMG::Vertex *v = mesh->vertices[off];
                             mesh->cleanVertices[i * 3] = v->x;
                             mesh->cleanVertices[i * 3 + 1] = v->y;
                             mesh->cleanVertices[i * 3 + 2] = v->z;
-                            mesh->cleanColours[i * 3] = 1;
-                            mesh->cleanColours[i * 3 + 1] = 1;
-                            mesh->cleanColours[i * 3 + 2] = 1;
-                            mesh->cleanColours[i * 3 + 3] = 1;
+                            mesh->cleanColours[i * 4] = ((GLfloat)v->r / 255.0);
+                            mesh->cleanColours[i * 4 + 1] = ((GLfloat)v->g / 255.0);
+                            mesh->cleanColours[i * 4 + 2] = ((GLfloat)v->b / 255.0);
+                            mesh->cleanColours[i * 4 + 3] = ((GLfloat)v->a / 255.0);
                         }
+
                         for (int i = 0; i < mesh->skinCount; i++) {
                             PMG::Skin *s = new PMG::Skin();
                             memcpy(s, &data[pos], sizeof(PMG::Skin));

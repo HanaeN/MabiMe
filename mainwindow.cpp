@@ -29,7 +29,9 @@ void MainWindow::startTimer() {
     MabiPackReader *p = new MabiPackReader();
     if (p->OpenPackage("C:/Nexon/Library/mabinogi/appdata/package/183_full.pack")) {
         PMGReader r;
-        r.LoadPMG(p->ExtractFile("gfx\\char\\human\\female\\hair\\female_hair01_t01.pmg"));
+//        r.LoadPMG(p->ExtractFile("gfx\\char\\human\\female\\hair\\female_hair01_t01.pmg"));
+        r.LoadPMG(p->ExtractFile("gfx\\char\\human\\female\\hair\\female_hair07_t07.pmg"));
+//        r.LoadPMG(p->ExtractFile("gfx\\char\\item\\mesh\\item_woodplate01_i.pmg"));
         qDebug() << r.meshes.count();
         ui->glSurface->meshes.append(r.meshes[0]);
         ui->glSurface->repaint();

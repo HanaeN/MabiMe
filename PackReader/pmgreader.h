@@ -18,7 +18,7 @@ namespace PMG {
     struct Vertex {
         float x, y, z;
         float nx, ny, nz;
-        unsigned int rgba;
+        unsigned char r,g,b,a;
         float u,v;
     };
     struct Skin {

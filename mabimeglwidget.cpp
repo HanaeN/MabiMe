@@ -3,6 +3,7 @@
 #include <QtOpenGL>
 #include <QDebug>
 #include "GL/gl.h"
+#include "GL/glu.h"
 
 void MabiMeGLWidget::CheckError(QString error) {
     QString finalError = "";
@@ -49,11 +50,12 @@ MabiMeGLWidget::MabiMeGLWidget(QWidget *parent) : QGLWidget(QGLFormat(QGL::Sampl
 void MabiMeGLWidget::paintGL() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
-    ti += 0.1;
+//    glTranslatef(5.0, -32, 10);
+    glTranslatef(0, 8, -50);
+    ti += 0.4;
     for (int n = 0; n < meshes.count(); n++) {
         renderPMGMesh(*meshes[n]);
     }
-    glTranslatef(0.0, 0.0, 0.0);
     //glRotatef(ti, 1.0, 0.0, 0.0);
     //glRotatef(ti, 0.0, 1.0, 0.0);
     //glRotatef(0, 0.0, 0.0, 1.0);
@@ -97,15 +99,60 @@ void MabiMeGLWidget::initializeGL() {
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
     glShadeModel(GL_SMOOTH);
+
+    glEnable (GL_BLEND);
+    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+
+    glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_COLOR_ARRAY);
+
+
+//    glEnable(GL_LIGHTING);
+//      glEnable(GL_LIGHT0);
+
+//      static GLfloat lightPosition[4] = { 0, 0, 10, 1.0 };
+//      glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
+
+    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    QTimer *q = new QTimer(this);
+    connect(q, SIGNAL(timeout()), SLOT(renderTimer()));
+    q->setInterval(10);
+    q->start();
+}
+
+void MabiMeGLWidget::renderTimer() {
+    this->repaint();
+}
+
+
+void Perspective( GLdouble fov, GLdouble aspect, GLdouble zNear, GLdouble zFar )
+{
+    GLdouble m[16] = { 1,0,0,0,0,1,0,0,0,0,1,-1,0,0,0,0 };
+    double sine, cotangent, deltaZ;
+    double radians = fov / 2 * 3.14159265358979323846 / 180;
+
+    deltaZ = zFar - zNear;
+    sine = sin(radians);
+    if ((deltaZ == 0) || (sine == 0) || (aspect == 0)) {
+    return;
+    }
+    cotangent = cos(radians) / sine;
+
+    m[0] = cotangent / aspect;
+    m[5] = cotangent;
+    m[10] = -(zFar + zNear) / deltaZ;
+    m[14] = -2 * zNear * zFar / deltaZ;
+    glMultMatrixd(&m[0]);
 }
 
 void MabiMeGLWidget::resizeGL(int width, int height) {
     // viewport things
     int side = qMin(width, height);
-    glViewport((width - side) / 2, (height - side) / 2, side, side);
+    glViewport(0, 0, width, height);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
+    Perspective(60, (GLfloat)width / (GLfloat)height, 1.0, 1000.0);
     glMatrixMode(GL_MODELVIEW);
 }
 
@@ -123,24 +170,15 @@ void MabiMeGLWidget::renderPMGMesh(PMG::Mesh mesh) {
       */
     // doesnt ????
     glPushMatrix();
-    qDebug() << mesh.cleanVertices[0] << mesh.cleanVertices[1] << mesh.cleanVertices[2];
-    mesh.cleanVertices[0] = -1;
-    mesh.cleanVertices[1] = -1;
-    mesh.cleanVertices[2] = 0;
-    mesh.cleanVertices[3] = -1;
-    mesh.cleanVertices[4] = 1;
-    mesh.cleanVertices[5] = 0;
-    mesh.cleanVertices[6] = 1;
-    mesh.cleanVertices[7] = 1;
-    mesh.cleanVertices[8] = 0;
-    mesh.cleanVertices[9] = 1;
-    mesh.cleanVertices[10] = -1;
-    mesh.cleanVertices[11] = 0;
+    glRotatef(ti, 0.0, 4.0, 0.0);
+    for (int n = 0; n < mesh.faceVertexCount; n++) {
+//        qDebug() << mesh.cleanVertices[n] << mesh.cleanVertices[n + 1] << mesh.cleanVertices[n + 2];
+    }
     glVertexPointer(3, GL_FLOAT, 0, mesh.cleanVertices);
     CheckError("glVertexPointer");
     glColorPointer(4, GL_FLOAT, 0, mesh.cleanColours);
     CheckError("glColorPointer");
-    glDrawArrays(GL_QUADS, 0, 4);
+    glDrawArrays(GL_TRIANGLES, 0, mesh.faceVertexCount);
     CheckError("glDrawArrays");
     glPopMatrix();
 }
