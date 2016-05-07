@@ -66,6 +66,7 @@ private:
 public:
     QByteArray ExtractFile(QString filename);
     bool OpenPackage(QString filename);
+    QString FindTexture(QString texture);
     void ClosePackage();
     MabiPackReader();
 

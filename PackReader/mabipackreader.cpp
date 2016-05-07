@@ -14,7 +14,7 @@ bool MabiPackReader::OpenPackage(QString filename) {
     packFile = new QFile(filename);
     if (packFile->exists()) {
         if (packFile->open(QIODevice::ReadOnly)) {
-            qDebug() << "Successefully opened " + filename + " for reading.";
+            qDebug() << "Successfully opened " + filename + " for reading.";
             fileOpen = true;
             io.setDevice(packFile);
             if (ReadFileHeader()) {
@@ -141,4 +141,15 @@ QByteArray MabiPackReader::ExtractFile(QString filename) {
         }
     }
     return QByteArray();
+}
+
+QString MabiPackReader::FindTexture(QString texture) {
+    for (int n = 0; n < packageEntries.count(); n++) {
+        if (packageEntries[n]->name.startsWith("gfx\\image") || packageEntries[n]->name.startsWith("gfx\\gui")) {
+            if (packageEntries[n]->name.split("\\", QString::SkipEmptyParts).last() == texture + ".dds") {
+                return packageEntries[n]->name;
+            }
+        }
+    }
+    return "";
 }
