@@ -136,9 +136,7 @@ QByteArray MabiPackReader::ExtractFile(MabiPack::PackageEntry file) {
 
 QByteArray MabiPackReader::ExtractFile(QString filename) {
     for (int i = 0; i < packageEntries.count(); i++) {
-        if (packageEntries[i]->name == filename) {
-            return ExtractFile(*packageEntries.at(i));
-        }
+        if (packageEntries[i]->name == filename) return ExtractFile(*packageEntries.at(i));
     }
     return QByteArray();
 }
