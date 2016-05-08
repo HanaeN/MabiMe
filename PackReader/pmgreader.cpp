@@ -183,16 +183,19 @@ bool PMGReader::LoadPMG(QByteArray stream) {
                         mesh->skins.append(s);
                     }
 
-                    QMatrix4x4 m; // swap the matrix for openGL reading
-                    int index = 0;
-                    for (int yy = 0; yy < 4; yy++) {
-                        for (int xx = 0; xx < 4; xx++) {
-                            m.data()[index] = mesh->majorMatrix.data()[xx * 4 + yy];
-                            index++;
-                        }
-                    }
+                    float d[16];
+                    memcpy(d, mesh->majorMatrix.data(), 64);
+                    QMatrix4x4 m(d[0],  d[1],  d[2],  d[3],
+                                 d[4],  d[5],  d[6],  d[7],
+                                 d[8],  d[9],  d[10], d[11],
+                                 d[12], d[13], d[14], d[15]);
                     memcpy(mesh->majorMatrix.data(), m.data(), 64);
-
+                    memcpy(d, mesh->minorMatrix.data(), 64);
+                    m = QMatrix4x4(d[0],  d[1],  d[2],  d[3],
+                                   d[4],  d[5],  d[6],  d[7],
+                                   d[8],  d[9],  d[10], d[11],
+                                   d[12], d[13], d[14], d[15]);
+                    memcpy(mesh->minorMatrix.data(), m.data(), 64);
                     meshes.append(mesh);
                 }
                 return true;
