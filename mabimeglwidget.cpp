@@ -83,7 +83,6 @@ void MabiMeGLWidget::paintGL() {
                     if (b == nullptr) break;
                 }
             }
-            if (t == nullptr) qDebug() << "null" << o->meshes[n]->textureName;
             if (bl.count() > 0) {
                 renderPMGMesh(*o->meshes[n], &bl, t);
             } else {
