@@ -15,18 +15,29 @@ struct CameraInfo {
     float x = 0, y = 40, zoom = -170;
     Rotation rotation;
 };
+struct PMGTexture {
+    QString name;
+    QImage img;
+    GLuint texture = -1;
+};
+
+struct PMGObject {
+    QList<PMG::Mesh*> meshes;
+    QList<PMGTexture*> textures;
+};
 
 class MabiMeGLWidget : public QGLWidget
 {
     Q_OBJECT
 public:
     explicit MabiMeGLWidget(QWidget *parent = 0);
-    QList<PMG::Mesh*> meshes = QList<PMG::Mesh*>();
     CameraInfo getCameraInfo();
+    bool addPMG(PMGObject *pmg);
 private:
     CameraInfo camera;
     QPoint drag;
     QPointF oldCameraPos = QPointF(0, 40);
+    QList<PMGObject*> objects = QList<PMGObject*>();
     Rotation oldCameraRotation;
     bool isLeftDragging = false;
     bool isRightDragging = false;
@@ -34,8 +45,10 @@ private:
     void mousePressEvent(QMouseEvent* event);
     void mouseReleaseEvent(QMouseEvent* event);
     void mouseMoveEvent(QMouseEvent* event);
-    void CheckError(QString error);
+    void checkError(QString error);
+    bool loadTexture(PMGTexture *t, bool useFiltering);
     float ti = 0 ;
+    PFNGLCLIENTACTIVETEXTUREPROC     glClientActiveTexture;
     PFNGLCREATEPROGRAMPROC           glCreateProgram;
     PFNGLCREATESHADERPROC            glCreateShader;
     PFNGLSHADERSOURCEPROC            glShaderSource;
@@ -69,7 +82,7 @@ protected:
     void initializeGL();
     void paintGL();
     void resizeGL(int width, int height);
-    void renderPMGMesh(PMG::Mesh mesh);
+    void renderPMGMesh(PMG::Mesh mesh, PMGTexture *t = nullptr);
 signals:
     void cameraChange(CameraInfo camera);
 public slots:

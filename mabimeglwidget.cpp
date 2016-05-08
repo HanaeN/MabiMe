@@ -5,7 +5,7 @@
 #include "GL/gl.h"
 #include "GL/glu.h"
 
-void MabiMeGLWidget::CheckError(QString error) {
+void MabiMeGLWidget::checkError(QString error) {
     QString finalError = "";
     GLenum a = glGetError();
     if (a == GL_INVALID_ENUM) finalError = "GL_INVALID_ENUM";
@@ -51,8 +51,19 @@ void MabiMeGLWidget::paintGL() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
     glTranslatef(camera.x, camera.y, camera.zoom);
-    for (int n = 0; n < meshes.count(); n++) {
-        renderPMGMesh(*meshes[n]);
+    for (int i = 0; i < objects.count(); i++) {
+        PMGObject *o = objects[i];
+        for (int n = 0; n < o->meshes.count(); n++) {
+            PMGTexture *t = nullptr;
+            for (int i = 0; i < o->textures.count(); i++) {
+                if (o->textures[i]->name == o->meshes[n]->textureName) {
+                    t = o->textures[i];
+                    break;
+                }
+            }
+            if (t == nullptr) qDebug() << "null" << o->meshes[n]->textureName;
+            renderPMGMesh(*o->meshes[n], t);
+        }
     }
 }
 
@@ -87,19 +98,22 @@ void MabiMeGLWidget::initializeGL() {
     glBufferData                = (PFNGLBUFFERDATAPROC)GetAnyGLFuncAddress("glBufferData");
     glGenBuffers                = (PFNGLGENBUFFERSPROC)GetAnyGLFuncAddress("glGenBuffers");
     glActiveTexture             = (PFNGLACTIVETEXTUREPROC)GetAnyGLFuncAddress("glActiveTexture");
+    glClientActiveTexture       = (PFNGLCLIENTACTIVETEXTUREPROC)GetAnyGLFuncAddress("glClientActiveTexture");
 
-    qglClearColor(Qt::black);
+    qglClearColor(QColor(200, 200, 200));
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
     glShadeModel(GL_SMOOTH);
     glEnable(GL_TEXTURE_2D);
-
     glEnable (GL_BLEND);
-    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_ALPHA_TEST);
+    glAlphaFunc(GL_GEQUAL, 1);
 
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_COLOR_ARRAY);
     glEnableClientState(GL_NORMAL_ARRAY);
+    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
 
     glEnable(GL_LIGHTING);
@@ -141,7 +155,7 @@ void MabiMeGLWidget::resizeGL(int width, int height) {
     glMatrixMode(GL_MODELVIEW);
 }
 
-void MabiMeGLWidget::renderPMGMesh(PMG::Mesh mesh) {
+void MabiMeGLWidget::renderPMGMesh(PMG::Mesh mesh, PMGTexture *t) {
     qglColor(Qt::red);
     glPushMatrix();
     glRotatef(camera.rotation.pitch, 1.0, 0.0, 0.0);
@@ -152,6 +166,15 @@ void MabiMeGLWidget::renderPMGMesh(PMG::Mesh mesh) {
     glColorPointer(4, GL_FLOAT, 0, mesh.cleanColours);
     glNormalPointer(GL_FLOAT, 0, mesh.cleanNormals);
     glTexCoordPointer(2, GL_FLOAT, 0, mesh.cleanTextureCoords);
+    glActiveTexture(GL_TEXTURE0);
+    if (t != NULL) {
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+        glBindTexture(GL_TEXTURE_2D, t->texture);
+    } else {
+        glBindTexture(GL_TEXTURE_2D, 0);
+    }
+    checkError("glBindTexture");
     glDrawArrays(GL_TRIANGLES, 0, mesh.cleanVertexCount);
     glPopMatrix();
 }
@@ -208,4 +231,28 @@ void MabiMeGLWidget::wheelEvent(QWheelEvent *event) {
         this->repaint();
         emit cameraChange(camera);
     }
+}
+
+bool MabiMeGLWidget::loadTexture(PMGTexture *t, bool useFiltering) {
+    glGenTextures(1, &t->texture);
+    glBindTexture(GL_TEXTURE_2D, t->texture);
+    glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    if (!useFiltering) {
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    } else {
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    }
+    glTexImage2D(GL_TEXTURE_2D, 0, 4, t->img.width(), t->img.height(), 0, GL_BGRA, GL_UNSIGNED_BYTE, t->img.bits());
+    return true;
+}
+
+bool MabiMeGLWidget::addPMG(PMGObject *pmg) {
+    for (int i = 0; i < pmg->textures.count(); i++) {
+        loadTexture(pmg->textures[i], true);
+    }
+    objects.append(pmg);
 }
