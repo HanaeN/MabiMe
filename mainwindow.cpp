@@ -30,15 +30,16 @@ void MainWindow::startTimer() {
     MabiPackReader *p = new MabiPackReader();
     if (p->OpenPackage("C:/Nexon/Library/mabinogi/appdata/package/183_full.pack")) {
 //        QString PMGpath = "gfx\\char\\item\\mesh\\item_treasurechest01_i";
-        QString PMGpath = "gfx\\char\\monster\\mesh\\tabhartas\\tabhartas_mesh";
-//        QString PMGpath = "gfx\\char\\chapter4\\elf\\female\\wear\\elf_female_c4_anarugacha02_bss";
+//        QString PMGpath = "gfx\\char\\monster\\mesh\\tabhartas\\tabhartas";
+        QString PMGpath = "gfx\\char\\chapter4\\monster\\mesh\\ogre\\c4_ogre01";
         this->setWindowTitle("MM:" + PMGpath);
 
         // load a PMG
-        r.LoadPMG(p->ExtractFile(PMGpath + ".pmg"));
-        f.LoadFRM(p->ExtractFile(PMGpath + ".frm"));
+        r.LoadPMG(p->ExtractFile(PMGpath + "_boss_mesh.pmg"));
+        f.LoadFRM(p->ExtractFile(PMGpath + "_framework.frm"));
 
         PMGObject *o = new PMGObject();
+        o->bones = f.bones;
         for (int i = 0; i < r.textures.count(); i++) {
             PMGTexture *t = new PMGTexture;
             t->name = r.textures[i];
