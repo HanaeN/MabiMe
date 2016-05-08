@@ -29,30 +29,28 @@ void MainWindow::show() {
 void MainWindow::startTimer() {
     MabiPackReader *p = new MabiPackReader();
     if (p->OpenPackage("C:/Nexon/Library/mabinogi/appdata/package/183_full.pack")) {
-//        QString PMGpath = "gfx\\char\\item\\mesh\\item_treasurechest01_i.pmg";
-        QString PMGpath = "gfx\\char\\monster\\mesh\\tabhartas\\tabhartas_mesh.pmg";
+//        QString PMGpath = "gfx\\char\\item\\mesh\\item_treasurechest01_i";
+        QString PMGpath = "gfx\\char\\monster\\mesh\\tabhartas\\tabhartas_mesh";
+//        QString PMGpath = "gfx\\char\\chapter4\\elf\\female\\wear\\elf_female_c4_anarugacha02_bss";
         this->setWindowTitle("MM:" + PMGpath);
-        r.LoadPMG(p->ExtractFile(PMGpath));
-        qDebug() << r.textures;
-        qDebug() << p->FindTexture("hair01") << "texture";
-        QImage img = QPixmap(p->ExtractFile("gfx\\image\\advanced_play_service3.dds")).toImage();
-        img.save("D:/Coding/tmp.png");
 
+        // load a PMG
+        r.LoadPMG(p->ExtractFile(PMGpath + ".pmg"));
+        f.LoadFRM(p->ExtractFile(PMGpath + ".frm"));
 
-
-        for (int i = 0; i < r.meshes.count(); i++) {
-            ui->glSurface->meshes.append(r.meshes[i]);
+        PMGObject *o = new PMGObject();
+        for (int i = 0; i < r.textures.count(); i++) {
+            PMGTexture *t = new PMGTexture;
+            t->name = r.textures[i];
+            QPixmap pix;
+            pix.loadFromData(p->ExtractFile(p->FindTexture(t->name)));
+            t->img = pix.toImage();
+            o->textures.append(t);
         }
+        o->meshes = r.meshes;
+        ui->glSurface->addPMG(o);
         ui->lMeshes->setText("Meshes: " + QString::number(r.meshes.count()));
         ui->glSurface->repaint();
-
-        /*
-        QFile f("D:\\Coding\\tmp.pmg");
-        f.open(QFile::ReadWrite);
-        f.write(file);
-        f.close();
-*/
-        // opened so do  things
         p->ClosePackage();
     }
     //this->close();

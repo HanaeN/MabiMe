@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include "mabimeglwidget.h"
 #include "PackReader/pmgreader.h"
+#include "PackReader/frmreader.h"
 
 namespace Ui {
 class MainWindow;
@@ -22,6 +23,7 @@ private slots:
     void cameraChange(CameraInfo camera);
 private:
     PMGReader r;
+    FRMReader f;
     Ui::MainWindow *ui;
 };
 
