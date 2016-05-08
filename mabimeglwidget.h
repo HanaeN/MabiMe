@@ -6,6 +6,7 @@
 #include <QPoint>
 
 #include "PackReader/pmgreader.h"
+#include "PackReader/frmreader.h"
 
 struct Rotation {
     int pitch = 0, yaw = 0, roll = 0;
@@ -24,6 +25,7 @@ struct PMGTexture {
 struct PMGObject {
     QList<PMG::Mesh*> meshes;
     QList<PMGTexture*> textures;
+    QList<FRM::Bone*> bones;
 };
 
 class MabiMeGLWidget : public QGLWidget
@@ -82,7 +84,7 @@ protected:
     void initializeGL();
     void paintGL();
     void resizeGL(int width, int height);
-    void renderPMGMesh(PMG::Mesh mesh, PMGTexture *t = nullptr);
+    void renderPMGMesh(PMG::Mesh mesh, QList<FRM::Bone*> *bones = nullptr, PMGTexture *t = nullptr);
 signals:
     void cameraChange(CameraInfo camera);
 public slots:

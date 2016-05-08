@@ -55,14 +55,40 @@ void MabiMeGLWidget::paintGL() {
         PMGObject *o = objects[i];
         for (int n = 0; n < o->meshes.count(); n++) {
             PMGTexture *t = nullptr;
+            FRM::Bone *b = nullptr;
             for (int i = 0; i < o->textures.count(); i++) {
                 if (o->textures[i]->name == o->meshes[n]->textureName) {
                     t = o->textures[i];
                     break;
                 }
             }
+            for (int i = 0; i < o->bones.count(); i++) {
+                if (o->bones[i]->name == o->meshes[n]->boneName) {
+                    b = o->bones[i];
+                    break;
+                }
+            }
+            QList<FRM::Bone*> bl = QList<FRM::Bone*>();
+            if (b != nullptr) {
+                while (true) {
+                    bl.insert(0, b);
+                    char parent = b->parentID;
+                    b = nullptr;
+                    for (int i = 0; i < o->bones.count(); i++) {
+                        if (o->bones[i]->boneID == parent) {
+                            b = o->bones[i];
+                            break;
+                        }
+                    }
+                    if (b == nullptr) break;
+                }
+            }
             if (t == nullptr) qDebug() << "null" << o->meshes[n]->textureName;
-            renderPMGMesh(*o->meshes[n], t);
+            if (bl.count() > 0) {
+                renderPMGMesh(*o->meshes[n], &bl, t);
+            } else {
+                renderPMGMesh(*o->meshes[n], nullptr, t);
+            }
         }
     }
 }
@@ -155,19 +181,25 @@ void MabiMeGLWidget::resizeGL(int width, int height) {
     glMatrixMode(GL_MODELVIEW);
 }
 
-void MabiMeGLWidget::renderPMGMesh(PMG::Mesh mesh, PMGTexture *t) {
+void MabiMeGLWidget::renderPMGMesh(PMG::Mesh mesh, QList<FRM::Bone *> *bones, PMGTexture *t) {
     qglColor(Qt::red);
     glPushMatrix();
     glRotatef(camera.rotation.pitch, 1.0, 0.0, 0.0);
     glRotatef(camera.rotation.yaw, 0.0, 1.0, 0.0);
-    glMultMatrixf(mesh.majorMatrix.data());
-
+    if (bones != nullptr) { // if bones, multiply the bone parents together
+        for (int i = 0; i < bones->count(); i++) {
+            glMultMatrixf(bones->at(i)->link);
+        }
+        glMultMatrixf(mesh.minorMatrix.data());
+    } else {
+        glMultMatrixf(mesh.majorMatrix.data());
+    }
     glVertexPointer(3, GL_FLOAT, 0, mesh.cleanVertices);
     glColorPointer(4, GL_FLOAT, 0, mesh.cleanColours);
     glNormalPointer(GL_FLOAT, 0, mesh.cleanNormals);
     glTexCoordPointer(2, GL_FLOAT, 0, mesh.cleanTextureCoords);
     glActiveTexture(GL_TEXTURE0);
-    if (t != NULL) {
+    if (t != nullptr) {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
         glBindTexture(GL_TEXTURE_2D, t->texture);
