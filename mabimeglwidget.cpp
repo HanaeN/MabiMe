@@ -222,25 +222,26 @@ void MabiMeGLWidget::renderPMGMesh(PMG::Mesh mesh, QList<FRM::Bone *> *bones, PM
     glPushMatrix();
     glRotatef(camera.rotation.pitch, 1.0, 0.0, 0.0);
     glRotatef(camera.rotation.yaw, 0.0, 1.0, 0.0);
-    if (bones != nullptr) { // if bones, multiply the bone parents together
-        QMatrix4x4 m, m2;
+    if (bones != nullptr) {
+        QMatrix4x4 m, m2, mult;
+        // build bone matrix
         for (int i = 0; i < bones->count(); i++) {
             memcpy(m2.data(), bones->at(i)->link, 64);
-            if (i > 0) {
-                m = m * m2;
-            } else {
-                m = m2;
-            }
-            glMultMatrixf(bones->at(i)->link);
+            m = (i > 0) ? m * m2 : m2;
         }
-        m.setRow(0, QVector4D(4, 0, 0, 0));
+        // translate to local space for morphing
+        memcpy(m2.data(), bones->last()->globalToLocal, 64);
+        m = m * m2;
+        setShaderVariableMatrix(boneShader, "boneMatrix", m);
+        setShaderVariableMatrix(boneShader, "worldMatrix", mesh.majorMatrix.transposed());
+    } else {
+        QMatrix4x4 m;
+        m.setRow(0, QVector4D(1, 0, 0, 0));
         m.setRow(1, QVector4D(0, 1, 0, 0));
         m.setRow(2, QVector4D(0, 0, 1, 0));
         m.setRow(3, QVector4D(0, 0, 0, 1));
         setShaderVariableMatrix(boneShader, "boneMatrix", m);
-        glMultMatrixf(mesh.minorMatrix.data());
-    } else {
-        glMultMatrixf(mesh.majorMatrix.data());
+        setShaderVariableMatrix(boneShader, "worldMatrix", mesh.majorMatrix.transposed());
     }
     glVertexPointer(3, GL_FLOAT, 0, mesh.cleanVertices);
     glColorPointer(4, GL_FLOAT, 0, mesh.cleanColours);
@@ -425,7 +426,7 @@ void MabiMeGLWidget::setShaderVariableMatrix(GLhandleARB shader, QString varname
     GLint id = glGetUniformLocation(shader, varname.toLatin1());
     checkError("glGetUniformLocation[" + varname + "]");
     if (id != -1) {
-        glUniformMatrix4fv(id, 1, GL_FALSE, matrix.data());
+        glUniformMatrix4fv(id, 1, GL_FALSE, matrix.constData());
         checkError("glUniformMatrix4fv(id [" + varname + "], ?)", true); // suppress error - there is a quirk in openGL to always return 0 for this
     }
 }
