@@ -19,7 +19,6 @@ void FRMReader::flipMatrix(float *matrix) {
 bool FRMReader::loadFRM(QByteArray stream) {
     char *data = stream.data();
     try {
-        qDebug() << stream.length();
         if ((unsigned int)stream.length() > sizeof(FRM::FileHeader)) {
             header = *(FRM::FileHeader*)&data[0];
             uint32_t pos = sizeof(FRM::FileHeader);
@@ -28,7 +27,6 @@ bool FRMReader::loadFRM(QByteArray stream) {
                 for (int n = 0; n < header.bonesCount; n++) {
                     FRM::Bone *b = new FRM::Bone();
                     memcpy(b, &data[pos], sizeof(FRM::Bone));
-                    qDebug() << QString::number(b->boneID) << b->name << QString::number(b->parentID);
                     flipMatrix(b->localToGlobal);
                     flipMatrix(b->globalToLocal);
                     flipMatrix(b->link);

@@ -37,7 +37,6 @@ bool PMGReader::loadPMG(QByteArray stream) {
     freePMG();
     char *data = stream.data();
     try {
-        qDebug() << stream.length();
         if ((unsigned int)stream.length() > sizeof(PMG::FileHeader)) {
             header = *(PMG::FileHeader*)&data[0];
             uint32_t pos = sizeof(PMG::FileHeader) + 64;
