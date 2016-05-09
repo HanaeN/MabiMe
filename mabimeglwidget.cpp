@@ -234,7 +234,6 @@ void MabiMeGLWidget::renderPMGMesh(PMG::Mesh mesh, QList<FRM::Bone *> *bones, PM
         // translate to local space for morphing
         memcpy(m2.data(), bones->last()->globalToLocal, 64);
         m = m * m2;
-        m.setRow(3, QVector4D(0, 0, 0, 1));
         setShaderArrayFloat(boneShader, "boneWeight[0]", mesh.cleanBoneWeights, mesh.cleanVertexCount);
         setShaderVariableMatrix(boneShader, "boneMatrix", m);
         setShaderVariableMatrix(boneShader, "worldMatrix", mesh.majorMatrix.transposed());
