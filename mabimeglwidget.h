@@ -48,7 +48,7 @@ private:
     void mousePressEvent(QMouseEvent* event);
     void mouseReleaseEvent(QMouseEvent* event);
     void mouseMoveEvent(QMouseEvent* event);
-    void checkError(QString error);
+    void checkError(QString error, bool suppress = false);
     bool loadTexture(PMGTexture *t, bool useFiltering);
     float ti = 0 ;
     PFNGLCLIENTACTIVETEXTUREPROC     glClientActiveTexture;
@@ -68,6 +68,7 @@ private:
     PFNGLUNIFORM3FPROC               glUniform3f;
     PFNGLUNIFORM4FPROC               glUniform4f;
     PFNGLUNIFORM4FVPROC              glUniform4fv;
+    PFNGLUNIFORMMATRIX4FVPROC        glUniformMatrix4fv;
     PFNGLBINDATTRIBLOCATIONPROC      glBindAttribLocation;
     PFNGLGETPROGRAMINFOLOGPROC       glGetProgramInfoLog;
     PFNGLVERTEXATTRIBPOINTERPROC     glVertexAttribPointer;
@@ -92,6 +93,7 @@ protected:
     void endShader();
     void setShaderVariableInt(GLhandleARB shader, QString varname, int data);
     void setShaderVariableFloat(GLhandleARB shader, QString varname, float data);
+    void setShaderVariableMatrix(GLhandleARB shader, QString varname, QMatrix4x4 matrix);
     void setShaderTextures(GLhandleARB shader, int count = 1);
 signals:
     void cameraChange(CameraInfo camera);

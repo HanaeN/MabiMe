@@ -38,9 +38,10 @@ QByteArray readTextFile(QString filename) {
     return data.toLatin1();
 }
 
-void MabiMeGLWidget::checkError(QString error) {
+void MabiMeGLWidget::checkError(QString error, bool suppress) {
     QString finalError = "";
     GLenum a = glGetError();
+    if (suppress) return;
     if (a == GL_INVALID_ENUM) finalError = "GL_INVALID_ENUM";
     if (a == GL_INVALID_VALUE) finalError = "GL_INVALID_VALUE";
     if (a == GL_INVALID_OPERATION) finalError = "GL_INVALID_OPERATION";
@@ -108,7 +109,6 @@ void MabiMeGLWidget::paintGL() {
     qglColor(Qt::red);
 
     glPushAttrib( GL_ALL_ATTRIB_BITS );
-    glEnable( GL_LIGHTING );
     glClearStencil(0);
     glClear( GL_STENCIL_BUFFER_BIT );
     glEnable( GL_STENCIL_TEST );
@@ -117,17 +117,18 @@ void MabiMeGLWidget::paintGL() {
     glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 
     useShader(boneShader);
+    setShaderVariableInt(boneShader, "isOutline", 0);
     setShaderTextures(boneShader);
     draw();
-    endShader();
-    glDisable( GL_LIGHTING );
     glStencilFunc( GL_NOTEQUAL, 1, 0xFFFF );
     glStencilOp( GL_KEEP, GL_KEEP, GL_REPLACE );
     glLineWidth(2.5f);
     glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
     glColor3f(0.0f, 0.0f, 0.0f );
     glDisableClientState(GL_COLOR_ARRAY);
+    setShaderVariableInt(boneShader, "isOutline", 1);
     draw();
+    endShader();
     glEnableClientState(GL_COLOR_ARRAY);
     glPopAttrib();
 }
@@ -154,6 +155,7 @@ void MabiMeGLWidget::initializeGL() {
     glUniform3f                 = (PFNGLUNIFORM3FPROC)GetAnyGLFuncAddress("glUniform3f");
     glUniform4f                 = (PFNGLUNIFORM4FPROC)GetAnyGLFuncAddress("glUniform4f");
     glUniform4fv                = (PFNGLUNIFORM4FVPROC)GetAnyGLFuncAddress("glUniform4fv");
+    glUniformMatrix4fv          = (PFNGLUNIFORMMATRIX4FVPROC)GetAnyGLFuncAddress("glUniformMatrix4fv");
     glBindAttribLocation        = (PFNGLBINDATTRIBLOCATIONPROC)GetAnyGLFuncAddress("glBindAttribLocation");
     glGenFramebuffers           = (PFNGLGENFRAMEBUFFERSEXTPROC)GetAnyGLFuncAddress("glGenFramebuffersEXT");
     glBindFramebuffer           = (PFNGLBINDFRAMEBUFFEREXTPROC)GetAnyGLFuncAddress("glBindFramebufferEXT");
@@ -221,9 +223,21 @@ void MabiMeGLWidget::renderPMGMesh(PMG::Mesh mesh, QList<FRM::Bone *> *bones, PM
     glRotatef(camera.rotation.pitch, 1.0, 0.0, 0.0);
     glRotatef(camera.rotation.yaw, 0.0, 1.0, 0.0);
     if (bones != nullptr) { // if bones, multiply the bone parents together
+        QMatrix4x4 m, m2;
         for (int i = 0; i < bones->count(); i++) {
+            memcpy(m2.data(), bones->at(i)->link, 64);
+            if (i > 0) {
+                m = m * m2;
+            } else {
+                m = m2;
+            }
             glMultMatrixf(bones->at(i)->link);
         }
+        m.setRow(0, QVector4D(4, 0, 0, 0));
+        m.setRow(1, QVector4D(0, 1, 0, 0));
+        m.setRow(2, QVector4D(0, 0, 1, 0));
+        m.setRow(3, QVector4D(0, 0, 0, 1));
+        setShaderVariableMatrix(boneShader, "boneMatrix", m);
         glMultMatrixf(mesh.minorMatrix.data());
     } else {
         glMultMatrixf(mesh.majorMatrix.data());
@@ -374,6 +388,7 @@ void MabiMeGLWidget::endShader() {
 
 void MabiMeGLWidget::setShaderVariableInt(GLhandleARB shader, QString varname, int data) {
     GLint id = glGetUniformLocation(shader, varname.toLatin1());
+    checkError("glGetUniformLocation[" + varname + "]");
     if (id != -1) {
         glUniform1i(id, data);
         checkError("glUniform1i(id [" + varname + "], " + QString::number(data) + ")");
@@ -382,6 +397,7 @@ void MabiMeGLWidget::setShaderVariableInt(GLhandleARB shader, QString varname, i
 
 void MabiMeGLWidget::setShaderVariableFloat(GLhandleARB shader, QString varname, float data) {
     GLint id = glGetUniformLocation(shader, varname.toLatin1());
+    checkError("glGetUniformLocation[" + varname + "]");
     if (id != -1) {
         glUniform1f(id, data);
         checkError("glUniform1f(id [" + varname + "], ?)");
@@ -390,15 +406,26 @@ void MabiMeGLWidget::setShaderVariableFloat(GLhandleARB shader, QString varname,
 
 void MabiMeGLWidget::setShaderTextures(GLhandleARB shader, int count) {
     GLint id = glGetUniformLocation(shader, "textureIn");
+    checkError("glGetUniformLocation[textureIn]");
     if (id != -1) {
         glUniform1i(id, 0);
         checkError("glUniform1i(id [textureIn], 0)");
     }
     if (count > 1) {
         GLint id = glGetUniformLocation(shader, "texture2");
+        checkError("glGetUniformLocation[texture2]");
         if (id != -1) {
             glUniform1i(id, 1);
             checkError("glUniform1i(id [texture2], 0)");
         }
+    }
+}
+
+void MabiMeGLWidget::setShaderVariableMatrix(GLhandleARB shader, QString varname, QMatrix4x4 matrix) {
+    GLint id = glGetUniformLocation(shader, varname.toLatin1());
+    checkError("glGetUniformLocation[" + varname + "]");
+    if (id != -1) {
+        glUniformMatrix4fv(id, 1, GL_FALSE, matrix.data());
+        checkError("glUniformMatrix4fv(id [" + varname + "], ?)", true); // suppress error - there is a quirk in openGL to always return 0 for this
     }
 }
