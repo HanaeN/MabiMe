@@ -38,7 +38,7 @@ bool PMGReader::LoadPMG(QByteArray stream) {
     char *data = stream.data();
     try {
         qDebug() << stream.length();
-        if (stream.length() > sizeof(PMG::FileHeader)) {
+        if ((unsigned int)stream.length() > sizeof(PMG::FileHeader)) {
             header = *(PMG::FileHeader*)&data[0];
             uint32_t pos = sizeof(PMG::FileHeader) + 64;
             if (strcmp(header.magic, "pmg\x00") == 0 && header.version == 258) { // check if valid
@@ -182,7 +182,6 @@ bool PMGReader::LoadPMG(QByteArray stream) {
                         pos += sizeof(PMG::Skin);
                         mesh->skins.append(s);
                     }
-
                     float d[16];
                     memcpy(d, mesh->majorMatrix.data(), 64);
                     QMatrix4x4 m(d[0],  d[1],  d[2],  d[3],

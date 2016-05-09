@@ -11,7 +11,7 @@ bool FRMReader::LoadFRM(QByteArray stream) {
     char *data = stream.data();
     try {
         qDebug() << stream.length();
-        if (stream.length() > sizeof(FRM::FileHeader)) {
+        if ((unsigned int)stream.length() > sizeof(FRM::FileHeader)) {
             header = *(FRM::FileHeader*)&data[0];
             uint32_t pos = sizeof(FRM::FileHeader);
             if (strcmp(header.magic, "pf!\x00") == 0 && header.version == 1) { // check if valid
