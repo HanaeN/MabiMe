@@ -41,6 +41,7 @@ private:
     QPointF oldCameraPos = QPointF(0, 40);
     QList<PMGObject*> objects = QList<PMGObject*>();
     Rotation oldCameraRotation;
+    GLhandleARB boneShader;
     bool isLeftDragging = false;
     bool isRightDragging = false;
     void wheelEvent(QWheelEvent* event);
@@ -83,6 +84,7 @@ private:
 protected:
     void initializeGL();
     void paintGL();
+    void draw();
     void resizeGL(int width, int height);
     void renderPMGMesh(PMG::Mesh mesh, QList<FRM::Bone*> *bones = nullptr, PMGTexture *t = nullptr);
     GLhandleARB linkShader(QString vp_str, QString fp_str);
@@ -90,6 +92,7 @@ protected:
     void endShader();
     void setShaderVariableInt(GLhandleARB shader, QString varname, int data);
     void setShaderVariableFloat(GLhandleARB shader, QString varname, float data);
+    void setShaderTextures(GLhandleARB shader, int count = 1);
 signals:
     void cameraChange(CameraInfo camera);
 public slots:

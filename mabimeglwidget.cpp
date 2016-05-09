@@ -34,6 +34,7 @@ QByteArray readTextFile(QString filename) {
     QTextStream in(&file);
     QString data = in.readAll();
     file.close();
+    qDebug() << data.toLatin1();
     return data.toLatin1();
 }
 
@@ -54,15 +55,11 @@ void MabiMeGLWidget::checkError(QString error) {
 }
 
 
-MabiMeGLWidget::MabiMeGLWidget(QWidget *parent) : QGLWidget(QGLFormat(QGL::SampleBuffers), parent)
+MabiMeGLWidget::MabiMeGLWidget(QWidget *parent) : QGLWidget(QGLFormat(QGL::DepthBuffer | QGL::Rgba | QGL::AlphaChannel | QGL::StencilBuffer | QGL::DirectRendering | QGL::SampleBuffers | QGL::DeprecatedFunctions), parent)
 {
+//    this->setFormat(QGLFormat());
 }
-
-void MabiMeGLWidget::paintGL() {
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glLoadIdentity();
-    glTranslatef(camera.x, camera.y, camera.zoom);
-    qglColor(Qt::red);
+void MabiMeGLWidget::draw() {
     for (int i = 0; i < objects.count(); i++) {
         PMGObject *o = objects[i];
         for (int n = 0; n < o->meshes.count(); n++) {
@@ -104,6 +101,37 @@ void MabiMeGLWidget::paintGL() {
     }
 }
 
+void MabiMeGLWidget::paintGL() {
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+    glLoadIdentity();
+    glTranslatef(camera.x, camera.y, camera.zoom);
+    qglColor(Qt::red);
+
+    glPushAttrib( GL_ALL_ATTRIB_BITS );
+    glEnable( GL_LIGHTING );
+    glClearStencil(0);
+    glClear( GL_STENCIL_BUFFER_BIT );
+    glEnable( GL_STENCIL_TEST );
+    glStencilFunc( GL_ALWAYS, 1, 0xFFFF );
+    glStencilOp( GL_KEEP, GL_KEEP, GL_REPLACE );
+    glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+
+    useShader(boneShader);
+    setShaderTextures(boneShader);
+    draw();
+    endShader();
+    glDisable( GL_LIGHTING );
+    glStencilFunc( GL_NOTEQUAL, 1, 0xFFFF );
+    glStencilOp( GL_KEEP, GL_KEEP, GL_REPLACE );
+    glLineWidth(2.5f);
+    glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+    glColor3f(0.0f, 0.0f, 0.0f );
+    glDisableClientState(GL_COLOR_ARRAY);
+    draw();
+    glEnableClientState(GL_COLOR_ARRAY);
+    glPopAttrib();
+}
+
 void MabiMeGLWidget::initializeGL() {
     // load extensions
     glEnableVertexAttribArray   = (PFNGLENABLEVERTEXATTRIBARRAYPROC)GetAnyGLFuncAddress("glEnableVertexAttribArray");
@@ -136,7 +164,6 @@ void MabiMeGLWidget::initializeGL() {
     glGenBuffers                = (PFNGLGENBUFFERSPROC)GetAnyGLFuncAddress("glGenBuffers");
     glActiveTexture             = (PFNGLACTIVETEXTUREPROC)GetAnyGLFuncAddress("glActiveTexture");
     glClientActiveTexture       = (PFNGLCLIENTACTIVETEXTUREPROC)GetAnyGLFuncAddress("glClientActiveTexture");
-
     qglClearColor(QColor(200, 200, 200));
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
@@ -152,14 +179,12 @@ void MabiMeGLWidget::initializeGL() {
     glEnableClientState(GL_NORMAL_ARRAY);
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
-
     glEnable(GL_LIGHTING);
     glEnable(GL_LIGHT0);
 
     static GLfloat lightPosition[4] = { 0, 0, 10, 1.0 };
     glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
-
-    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    boneShader = linkShader("Shaders/bone.v", "Shaders/bone.f");
     emit cameraChange(camera);
 }
 
@@ -360,5 +385,20 @@ void MabiMeGLWidget::setShaderVariableFloat(GLhandleARB shader, QString varname,
     if (id != -1) {
         glUniform1f(id, data);
         checkError("glUniform1f(id [" + varname + "], ?)");
+    }
+}
+
+void MabiMeGLWidget::setShaderTextures(GLhandleARB shader, int count) {
+    GLint id = glGetUniformLocation(shader, "textureIn");
+    if (id != -1) {
+        glUniform1i(id, 0);
+        checkError("glUniform1i(id [textureIn], 0)");
+    }
+    if (count > 1) {
+        GLint id = glGetUniformLocation(shader, "texture2");
+        if (id != -1) {
+            glUniform1i(id, 1);
+            checkError("glUniform1i(id [texture2], 0)");
+        }
     }
 }
