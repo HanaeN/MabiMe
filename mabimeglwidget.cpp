@@ -151,6 +151,7 @@ void MabiMeGLWidget::initializeGL() {
     glUniform1i                 = (PFNGLUNIFORM1IPROC)GetAnyGLFuncAddress("glUniform1i");
     glUniform1iv                = (PFNGLUNIFORM1IVPROC)GetAnyGLFuncAddress("glUniform1iv");
     glUniform1f                 = (PFNGLUNIFORM1FPROC)GetAnyGLFuncAddress("glUniform1f");
+    glUniform1fv                = (PFNGLUNIFORM1FVPROC)GetAnyGLFuncAddress("glUniform1fv");
     glUniform2f                 = (PFNGLUNIFORM2FPROC)GetAnyGLFuncAddress("glUniform2f");
     glUniform3f                 = (PFNGLUNIFORM3FPROC)GetAnyGLFuncAddress("glUniform3f");
     glUniform4f                 = (PFNGLUNIFORM4FPROC)GetAnyGLFuncAddress("glUniform4f");
@@ -227,11 +228,14 @@ void MabiMeGLWidget::renderPMGMesh(PMG::Mesh mesh, QList<FRM::Bone *> *bones, PM
         // build bone matrix
         for (int i = 0; i < bones->count(); i++) {
             memcpy(m2.data(), bones->at(i)->link, 64);
+            if (strcmp(bones->at(i)->name, "head") == 0) m2.translate(camera.x / 1000, 0, 0);
             m = (i > 0) ? m * m2 : m2;
         }
         // translate to local space for morphing
         memcpy(m2.data(), bones->last()->globalToLocal, 64);
         m = m * m2;
+        m.setRow(3, QVector4D(0, 0, 0, 1));
+        setShaderArrayFloat(boneShader, "boneWeight[0]", mesh.cleanBoneWeights, mesh.cleanVertexCount);
         setShaderVariableMatrix(boneShader, "boneMatrix", m);
         setShaderVariableMatrix(boneShader, "worldMatrix", mesh.majorMatrix.transposed());
     } else {
@@ -401,7 +405,7 @@ void MabiMeGLWidget::setShaderVariableFloat(GLhandleARB shader, QString varname,
     checkError("glGetUniformLocation[" + varname + "]");
     if (id != -1) {
         glUniform1f(id, data);
-        checkError("glUniform1f(id [" + varname + "], ?)");
+        checkError("glUniform1f(id [" + varname + "], " + QString::number(data) + ")");
     }
 }
 
@@ -427,6 +431,15 @@ void MabiMeGLWidget::setShaderVariableMatrix(GLhandleARB shader, QString varname
     checkError("glGetUniformLocation[" + varname + "]");
     if (id != -1) {
         glUniformMatrix4fv(id, 1, GL_FALSE, matrix.constData());
-        checkError("glUniformMatrix4fv(id [" + varname + "], ?)", true); // suppress error - there is a quirk in openGL to always return 0 for this
+        checkError("glUniformMatrix4fv(id [" + varname + "], <ptr>)", true); // suppress error - there is a quirk in openGL to always return 0 for this
+    }
+}
+
+void MabiMeGLWidget::setShaderArrayFloat(GLhandleARB shader, QString varname, float *data, int arraySize) {
+    GLint id = glGetUniformLocation(shader, varname.toLatin1());
+    checkError("glGetUniformLocation[" + varname + "]");
+    if (id != -1) {
+        glUniform1fv (id, arraySize, &data[0]);
+        checkError("glUniform1fv(id [" + varname + "], <size>" + QString::number(arraySize) + ", <ptr>)", false);
     }
 }

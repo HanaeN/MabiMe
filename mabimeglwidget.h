@@ -64,6 +64,7 @@ private:
     PFNGLUNIFORM1IPROC               glUniform1i;
     PFNGLUNIFORM1IVPROC              glUniform1iv;
     PFNGLUNIFORM1FPROC               glUniform1f;
+    PFNGLUNIFORM1FVPROC              glUniform1fv;
     PFNGLUNIFORM2FPROC               glUniform2f;
     PFNGLUNIFORM3FPROC               glUniform3f;
     PFNGLUNIFORM4FPROC               glUniform4f;
@@ -93,6 +94,7 @@ protected:
     void endShader();
     void setShaderVariableInt(GLhandleARB shader, QString varname, int data);
     void setShaderVariableFloat(GLhandleARB shader, QString varname, float data);
+    void setShaderArrayFloat(GLhandleARB shader, QString varname, float *data, int arraySize);
     void setShaderVariableMatrix(GLhandleARB shader, QString varname, QMatrix4x4 matrix);
     void setShaderTextures(GLhandleARB shader, int count = 1);
 signals:
