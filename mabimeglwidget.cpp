@@ -228,7 +228,7 @@ void MabiMeGLWidget::renderPMGMesh(PMG::Mesh mesh, QList<FRM::Bone *> *bones, PM
         // build bone matrix
         for (int i = 0; i < bones->count(); i++) {
             memcpy(m2.data(), bones->at(i)->link, 64);
-            if (strcmp(bones->at(i)->name, "head") == 0) m2.translate(camera.x / 1000, 0, 0);
+            if (strcmp(bones->at(i)->name, "chest") == 0) m2.translate(camera.x / 1000, 0, 0);
             m = (i > 0) ? m * m2 : m2;
         }
         // translate to local space for morphing

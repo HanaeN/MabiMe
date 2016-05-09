@@ -182,7 +182,7 @@ bool PMGReader::loadPMG(QByteArray stream) {
                     for (int n = 0; n < mesh->skinCount; n++) {
                         PMG::Skin *s = new PMG::Skin();
                         memcpy(s, &data[pos], sizeof(PMG::Skin));
-                        mesh->cleanBoneWeights[s->vertexID] = s->weight;
+                        //mesh->cleanBoneWeights[s->vertexID] = s->weight;
                         pos += sizeof(PMG::Skin);
                         mesh->skins.append(s);
                     }
