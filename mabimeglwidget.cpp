@@ -5,22 +5,6 @@
 #include "GL/gl.h"
 #include "GL/glu.h"
 
-void MabiMeGLWidget::checkError(QString error) {
-    QString finalError = "";
-    GLenum a = glGetError();
-    if (a == GL_INVALID_ENUM) finalError = "GL_INVALID_ENUM";
-    if (a == GL_INVALID_VALUE) finalError = "GL_INVALID_VALUE";
-    if (a == GL_INVALID_OPERATION) finalError = "GL_INVALID_OPERATION";
-    if (a == GL_INVALID_FRAMEBUFFER_OPERATION) finalError = "GL_INVALID_FRAMEBUFFER_OPERATION";
-    if (a == GL_OUT_OF_MEMORY) finalError = "GL_OUT_OF_MEMORY";
-    if (a == GL_STACK_UNDERFLOW) finalError = "GL_STACK_UNDERFLOW";
-    if (a == GL_STACK_OVERFLOW) finalError = "GL_STACK_OVERFLOW";
-    if (finalError.length() > 0) {
-        finalError = error + " - " + finalError;
-        qDebug() << finalError;
-    }
-
-}
 
 #if defined(Q_OS_WIN)
     void *GetAnyGLFuncAddress(const char *name)
@@ -43,6 +27,33 @@ void MabiMeGLWidget::checkError(QString error) {
     }
 #endif
 
+
+QByteArray readTextFile(QString filename) {
+    QFile file(filename);
+    file.open(QIODevice::ReadOnly);
+    QTextStream in(&file);
+    QString data = in.readAll();
+    file.close();
+    return data.toLatin1();
+}
+
+void MabiMeGLWidget::checkError(QString error) {
+    QString finalError = "";
+    GLenum a = glGetError();
+    if (a == GL_INVALID_ENUM) finalError = "GL_INVALID_ENUM";
+    if (a == GL_INVALID_VALUE) finalError = "GL_INVALID_VALUE";
+    if (a == GL_INVALID_OPERATION) finalError = "GL_INVALID_OPERATION";
+    if (a == GL_INVALID_FRAMEBUFFER_OPERATION) finalError = "GL_INVALID_FRAMEBUFFER_OPERATION";
+    if (a == GL_OUT_OF_MEMORY) finalError = "GL_OUT_OF_MEMORY";
+    if (a == GL_STACK_UNDERFLOW) finalError = "GL_STACK_UNDERFLOW";
+    if (a == GL_STACK_OVERFLOW) finalError = "GL_STACK_OVERFLOW";
+    if (finalError.length() > 0) {
+        finalError = error + " - " + finalError;
+        qDebug() << finalError;
+    }
+}
+
+
 MabiMeGLWidget::MabiMeGLWidget(QWidget *parent) : QGLWidget(QGLFormat(QGL::SampleBuffers), parent)
 {
 }
@@ -51,6 +62,7 @@ void MabiMeGLWidget::paintGL() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
     glTranslatef(camera.x, camera.y, camera.zoom);
+    qglColor(Qt::red);
     for (int i = 0; i < objects.count(); i++) {
         PMGObject *o = objects[i];
         for (int n = 0; n < o->meshes.count(); n++) {
@@ -172,7 +184,6 @@ void Perspective( GLdouble fov, GLdouble aspect, GLdouble zNear, GLdouble zFar )
 }
 
 void MabiMeGLWidget::resizeGL(int width, int height) {
-    int side = qMin(width, height);
     glViewport(0, 0, width, height);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
@@ -181,7 +192,6 @@ void MabiMeGLWidget::resizeGL(int width, int height) {
 }
 
 void MabiMeGLWidget::renderPMGMesh(PMG::Mesh mesh, QList<FRM::Bone *> *bones, PMGTexture *t) {
-    qglColor(Qt::red);
     glPushMatrix();
     glRotatef(camera.rotation.pitch, 1.0, 0.0, 0.0);
     glRotatef(camera.rotation.yaw, 0.0, 1.0, 0.0);
@@ -205,7 +215,6 @@ void MabiMeGLWidget::renderPMGMesh(PMG::Mesh mesh, QList<FRM::Bone *> *bones, PM
     } else {
         glBindTexture(GL_TEXTURE_2D, 0);
     }
-    checkError("glBindTexture");
     glDrawArrays(GL_TRIANGLES, 0, mesh.cleanVertexCount);
     glPopMatrix();
 }
@@ -282,8 +291,74 @@ bool MabiMeGLWidget::loadTexture(PMGTexture *t, bool useFiltering) {
 }
 
 bool MabiMeGLWidget::addPMG(PMGObject *pmg) {
-    for (int i = 0; i < pmg->textures.count(); i++) {
-        loadTexture(pmg->textures[i], true);
+    try {
+        for (int i = 0; i < pmg->textures.count(); i++) {
+            loadTexture(pmg->textures[i], true);
+        }
+        objects.append(pmg);
+        return true;
+    } catch (...) {
+        return false;
     }
-    objects.append(pmg);
+}
+
+
+GLhandleARB MabiMeGLWidget::linkShader(QString vp_str, QString fp_str)
+{
+    GLhandleARB v,f,p;
+    QByteArray vs, fs;
+    v = glCreateShader(GL_VERTEX_SHADER);
+    checkError("glCreateShader(GL_VERTEX_SHADER)");
+    f = glCreateShader(GL_FRAGMENT_SHADER);
+    checkError("f = glCreateShader(GL_FRAGMENT_SHADER)");
+    vs = readTextFile(vp_str);
+    fs = readTextFile(fp_str);
+    char *cvs = vs.data();
+    char *cfs = fs.data();
+    glShaderSource(v, 1, (const GLcharARB**) &cvs, NULL);
+    checkError("glShaderSource(v, 1, (const GLcharARB**) &cvs, NULL)");
+    glShaderSource(f, 1, (const GLcharARB**) &cfs, NULL);
+    checkError("glShaderSource(f, 1, (const GLcharARB**) &cfs, NULL)");
+    glCompileShader(v);
+    checkError("glCompileShader(v)");
+    glCompileShader(f);
+    checkError("glCompileShader(f)");
+    vs.clear();
+    fs.clear();
+
+    p = glCreateProgram();
+    checkError("p = glCreateProgram()");
+    glAttachShader(p,v);
+    checkError("glAttachShader(p,v)");
+    glAttachShader(p,f);
+    checkError("glAttachShader(p,f)");
+    glLinkProgram(p);
+    checkError("glLinkProgram(p)");
+    return p;
+}
+
+void MabiMeGLWidget::useShader(GLhandleARB shader) {
+    glUseProgram(shader);
+    checkError("glUseProgram(shader)");
+}
+
+void MabiMeGLWidget::endShader() {
+    glUseProgram(0);
+    checkError("glUseProgram(0)");
+}
+
+void MabiMeGLWidget::setShaderVariableInt(GLhandleARB shader, QString varname, int data) {
+    GLint id = glGetUniformLocation(shader, varname.toLatin1());
+    if (id != -1) {
+        glUniform1i(id, data);
+        checkError("glUniform1i(id [" + varname + "], " + QString::number(data) + ")");
+    }
+}
+
+void MabiMeGLWidget::setShaderVariableFloat(GLhandleARB shader, QString varname, float data) {
+    GLint id = glGetUniformLocation(shader, varname.toLatin1());
+    if (id != -1) {
+        glUniform1f(id, data);
+        checkError("glUniform1f(id [" + varname + "], ?)");
+    }
 }
