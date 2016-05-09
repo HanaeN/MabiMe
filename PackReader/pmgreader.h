@@ -22,7 +22,7 @@ namespace PMG {
         float u,v;
     };
     struct Skin {
-        int n = 0;
+        int vertexID = 0;
         int a = 0;
         float weight = 1;
         int b = 1;
