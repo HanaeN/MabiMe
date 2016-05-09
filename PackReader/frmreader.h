@@ -29,10 +29,11 @@ class FRMReader
 {
 private:
     FRM::FileHeader header;
+    void flipMatrix(float *matrix);
 public:
     QList<FRM::Bone*> bones;
     FRMReader();
-    bool LoadFRM(QByteArray stream);
+    bool loadFRM(QByteArray stream);
 };
 
 #endif // FRMREADER_H

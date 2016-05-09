@@ -8,7 +8,7 @@ PMGReader::PMGReader()
     textures = QStringList();
 }
 
-void PMGReader::FreePMG() {
+void PMGReader::freePMG() {
     for (int n = 0; n < meshes.count(); n++) {
         PMG::Mesh *m = meshes[n];
         free(m->cleanColours);
@@ -33,8 +33,8 @@ void PMGReader::FreePMG() {
     textures.clear();
 }
 
-bool PMGReader::LoadPMG(QByteArray stream) {
-    FreePMG();
+bool PMGReader::loadPMG(QByteArray stream) {
+    freePMG();
     char *data = stream.data();
     try {
         qDebug() << stream.length();
@@ -211,5 +211,5 @@ bool PMGReader::LoadPMG(QByteArray stream) {
 }
 
 PMGReader::~PMGReader() {
-    this->FreePMG();
+    this->freePMG();
 }

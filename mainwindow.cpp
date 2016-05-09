@@ -35,8 +35,8 @@ void MainWindow::startTimer() {
         this->setWindowTitle("MM:" + PMGpath);
 
         // load a PMG
-        r.LoadPMG(p->ExtractFile(PMGpath + "_boss_mesh.pmg"));
-        f.LoadFRM(p->ExtractFile(PMGpath + "_framework.frm"));
+        r.loadPMG(p->ExtractFile(PMGpath + "_boss_mesh.pmg"));
+        f.loadFRM(p->ExtractFile(PMGpath + "_framework.frm"));
 
         PMGObject *o = new PMGObject();
         o->bones = f.bones;
