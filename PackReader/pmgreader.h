@@ -47,6 +47,7 @@ namespace PMG {
         GLfloat *cleanColours;
         GLfloat *cleanNormals;
         GLfloat *cleanTextureCoords;
+        GLfloat *cleanBoneWeights;
         int cleanVertexCount;
         QList<Skin*> skins = QList<Skin*>();
     };

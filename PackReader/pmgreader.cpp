@@ -15,6 +15,7 @@ void PMGReader::freePMG() {
         free(m->cleanNormals);
         free(m->cleanTextureCoords);
         free(m->cleanVertices);
+        free(m->cleanBoneWeights);
         for (int i = 0; i < m->skins.count(); i++) {
             delete m->skins[i];
         }
@@ -157,6 +158,7 @@ bool PMGReader::loadPMG(QByteArray stream) {
                     mesh->cleanColours = (GLfloat*)malloc(4 * mesh->faceVertexCount * 4);
                     mesh->cleanNormals = (GLfloat*)malloc(4 * mesh->faceVertexCount * 3);
                     mesh->cleanTextureCoords = (GLfloat*)malloc(4 * mesh->faceVertexCount * 2);
+                    mesh->cleanBoneWeights = (GLfloat*)malloc(4 * mesh->faceVertexCount);
                     mesh->cleanVertexCount = mesh->faceVertexCount;
 
                     QVector2D uv;
@@ -175,10 +177,12 @@ bool PMGReader::loadPMG(QByteArray stream) {
                         memcpy(&mesh->cleanNormals[n * 3], &xyz, 12);
                         uv = QVector2D(v->u, v->v);
                         memcpy(&mesh->cleanTextureCoords[n * 2], &uv, 8);
+                        mesh->cleanBoneWeights[n] = 1.0;
                     }
                     for (int n = 0; n < mesh->skinCount; n++) {
                         PMG::Skin *s = new PMG::Skin();
                         memcpy(s, &data[pos], sizeof(PMG::Skin));
+                        mesh->cleanBoneWeights[s->vertexID] = s->weight;
                         pos += sizeof(PMG::Skin);
                         mesh->skins.append(s);
                     }
