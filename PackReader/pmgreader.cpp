@@ -153,15 +153,16 @@ bool PMGReader::loadPMG(QByteArray stream) {
                         mesh->vertices.append(v);
                     }
                     if (!textures.contains(mesh->textureName)) textures.append(mesh->textureName);
-                    mesh->cleanVertices = (GLfloat*)malloc(4 * (mesh->faceVertexCount + mesh->stripFaceVertexCount) * 3);
-                    mesh->cleanColours = (GLfloat*)malloc(4 * (mesh->faceVertexCount + mesh->stripFaceVertexCount) * 4);
-                    mesh->cleanNormals = (GLfloat*)malloc(4 * (mesh->faceVertexCount + mesh->stripFaceVertexCount) * 3);
-                    mesh->cleanTextureCoords = (GLfloat*)malloc(4 * (mesh->faceVertexCount + mesh->stripFaceVertexCount) * 2);
-                    mesh->cleanVertexCount = mesh->faceVertexCount + mesh->stripFaceVertexCount;
+                    mesh->cleanVertices = (GLfloat*)malloc(4 * mesh->faceVertexCount * 3);
+                    mesh->cleanColours = (GLfloat*)malloc(4 * mesh->faceVertexCount * 4);
+                    mesh->cleanNormals = (GLfloat*)malloc(4 * mesh->faceVertexCount * 3);
+                    mesh->cleanTextureCoords = (GLfloat*)malloc(4 * mesh->faceVertexCount * 2);
+                    mesh->cleanVertexCount = mesh->faceVertexCount;
+
                     QVector2D uv;
                     QVector3D xyz;
                     QVector4D rgba;
-                    for (int n = 0; n < mesh->faceVertexCount + mesh->stripFaceVertexCount; n++) {
+                    for (int n = 0; n < mesh->faceVertexCount; n++) {
                         short off;
                         if (n < mesh->faceVertexCount) off = *mesh->vertexList[n];
                             else off = *mesh->stripVertexList[n - mesh->faceVertexCount];
