@@ -4,6 +4,7 @@
 #include <QGLWidget>
 #include <QList>
 #include <QPoint>
+#include <QVector3D>
 
 #include "PackReader/pmgreader.h"
 #include "PackReader/frmreader.h"
@@ -36,6 +37,7 @@ public:
     CameraInfo getCameraInfo();
     bool addPMG(PMGObject *pmg);
 private:
+    GLuint frmTexture;
     CameraInfo camera;
     QPoint drag;
     QPointF oldCameraPos = QPointF(0, 40);
@@ -49,7 +51,22 @@ private:
     void mouseReleaseEvent(QMouseEvent* event);
     void mouseMoveEvent(QMouseEvent* event);
     void checkError(QString error, bool suppress = false);
-    bool loadTexture(PMGTexture *t, bool useFiltering);
+    bool loadTexture(PMGTexture *t, bool useFiltering = false);
+    GLuint loadTexture(QString filename, bool useFiltering = false);
+    GLfloat vertexList[72] = {
+        1, -1, -1, 1, 1, -1, -1, 1, -1, -1, -1, -1,
+        1, -1, 1, 1, 1, 1, -1, 1, 1, -1, -1, 1,
+        1, -1, -1, 1, 1, -1, 1, 1, 1, 1, -1, 1,
+        -1, -1, 1, -1, 1, 1, -1, 1, -1, -1, -1, -1,
+        1, 1, 1, 1, 1, -1, -1, 1, -1, -1, 1, 1,
+        1, -1, -1, 1, -1, 1, -1, -1, 1, -1, -1, -1
+    };
+    GLfloat vertexUV[48] = {
+        0, 0, 0, 1, 1, 0, 1, 1,
+        0, 0, 0, 1, 1, 0, 1, 1,
+        0, 0, 0, 1, 1, 0, 1, 1,
+        0, 0, 0, 1, 1, 0, 1, 1
+    };
     float ti = 0 ;
     PFNGLCLIENTACTIVETEXTUREPROC     glClientActiveTexture;
     PFNGLCREATEPROGRAMPROC           glCreateProgram;

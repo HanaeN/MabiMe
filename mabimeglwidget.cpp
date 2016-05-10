@@ -108,6 +108,7 @@ void MabiMeGLWidget::paintGL() {
     glTranslatef(camera.x, camera.y, camera.zoom);
     qglColor(Qt::red);
 
+    glColor3f(1.0f, 1.0f, 1.0f );
     glPushAttrib( GL_ALL_ATTRIB_BITS );
     glClearStencil(0);
     glClear( GL_STENCIL_BUFFER_BIT );
@@ -169,7 +170,7 @@ void MabiMeGLWidget::initializeGL() {
     glClientActiveTexture       = (PFNGLCLIENTACTIVETEXTUREPROC)GetAnyGLFuncAddress("glClientActiveTexture");
     qglClearColor(QColor(200, 200, 200));
     glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);
+//    glEnable(GL_CULL_FACE);
     glShadeModel(GL_SMOOTH);
     glEnable(GL_TEXTURE_2D);
     glEnable (GL_BLEND);
@@ -187,6 +188,8 @@ void MabiMeGLWidget::initializeGL() {
 
     static GLfloat lightPosition[4] = { 0, 0, 10, 1.0 };
     glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
+
+    frmTexture = loadTexture("Images/frm.png");
     boneShader = linkShader("Shaders/bone.v", "Shaders/bone.f");
     emit cameraChange(camera);
 }
@@ -223,20 +226,49 @@ void MabiMeGLWidget::renderPMGMesh(PMG::Mesh mesh, QList<FRM::Bone *> *bones, PM
     glPushMatrix();
     glRotatef(camera.rotation.pitch, 1.0, 0.0, 0.0);
     glRotatef(camera.rotation.yaw, 0.0, 1.0, 0.0);
+
     if (bones != nullptr) {
         QMatrix4x4 m, m2, mult;
         // build bone matrix
         for (int i = 0; i < bones->count(); i++) {
             memcpy(m2.data(), bones->at(i)->link, 64);
-            if (strcmp(bones->at(i)->name, "chest") == 0) m2.translate(camera.x / 1000, 0, 0);
+//            if (strcmp(bones->at(i)->name, "head") == 0) m2.translate(camera.x / 10, 0, 0);
             m = (i > 0) ? m * m2 : m2;
         }
         // translate to local space for morphing
+
+        m2.setRow(0, QVector4D(1, 0, 0, 0));
+        m2.setRow(1, QVector4D(0, 1, 0, 0));
+        m2.setRow(2, QVector4D(0, 0, 1, 0));
+        m2.setRow(3, QVector4D(0, 0, 0, 1));
+        setShaderVariableMatrix(boneShader, "boneMatrix", m2);
+        memcpy(m2.data(), bones->last()->localToGlobal, 64);
+
+        glPushMatrix();
+        glMultMatrixf(m2.constData());
+        glDisableClientState(GL_COLOR_ARRAY);
+        glDisableClientState(GL_NORMAL_ARRAY);
+
+        glVertexPointer(3, GL_FLOAT, 0, &vertexList);
+        glTexCoordPointer(2, GL_FLOAT, 0, &vertexUV);
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+        glBindTexture(GL_TEXTURE_2D, frmTexture);
+
+        glDrawArrays(GL_QUADS, 0, 24);
+
+
+        glEnableClientState(GL_COLOR_ARRAY);
+        glEnableClientState(GL_NORMAL_ARRAY);
+        glPopMatrix();
+        glMultMatrixf(m.constData());
+        setShaderArrayFloat(boneShader, "boneWeight[0]", mesh.cleanBoneWeights, mesh.cleanVertexCount);
         memcpy(m2.data(), bones->last()->globalToLocal, 64);
         m = m * m2;
-        setShaderArrayFloat(boneShader, "boneWeight[0]", mesh.cleanBoneWeights, mesh.cleanVertexCount);
-        setShaderVariableMatrix(boneShader, "boneMatrix", m);
-        setShaderVariableMatrix(boneShader, "worldMatrix", mesh.majorMatrix.transposed());
+        glMultMatrixf(mesh.minorMatrix.constData());
+
+        //setShaderVariableMatrix(boneShader, "boneMatrix", m2);
     } else {
         QMatrix4x4 m;
         m.setRow(0, QVector4D(1, 0, 0, 0));
@@ -244,7 +276,6 @@ void MabiMeGLWidget::renderPMGMesh(PMG::Mesh mesh, QList<FRM::Bone *> *bones, PM
         m.setRow(2, QVector4D(0, 0, 1, 0));
         m.setRow(3, QVector4D(0, 0, 0, 1));
         setShaderVariableMatrix(boneShader, "boneMatrix", m);
-        setShaderVariableMatrix(boneShader, "worldMatrix", mesh.majorMatrix.transposed());
     }
     glVertexPointer(3, GL_FLOAT, 0, mesh.cleanVertices);
     glColorPointer(4, GL_FLOAT, 0, mesh.cleanColours);
@@ -331,6 +362,26 @@ bool MabiMeGLWidget::loadTexture(PMGTexture *t, bool useFiltering) {
     }
     glTexImage2D(GL_TEXTURE_2D, 0, 4, t->img.width(), t->img.height(), 0, GL_BGRA, GL_UNSIGNED_BYTE, t->img.bits());
     return true;
+}
+
+
+GLuint MabiMeGLWidget::loadTexture(QString filename, bool useFiltering) {
+    GLuint result;
+    glGenTextures(1, &result);
+    glBindTexture(GL_TEXTURE_2D, result);
+    glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    if (!useFiltering) {
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    } else {
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    }
+    QImage t(filename);
+    glTexImage2D(GL_TEXTURE_2D, 0, 4, t.width(), t.height(), 0, GL_BGRA, GL_UNSIGNED_BYTE, t.bits());
+    return result;
 }
 
 bool MabiMeGLWidget::addPMG(PMGObject *pmg) {
