@@ -122,9 +122,12 @@ bool PMGReader::loadPMG(QByteArray stream) {
                         pos += length;
                         length = *(int*)&data[pos];
                         pos += 4;
-                        mesh->boneName3 = QString::fromLatin1(&data[pos], length);
+                        mesh->statName = QString::fromLatin1(&data[pos], length);
                         pos += length;
+                        length = *(int*)&data[pos];
                         pos += 4;
+                        mesh->normalName = QString::fromLatin1(&data[pos], length);
+                        pos += length;
                         length = *(int*)&data[pos];
                         pos += 4;
                         mesh->colourMap = QString::fromLatin1(&data[pos], length);

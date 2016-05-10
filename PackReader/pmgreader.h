@@ -29,7 +29,7 @@ namespace PMG {
     };
     struct Mesh {
         int size;
-        QString boneName, boneName2, boneName3, meshName, textureName, colourMap;
+        QString boneName, boneName2, statName, normalName, meshName, textureName, colourMap;
         char parts2Length;
         int count;
         QMatrix4x4 minorMatrix, majorMatrix;
