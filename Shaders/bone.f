@@ -18,6 +18,6 @@ void main (void)
     vec4 Ispec = gl_FrontLightProduct[0].specular * pow(max(dot(R,E),0.0),0.3*gl_FrontMaterial.shininess);
     Ispec = clamp(Ispec, 0.0, 1.0); 
     gl_FragColor = texture2D(textureIn, gl_TexCoord[0].xy).rgba *
-    (gl_FrontLightModelProduct.sceneColor + Iamb + Idiff + Ispec); 
+    ((gl_FrontLightModelProduct.sceneColor + Iamb + Idiff + Ispec) / 2 + 0.5); 
   }
 }
