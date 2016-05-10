@@ -12,7 +12,11 @@ void main(void)
 {
   N = normalize(gl_NormalMatrix * gl_Normal);
   vec4 newVertex;
-  newVertex = (vec4(gl_Vertex.xyz, 1.0) * (boneMatrix * boneWeight[gl_VertexID]));
+  if (boneWeight[gl_VertexID] > 0.0) {
+    newVertex = (gl_Vertex) * boneMatrix;
+  } else {
+    newVertex = vec4(gl_Vertex.xyz, 1.0);
+  }
   v = vec3(gl_ModelViewMatrix * newVertex);       
   gl_Position = (gl_ModelViewProjectionMatrix * vec4(newVertex.xyz, 1.0));
   gl_TexCoord[0] = gl_MultiTexCoord0;

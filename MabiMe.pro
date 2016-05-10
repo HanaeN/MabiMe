@@ -13,19 +13,19 @@ TEMPLATE = app
 CONFIG += c++11
 
 SOURCES += main.cpp\
-        mainwindow.cpp \
+    mainwindow.cpp \
     PackReader/mabipackreader.cpp \
     PackReader/mabimt.cpp \
     mabimeglwidget.cpp \
     PackReader/pmgreader.cpp \
-    PackReader/frmreader.cpp
+    PackReader/frmreader.cpp \
 
 HEADERS  += mainwindow.h \
     PackReader/mabipackreader.h \
     PackReader/mabimt.h \
     mabimeglwidget.h \
     PackReader/pmgreader.h \
-    PackReader/frmreader.h
+    PackReader/frmreader.h \
 
 FORMS    += mainwindow.ui
 

@@ -232,7 +232,6 @@ void MabiMeGLWidget::renderPMGMesh(PMG::Mesh mesh, QList<FRM::Bone *> *bones, PM
         // build bone matrix
         for (int i = 0; i < bones->count(); i++) {
             memcpy(m2.data(), bones->at(i)->link, 64);
-//            if (strcmp(bones->at(i)->name, "head") == 0) m2.translate(camera.x / 10, 0, 0);
             m = (i > 0) ? m * m2 : m2;
         }
         // translate to local space for morphing
@@ -264,11 +263,16 @@ void MabiMeGLWidget::renderPMGMesh(PMG::Mesh mesh, QList<FRM::Bone *> *bones, PM
         glPopMatrix();
         glMultMatrixf(m.constData());
         setShaderArrayFloat(boneShader, "boneWeight[0]", mesh.cleanBoneWeights, mesh.cleanVertexCount);
-        memcpy(m2.data(), bones->last()->globalToLocal, 64);
-        m = m * m2;
         glMultMatrixf(mesh.minorMatrix.constData());
 
-        //setShaderVariableMatrix(boneShader, "boneMatrix", m2);
+        m2.setRow(0, QVector4D(1, 0, 0, 0));
+        m2.setRow(1, QVector4D(0, 1, 0, 0));
+        m2.setRow(2, QVector4D(0, 0, 1, 0));
+        m2.setRow(3, QVector4D(0, 0, 0, 1));
+        for (int i = 0; i < bones->count(); i++) {
+            if (strcmp(bones->at(i)->name, "chest") == 0) m2.translate(camera.x / 10, 4, 2);
+        }
+        setShaderVariableMatrix(boneShader, "boneMatrix", m2);
     } else {
         QMatrix4x4 m;
         m.setRow(0, QVector4D(1, 0, 0, 0));
