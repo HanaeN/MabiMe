@@ -29,5 +29,10 @@ HEADERS  += mainwindow.h \
 
 FORMS    += mainwindow.ui
 
+INCLUDEPATH += $$PWD/lib/cal3d
+INCLUDEPATH += $$PWD/lib
+
 win32:LIBS += -lopengl32
 unix:LIBS += -lGL
+
+LIBS += $$PWD/lib/cal3d

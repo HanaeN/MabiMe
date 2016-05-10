@@ -5,6 +5,7 @@
 
 #include "PackReader/mabipackreader.h"
 #include "PackReader/pmgreader.h"
+#include "cal3d.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
