@@ -3,12 +3,19 @@
 
 #include <QMainWindow>
 #include "mabimeglwidget.h"
+#include "PackReader/mabipackreader.h"
 #include "PackReader/pmgreader.h"
 #include "PackReader/frmreader.h"
 
 namespace Ui {
 class MainWindow;
 }
+
+struct RenderObject {
+    PMGReader r;
+    FRMReader f;
+    QString name;
+};
 
 class MainWindow : public QMainWindow
 {
@@ -17,14 +24,16 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
+    void close();
     void show();
 private slots:
     void startTimer();
     void cameraChange(CameraInfo camera);
 private:
-    PMGReader r;
-    FRMReader f;
+    void insertPMG(QString PMG, QString FRM = "");
+    MabiPackReader *p;
     Ui::MainWindow *ui;
+    QList<RenderObject*> objects;
 };
 
 #endif // MAINWINDOW_H
