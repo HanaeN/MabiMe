@@ -19,6 +19,8 @@ SOURCES += main.cpp\
     mabimeglwidget.cpp \
     PackReader/pmgreader.cpp \
     PackReader/frmreader.cpp \
+    bone.cpp \
+    model.cpp
 
 HEADERS  += mainwindow.h \
     PackReader/mabipackreader.h \
@@ -26,6 +28,8 @@ HEADERS  += mainwindow.h \
     mabimeglwidget.h \
     PackReader/pmgreader.h \
     PackReader/frmreader.h \
+    bone.h \
+    model.h
 
 FORMS    += mainwindow.ui
 

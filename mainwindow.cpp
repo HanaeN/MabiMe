@@ -5,6 +5,7 @@
 
 #include "PackReader/mabipackreader.h"
 #include "PackReader/pmgreader.h"
+#include "model.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -45,11 +46,15 @@ void MainWindow::startTimer() {
 //        insertPMG("gfx\\char\\chapter4\\monster\\mesh\\ogre\\c4_ogre01_boss_mesh", "gfx\\char\\chapter4\\monster\\mesh\\ogre\\c4_ogre01_framework");
 
         PMGpath = "gfx\\char\\human\\female\\";
-        insertPMG(PMGpath + "face\\female_adult01_f01", PMGpath + "female_framework");
-        insertPMG(PMGpath + "hair\\female_hair46_t46", PMGpath + "female_framework");
-        insertPMG(PMGpath + "wear\\female_summercloth01_bss", PMGpath + "female_framework");
-        insertPMG(PMGpath + "shoes\\female_summercloth02_s04", PMGpath + "female_framework");
-        insertPMG("gfx\\char\\chapter4\\human\\female\\mantle\\uni_c4_wing01", PMGpath + "female_framework");
+        PMGpath = "gfx\\char\\item\\mesh\\item_treasurechest01_i";
+        insertPMG(PMGpath, PMGpath);
+
+//        insertPMG(PMGpath + "face\\female_adult01_f01", PMGpath + "female_framework");
+//        insertPMG(PMGpath + "hair\\female_hair46_t46", PMGpath + "female_framework");
+//        insertPMG(PMGpath + "wear\\female_summercloth01_bss", PMGpath + "female_framework");
+//        insertPMG(PMGpath + "shoes\\female_summercloth02_s04", PMGpath + "female_framework");
+//        insertPMG("gfx\\char\\chapter4\\human\\female\\mantle\\uni_c4_wing01", PMGpath + "female_framework");
+
 //        ui->lMeshes->setText("Meshes: " + QString::number(r.meshes.count()));
 }
 
@@ -64,6 +69,8 @@ void MainWindow::cameraChange(CameraInfo camera) {
 }
 
 void MainWindow::insertPMG(QString PMG, QString FRM) {
+    Model *m = new Model(p, PMG, FRM);
+    return;
     RenderObject *obj = new RenderObject();
     obj->r.loadPMG(p->ExtractFile(PMG + ".pmg"));
     obj->f.loadFRM(p->ExtractFile(FRM + ".frm"));
