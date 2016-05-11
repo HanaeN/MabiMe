@@ -9,6 +9,7 @@ PMGReader::PMGReader()
 }
 
 void PMGReader::freePMG() {
+    hasLoaded = false;
     for (int n = 0; n < meshes.count(); n++) {
         PMG::Mesh *m = meshes[n];
         free(m->cleanColours);
@@ -29,7 +30,7 @@ void PMGReader::freePMG() {
 }
 
 bool PMGReader::loadPMG(QByteArray stream) {
-    freePMG();
+    if (hasLoaded) freePMG();
     char *data = stream.data();
     try {
         if ((unsigned int)stream.length() > sizeof(PMG::FileHeader)) {
@@ -206,6 +207,7 @@ bool PMGReader::loadPMG(QByteArray stream) {
         qDebug() << "Failed to load PMG header";
         return false;
     }
+    hasLoaded = true;
     return true;
 }
 

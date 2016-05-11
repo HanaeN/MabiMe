@@ -57,6 +57,7 @@ class PMGReader
 {
 private:
     PMG::FileHeader header;
+    bool hasLoaded = false;
 public:
     void freePMG();
     QStringList textures;
