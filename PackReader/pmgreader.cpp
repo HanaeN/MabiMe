@@ -145,8 +145,8 @@ bool PMGReader::loadPMG(QByteArray stream) {
                     }
                     for (int n = 0; n < mesh->vertexCount; n++) {
                         PMG::Vertex *v = new PMG::Vertex();
-                        memcpy(v, &data[pos], sizeof(PMG::Vertex));
-                        pos += sizeof(PMG::Vertex);
+                        memcpy(v, &data[pos], 36);
+                        pos += 36;
                         mesh->vertices.append(v);
                     }
                     if (!textures.contains(mesh->textureName)) textures.append(mesh->textureName);
@@ -173,12 +173,11 @@ bool PMGReader::loadPMG(QByteArray stream) {
                         memcpy(&mesh->cleanNormals[n * 3], &xyz, 12);
                         uv = QVector2D(v->u, v->v);
                         memcpy(&mesh->cleanTextureCoords[n * 2], &uv, 8);
-                        mesh->cleanBoneWeights[n] = 0.0;
                     }
                     for (int n = 0; n < mesh->skinCount; n++) {
                         PMG::Skin *s = new PMG::Skin();
                         memcpy(s, &data[pos], sizeof(PMG::Skin));
-                        mesh->cleanBoneWeights[s->vertexID] = s->weight;
+                        mesh->vertices[s->vertexID]->skin = *s;
                         pos += sizeof(PMG::Skin);
                         mesh->skins.append(s);
                     }

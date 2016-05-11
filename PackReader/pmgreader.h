@@ -15,17 +15,19 @@ namespace PMG {
         int meshType;
     };
     #pragma pack(1)
+    struct Skin {
+        int vertexID = 0;
+        int a = 0;
+        float scale = 0.5;
+        int b = 1;
+    };
+    #pragma pack(1)
     struct Vertex {
         float x, y, z;
         float nx, ny, nz;
         unsigned char r,g,b,a;
         float u,v;
-    };
-    struct Skin {
-        int vertexID = 0;
-        int a = 0;
-        float weight = 1;
-        int b = 1;
+        Skin skin;
     };
     struct Mesh {
         int size;
