@@ -7,6 +7,7 @@ Bone::Bone(QList<FRM::Bone*> *boneData, int boneIndex)
     FRM::Bone *bone = boneData->at(boneIndex);
     id = bone->boneID;
     name = bone->name;
+    // extract the bone data from the FRM raw and convert it into easy to use values
     QMatrix4x4 matrix(bone->link);
     worldMatrix = matrix;
     translation = matrix.column(3).toVector3D();
@@ -29,10 +30,12 @@ const QString Bone::getName() {
 }
 
 void Bone::updateBone() {
+    // create a matrix from the stored translation, rotation and scale
     QMatrix4x4 matrix;
     matrix.translate(translation);
     matrix.rotate(rotation);
     matrix.scale(scale);
+    // generate new matrix. if a child multiply it from the parent matrix first
     if (boneParent != nullptr) worldMatrix = boneParent->worldMatrix * matrix;
         else worldMatrix = matrix;
     for (int i = 0; i < children.count(); i++) {
