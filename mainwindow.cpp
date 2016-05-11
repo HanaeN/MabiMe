@@ -44,15 +44,15 @@ void MainWindow::startTimer() {
         // load a PMG
 //        insertPMG("gfx\\char\\chapter4\\monster\\mesh\\ogre\\c4_ogre01_boss_mesh", "gfx\\char\\chapter4\\monster\\mesh\\ogre\\c4_ogre01_framework");
 
-        PMGpath = "gfx\\char\\human\\female\\";
-        PMGpath = "gfx\\char\\item\\mesh\\item_treasurechest01_i";
-        insertPMG(PMGpath, PMGpath);
+//        PMGpath = "gfx\\char\\item\\mesh\\item_treasurechest01_i";
+//        insertPMG(PMGpath, PMGpath);
 
-//        insertPMG(PMGpath + "face\\female_adult01_f01", PMGpath + "female_framework");
-//        insertPMG(PMGpath + "hair\\female_hair46_t46", PMGpath + "female_framework");
-//        insertPMG(PMGpath + "wear\\female_summercloth01_bss", PMGpath + "female_framework");
-//        insertPMG(PMGpath + "shoes\\female_summercloth02_s04", PMGpath + "female_framework");
-//        insertPMG("gfx\\char\\chapter4\\human\\female\\mantle\\uni_c4_wing01", PMGpath + "female_framework");
+        PMGpath = "gfx\\char\\human\\female\\";
+        insertPMG("human", PMGpath + "face\\female_adult01_f01", PMGpath + "female_framework");
+        insertPMG("human", PMGpath + "hair\\female_hair46_t46", PMGpath + "female_framework");
+        insertPMG("human", PMGpath + "wear\\female_summercloth01_bss", PMGpath + "female_framework");
+        insertPMG("human", PMGpath + "shoes\\female_summercloth02_s04", PMGpath + "female_framework");
+        insertPMG("human", "gfx\\char\\chapter4\\human\\female\\mantle\\uni_c4_wing01", PMGpath + "female_framework");
 
 //        ui->lMeshes->setText("Meshes: " + QString::number(r.meshes.count()));
 }
@@ -66,9 +66,17 @@ void MainWindow::cameraChange(CameraInfo camera) {
     ui->lZ->setText("Zoom: " + QString::number(camera.zoom));
 }
 
-void MainWindow::insertPMG(QString PMG, QString FRM) {
-    Model *m = new Model(p, PMG, FRM);
-    ui->glSurface->addModel(m);
+void MainWindow::insertPMG(QString modelName, QString PMG, QString FRM) {
+
+    Model *m = ui->glSurface->getModel(modelName);
+    if (m == nullptr) {
+        m = new Model(p, PMG, FRM);
+        m->setName(modelName);
+        ui->glSurface->addModel(m);
+    } else {
+        m->addPMG(PMG);
+        ui->glSurface->updateModel(modelName);
+    }
     this->setWindowTitle("MM:<" + PMG + "> [" + QString::number(ui->glSurface->getModelCount()) + " total object" + (ui->glSurface->getModelCount() != 1 ? "s]" : "]"));
     ui->glSurface->repaint();
 }

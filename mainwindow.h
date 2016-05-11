@@ -24,7 +24,7 @@ private slots:
     void startTimer();
     void cameraChange(CameraInfo camera);
 private:
-    void insertPMG(QString PMG, QString FRM = "");
+    void insertPMG(QString modelName, QString PMG, QString FRM = "");
     MabiPackReader *p;
     Ui::MainWindow *ui;
 };
