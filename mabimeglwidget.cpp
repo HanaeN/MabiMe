@@ -5,7 +5,6 @@
 #include "GL/gl.h"
 #include "GL/glu.h"
 
-
 #if defined(Q_OS_WIN)
     void *GetAnyGLFuncAddress(const char *name)
     {
