@@ -10,9 +10,10 @@
 class Bone
 {
 public:
-    Bone(QList<FRM::Bone*> *boneData, int boneIndex);
+    Bone(QList<FRM::Bone*> *boneData, int boneIndex, Bone *parent = nullptr);
     const QString getName();
     const QMatrix4x4 getMatrix();
+    void setX(GLfloat x);
     Bone *findBone(QString boneName);
 private:
     QVector3D translation;
@@ -21,7 +22,7 @@ private:
     QMatrix4x4 worldMatrix;
     QString name;
     int id;
-    Bone *boneParent;
+    Bone *parentBone;
     QList<Bone*> children;
     void updateBone();
 };
