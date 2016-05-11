@@ -34,7 +34,6 @@ QByteArray readTextFile(QString filename) {
     QTextStream in(&file);
     QString data = in.readAll();
     file.close();
-    qDebug() << data.toLatin1();
     return data.toLatin1();
 }
 
@@ -66,15 +65,18 @@ MabiMeGLWidget::MabiMeGLWidget(QWidget *parent) : QGLWidget(QGLFormat(QGL::Depth
 void MabiMeGLWidget::draw() {
     for (int i = 0; i < models.count(); i++) {
         Model *o = models[i];
-        for (int n = 0; n < o->meshes.count(); n++) {
-            PMGTexture t;
-            for (int i = 0; i < o->textures.count(); i++) {
-                if (o->textures[i].name == o->meshes[n]->textureName) {
-                    t = o->textures.at(i);
-                    break;
+        for (int index = 0; index < o->models.count(); index++) {
+            PMGModel *pmgModel = o->models[index];
+            for (int n = 0; n < pmgModel->meshes.count(); n++) {
+                PMGTexture t;
+                for (int i = 0; i < o->textures.count(); i++) {
+                    if (o->textures[i].name == pmgModel->meshes[n]->textureName) {
+                        t = o->textures.at(i);
+                        break;
+                    }
                 }
+                renderPMGMesh(*pmgModel->meshes[n], o->findBone(pmgModel->meshes[n]->boneName), t.texture);
             }
-            renderPMGMesh(*o->meshes[n], t.texture);
         }
     }
 }
@@ -199,59 +201,14 @@ void MabiMeGLWidget::resizeGL(int width, int height) {
     glMatrixMode(GL_MODELVIEW);
 }
 
-void MabiMeGLWidget::renderPMGMesh(PMG::Mesh mesh, GLuint texture) {
+void MabiMeGLWidget::renderPMGMesh(PMG::Mesh mesh, Bone *bone, GLuint texture) {
     glPushMatrix();
     glRotatef(camera.rotation.pitch, 1.0, 0.0, 0.0);
     glRotatef(camera.rotation.yaw, 0.0, 1.0, 0.0);
-/*
-    if (bones != nullptr) {
-        QMatrix4x4 m, m2, mult;
-        // build bone matrix
-        for (int i = 0; i < bones->count(); i++) {
-            memcpy(m2.data(), bones->at(i)->link, 64);
-            m = (i > 0) ? m * m2 : m2;
-        }
-        // translate to local space for morphing
-
-        m2.setRow(0, QVector4D(1, 0, 0, 0));
-        m2.setRow(1, QVector4D(0, 1, 0, 0));
-        m2.setRow(2, QVector4D(0, 0, 1, 0));
-        m2.setRow(3, QVector4D(0, 0, 0, 1));
-        setShaderVariableMatrix(boneShader, "boneMatrix", m2);
-        memcpy(m2.data(), bones->last()->localToGlobal, 64);
-
-        glPushMatrix();
-        glMultMatrixf(m2.constData());
-        glDisableClientState(GL_COLOR_ARRAY);
-        glDisableClientState(GL_NORMAL_ARRAY);
-
-        glVertexPointer(3, GL_FLOAT, 0, &vertexList);
-        glTexCoordPointer(2, GL_FLOAT, 0, &vertexUV);
-
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-        glBindTexture(GL_TEXTURE_2D, frmTexture);
-
-        glDrawArrays(GL_QUADS, 0, 24);
-
-
-        glEnableClientState(GL_COLOR_ARRAY);
-        glEnableClientState(GL_NORMAL_ARRAY);
-        glPopMatrix();
-        glMultMatrixf(m.constData());
-        setShaderArrayFloat(boneShader, "boneWeight[0]", mesh.cleanBoneWeights, mesh.cleanVertexCount);
+    if (bone != nullptr) {
+        glMultMatrixf(bone->getMatrix().constData());
         glMultMatrixf(mesh.minorMatrix.constData());
-
-        m2.setRow(0, QVector4D(1, 0, 0, 0));
-        m2.setRow(1, QVector4D(0, 1, 0, 0));
-        m2.setRow(2, QVector4D(0, 0, 1, 0));
-        m2.setRow(3, QVector4D(0, 0, 0, 1));
-        for (int i = 0; i < bones->count(); i++) {
-            if (strcmp(bones->at(i)->name, "chest") == 0) m2.translate(camera.x / 10, 4, 2);
-        }
-        setShaderVariableMatrix(boneShader, "boneMatrix", m2);
     } else {
-*/
         QMatrix4x4 m;
         m.setRow(0, QVector4D(1, 0, 0, 0));
         m.setRow(1, QVector4D(0, 1, 0, 0));
@@ -259,7 +216,7 @@ void MabiMeGLWidget::renderPMGMesh(PMG::Mesh mesh, GLuint texture) {
         m.setRow(3, QVector4D(0, 0, 0, 1));
         setShaderVariableMatrix(boneShader, "boneMatrix", m);
         glMultMatrixf(mesh.majorMatrix.constData());
-//    }
+    }
     glVertexPointer(3, GL_FLOAT, 0, mesh.cleanVertices);
     glColorPointer(4, GL_FLOAT, 0, mesh.cleanColours);
     glNormalPointer(GL_FLOAT, 0, mesh.cleanNormals);
@@ -344,6 +301,7 @@ bool MabiMeGLWidget::loadTexture(PMGTexture *t, bool useFiltering) {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     }
     glTexImage2D(GL_TEXTURE_2D, 0, 4, t->img.width(), t->img.height(), 0, GL_BGRA, GL_UNSIGNED_BYTE, t->img.bits());
+    t->loaded = true;
     return true;
 }
 
@@ -368,14 +326,31 @@ GLuint MabiMeGLWidget::loadTexture(QString filename, bool useFiltering) {
 
 bool MabiMeGLWidget::addModel(Model *model) {
     try {
+        // load textures that havent been loaded yet
         for (int i = 0; i < model->textures.count(); i++) {
-            loadTexture(&model->textures[i], true);
+            if (!model->textures[i].loaded) loadTexture(&model->textures[i], true);
         }
-        models.append(model);
+        // add the model if it doesnt exist
+        if (!models.contains(model)) {
+            models.append(model);
+        }
         return true;
     } catch (...) {
-        qDebug() << "fail";
+        qDebug() << "failed to add model";
         return false;
+    }
+}
+
+void MabiMeGLWidget::updateModel(QString modelName) {
+    try {
+        for (int i = 0; i < models.count(); i++) {
+            if (models[i]->getName() == modelName) {
+                addModel(models[i]);
+                return;
+            }
+        }
+    } catch (...) {
+        qDebug() << "failed to update model";
     }
 }
 
@@ -477,4 +452,12 @@ void MabiMeGLWidget::setShaderArrayFloat(GLhandleARB shader, QString varname, fl
 }
 int MabiMeGLWidget::getModelCount() {
     return models.count();
+}
+
+Model* MabiMeGLWidget::getModel(QString modelName) {
+    for (int i = 0; i < models.count(); i++) {
+        Model *m = models[i];
+        if (m->getName() == modelName) return m;
+    }
+    return nullptr;
 }

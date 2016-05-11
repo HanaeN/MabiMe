@@ -24,7 +24,9 @@ public:
     explicit MabiMeGLWidget(QWidget *parent = 0);
     CameraInfo getCameraInfo();
     bool addModel(Model *model);
+    void updateModel(QString modelName);
     int getModelCount();
+    Model* getModel(QString modelName);
 private:
     GLuint frmTexture;
     CameraInfo camera;
@@ -94,7 +96,7 @@ protected:
     void paintGL();
     void draw();
     void resizeGL(int width, int height);
-    void renderPMGMesh(PMG::Mesh mesh, GLuint texture);
+    void renderPMGMesh(PMG::Mesh mesh, Bone *bone = nullptr, GLuint texture = 0);
     GLhandleARB linkShader(QString vp_str, QString fp_str);
     void useShader(GLhandleARB shader);
     void endShader();
