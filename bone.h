@@ -12,10 +12,12 @@ class Bone
 public:
     Bone(QList<FRM::Bone*> *boneData, int boneIndex);
     const QString getName();
+    const QMatrix4x4 getMatrix();
+    Bone *findBone(QString boneName);
+private:
     QVector3D translation;
     QVector3D scale;
     QQuaternion rotation;
-private:
     QMatrix4x4 worldMatrix;
     QString name;
     int id;

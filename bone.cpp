@@ -42,3 +42,16 @@ void Bone::updateBone() {
         children[i]->updateBone();
     }
 }
+
+const QMatrix4x4 Bone::getMatrix() {
+    return worldMatrix.transposed();
+}
+
+Bone* Bone::findBone(QString boneName) {
+    if (boneName == name) return this;
+    for (int i = 0; i < children.count(); i++) {
+        Bone *b = children[i]->findBone(name);
+        if (b != nullptr) return b;
+    }
+    return nullptr;
+}
