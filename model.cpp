@@ -9,7 +9,6 @@ Model::Model(MabiPackReader *packReader, QString PMGpath, QString FRMpath)
     pmgReader.loadPMG(packReader->ExtractFile(PMGpath + ".pmg"));
     frmReader.loadFRM(packReader->ExtractFile(FRMpath + ".frm"));
     name = PMGpath;
-/*
     // loop through and find parent bone
     for (int i = 0; i < frmReader.bones.count(); i++) {
         FRM::Bone *bone = frmReader.bones[i];
@@ -21,7 +20,6 @@ Model::Model(MabiPackReader *packReader, QString PMGpath, QString FRMpath)
     if (boneTree != nullptr) {
     } else qDebug() << "no root bone";
     // load textures ready for rendering
-    */
     for (int i = 0; i < pmgReader.textures.count(); i++) {
         PMGTexture t;
         t.name = pmgReader.textures[i];
