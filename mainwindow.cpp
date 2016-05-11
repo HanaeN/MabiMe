@@ -20,7 +20,6 @@ MainWindow::MainWindow(QWidget *parent) :
     } else {
         qDebug() << "failed to load";
     }
-    objects = QList<RenderObject*>();
 }
 
 MainWindow::~MainWindow()
@@ -65,29 +64,11 @@ void MainWindow::cameraChange(CameraInfo camera) {
     ui->lX->setText("X: " + QString::number(camera.x));
     ui->lY->setText("Y: " + QString::number(camera.y));
     ui->lZ->setText("Zoom: " + QString::number(camera.zoom));
-
 }
 
 void MainWindow::insertPMG(QString PMG, QString FRM) {
     Model *m = new Model(p, PMG, FRM);
-    return;
-    RenderObject *obj = new RenderObject();
-    obj->r.loadPMG(p->ExtractFile(PMG + ".pmg"));
-    obj->f.loadFRM(p->ExtractFile(FRM + ".frm"));
-    obj->name = PMG;
-    objects.append(obj);
-    PMGObject *o = new PMGObject();
-    o->bones = obj->f.bones;
-    for (int i = 0; i < obj->r.textures.count(); i++) {
-        PMGTexture *t = new PMGTexture;
-        t->name = obj->r.textures[i];
-        QPixmap pix;
-        pix.loadFromData(p->ExtractFile(p->FindTexture(t->name)));
-        t->img = pix.toImage();
-        o->textures.append(t);
-    }
-    o->meshes = obj->r.meshes;
-    ui->glSurface->addPMG(o);
-    this->setWindowTitle("MM:<" + PMG + "> [" + QString::number(objects.count()) + " total object" + (objects.count() != 1 ? "s]" : "]"));
+    ui->glSurface->addModel(m);
+    this->setWindowTitle("MM:<" + PMG + "> [" + QString::number(ui->glSurface->getModelCount()) + " total object" + (ui->glSurface->getModelCount() != 1 ? "s]" : "]"));
     ui->glSurface->repaint();
 }

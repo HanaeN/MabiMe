@@ -11,12 +11,6 @@ namespace Ui {
 class MainWindow;
 }
 
-struct RenderObject {
-    PMGReader r;
-    FRMReader f;
-    QString name;
-};
-
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -33,7 +27,6 @@ private:
     void insertPMG(QString PMG, QString FRM = "");
     MabiPackReader *p;
     Ui::MainWindow *ui;
-    QList<RenderObject*> objects;
 };
 
 #endif // MAINWINDOW_H

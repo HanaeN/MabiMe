@@ -2,6 +2,7 @@
 #include <QtWidgets>
 #include <QtOpenGL>
 #include <QDebug>
+#include <QMouseEvent>
 #include "GL/gl.h"
 #include "GL/glu.h"
 
@@ -57,46 +58,23 @@ void MabiMeGLWidget::checkError(QString error, bool suppress) {
 
 MabiMeGLWidget::MabiMeGLWidget(QWidget *parent) : QGLWidget(QGLFormat(QGL::DepthBuffer | QGL::Rgba | QGL::AlphaChannel | QGL::StencilBuffer | QGL::DirectRendering | QGL::SampleBuffers | QGL::DeprecatedFunctions), parent)
 {
-//    this->setFormat(QGLFormat());
+    // init
 }
+
+
+
 void MabiMeGLWidget::draw() {
-    for (int i = 0; i < objects.count(); i++) {
-        PMGObject *o = objects[i];
+    for (int i = 0; i < models.count(); i++) {
+        Model *o = models[i];
         for (int n = 0; n < o->meshes.count(); n++) {
-            PMGTexture *t = nullptr;
-            FRM::Bone *b = nullptr;
+            PMGTexture t;
             for (int i = 0; i < o->textures.count(); i++) {
-                if (o->textures[i]->name == o->meshes[n]->textureName) {
-                    t = o->textures[i];
+                if (o->textures[i].name == o->meshes[n]->textureName) {
+                    t = o->textures.at(i);
                     break;
                 }
             }
-            for (int i = 0; i < o->bones.count(); i++) {
-                if (o->bones[i]->name == o->meshes[n]->boneName) {
-                    b = o->bones[i];
-                    break;
-                }
-            }
-            QList<FRM::Bone*> bl = QList<FRM::Bone*>();
-            if (b != nullptr) {
-                while (true) {
-                    bl.insert(0, b);
-                    char parent = b->parentID;
-                    b = nullptr;
-                    for (int i = 0; i < o->bones.count(); i++) {
-                        if (o->bones[i]->boneID == parent) {
-                            b = o->bones[i];
-                            break;
-                        }
-                    }
-                    if (b == nullptr) break;
-                }
-            }
-            if (bl.count() > 0) {
-                renderPMGMesh(*o->meshes[n], &bl, t);
-            } else {
-                renderPMGMesh(*o->meshes[n], nullptr, t);
-            }
+            renderPMGMesh(*o->meshes[n], t.texture);
         }
     }
 }
@@ -221,11 +199,11 @@ void MabiMeGLWidget::resizeGL(int width, int height) {
     glMatrixMode(GL_MODELVIEW);
 }
 
-void MabiMeGLWidget::renderPMGMesh(PMG::Mesh mesh, QList<FRM::Bone *> *bones, PMGTexture *t) {
+void MabiMeGLWidget::renderPMGMesh(PMG::Mesh mesh, GLuint texture) {
     glPushMatrix();
     glRotatef(camera.rotation.pitch, 1.0, 0.0, 0.0);
     glRotatef(camera.rotation.yaw, 0.0, 1.0, 0.0);
-
+/*
     if (bones != nullptr) {
         QMatrix4x4 m, m2, mult;
         // build bone matrix
@@ -273,22 +251,24 @@ void MabiMeGLWidget::renderPMGMesh(PMG::Mesh mesh, QList<FRM::Bone *> *bones, PM
         }
         setShaderVariableMatrix(boneShader, "boneMatrix", m2);
     } else {
+*/
         QMatrix4x4 m;
         m.setRow(0, QVector4D(1, 0, 0, 0));
         m.setRow(1, QVector4D(0, 1, 0, 0));
         m.setRow(2, QVector4D(0, 0, 1, 0));
         m.setRow(3, QVector4D(0, 0, 0, 1));
         setShaderVariableMatrix(boneShader, "boneMatrix", m);
-    }
+        glMultMatrixf(mesh.majorMatrix.constData());
+//    }
     glVertexPointer(3, GL_FLOAT, 0, mesh.cleanVertices);
     glColorPointer(4, GL_FLOAT, 0, mesh.cleanColours);
     glNormalPointer(GL_FLOAT, 0, mesh.cleanNormals);
     glTexCoordPointer(2, GL_FLOAT, 0, mesh.cleanTextureCoords);
     glActiveTexture(GL_TEXTURE0);
-    if (t != nullptr) {
+    if (texture > 0) {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-        glBindTexture(GL_TEXTURE_2D, t->texture);
+        glBindTexture(GL_TEXTURE_2D, texture);
     } else {
         glBindTexture(GL_TEXTURE_2D, 0);
     }
@@ -367,7 +347,6 @@ bool MabiMeGLWidget::loadTexture(PMGTexture *t, bool useFiltering) {
     return true;
 }
 
-
 GLuint MabiMeGLWidget::loadTexture(QString filename, bool useFiltering) {
     GLuint result;
     glGenTextures(1, &result);
@@ -387,18 +366,18 @@ GLuint MabiMeGLWidget::loadTexture(QString filename, bool useFiltering) {
     return result;
 }
 
-bool MabiMeGLWidget::addPMG(PMGObject *pmg) {
+bool MabiMeGLWidget::addModel(Model *model) {
     try {
-        for (int i = 0; i < pmg->textures.count(); i++) {
-            loadTexture(pmg->textures[i], true);
+        for (int i = 0; i < model->textures.count(); i++) {
+            loadTexture(&model->textures[i], true);
         }
-        objects.append(pmg);
+        models.append(model);
         return true;
     } catch (...) {
+        qDebug() << "fail";
         return false;
     }
 }
-
 
 GLhandleARB MabiMeGLWidget::linkShader(QString vp_str, QString fp_str)
 {
@@ -495,4 +474,7 @@ void MabiMeGLWidget::setShaderArrayFloat(GLhandleARB shader, QString varname, fl
         glUniform1fv (id, arraySize, &data[0]);
         checkError("glUniform1fv(id [" + varname + "], <size>" + QString::number(arraySize) + ", <ptr>)", false);
     }
+}
+int MabiMeGLWidget::getModelCount() {
+    return models.count();
 }

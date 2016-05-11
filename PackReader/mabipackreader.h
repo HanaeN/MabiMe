@@ -62,7 +62,7 @@ private:
     bool ReadFileHeader();
     bool ReadPackageHeader();
     bool ReadPackageInfos();
-    QByteArray ExtractFile(MabiPack::PackageEntry file);
+    QByteArray ExtractFile(MabiPack::PackageEntry *file);
 public:
     QByteArray ExtractFile(QString filename);
     bool OpenPackage(QString filename);

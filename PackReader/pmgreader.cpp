@@ -19,12 +19,6 @@ void PMGReader::freePMG() {
         for (int i = 0; i < m->skins.count(); i++) {
             delete m->skins[i];
         }
-        for (int i = 0; i < m->stripVertexList.count(); i++) {
-            delete m->stripVertexList[i];
-        }
-        for (int i = 0; i < m->vertexList.count(); i++) {
-            delete m->vertexList[i];
-        }
         for (int i = 0; i < m->vertices.count(); i++) {
             delete m->vertices[i];
         }
@@ -139,16 +133,14 @@ bool PMGReader::loadPMG(QByteArray stream) {
                         pos += 64;
                     }
                     for (int n = 0; n < mesh->faceVertexCount; n++) {
-                        short *v = (short*)malloc(2);
-                        memcpy(v, &data[pos], 2);
-                        pos += 2;
+                        short v = *(short*)&data[pos];
                         mesh->vertexList.append(v);
+                        pos += 2;
                     }
                     for (int n = 0; n < mesh->stripFaceVertexCount; n++) {
-                        short *v = (short*)malloc(2);
-                        memcpy(v, &data[pos], 2);
-                        pos += 2;
+                        short v = *(short*)&data[pos];
                         mesh->stripVertexList.append(v);
+                        pos += 2;
                     }
                     for (int n = 0; n < mesh->vertexCount; n++) {
                         PMG::Vertex *v = new PMG::Vertex();
@@ -169,8 +161,8 @@ bool PMGReader::loadPMG(QByteArray stream) {
                     QVector4D rgba;
                     for (int n = 0; n < mesh->faceVertexCount; n++) {
                         short off;
-                        if (n < mesh->faceVertexCount) off = *mesh->vertexList[n];
-                            else off = *mesh->stripVertexList[n - mesh->faceVertexCount];
+                        if (n < mesh->faceVertexCount) off = mesh->vertexList[n];
+                            else off = mesh->stripVertexList[n - mesh->faceVertexCount];
                         PMG::Vertex *v = mesh->vertices[off];
                         xyz = QVector3D(v->x, v->y, v->z);
                         memcpy(&mesh->cleanVertices[n * 3], &xyz, 12);

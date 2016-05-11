@@ -117,26 +117,26 @@ bool MabiPackReader::ReadPackageInfos() {
     return true;
 }
 
-QByteArray MabiPackReader::ExtractFile(MabiPack::PackageEntry file) {
-    int fileSize = file.info.CompressedSize;
-    if (file.info.IsCompressed == 0) fileSize = file.info.DecompressedSize;
-    char *data = (char*)malloc(fileSize + (file.info.IsCompressed == 0 ? 0 : 4));
-    packFile->seek(file.info.Offset + pos);
+QByteArray MabiPackReader::ExtractFile(MabiPack::PackageEntry *file) {
+    int fileSize = file->info.CompressedSize;
+    if (file->info.IsCompressed == 0) fileSize = file->info.DecompressedSize;
+    char *data = (char*)malloc(fileSize + (file->info.IsCompressed == 0 ? 0 : 4));
+    packFile->seek(file->info.Offset + pos);
     packFile->read((data + 4), fileSize);
-    std::mt19937 generator((unsigned int)((file.info.Seed << 7) ^ 0xA9C36DE1));
+    std::mt19937 generator((unsigned int)((file->info.Seed << 7) ^ 0xA9C36DE1));
     for (int i = 0; i < fileSize; i++) {
         data[i + 4] = data[i + 4] ^ generator();
     }
-    *(uint32_t*)&data[0] = qToBigEndian(file.info.DecompressedSize);
-    QByteArray bytes(data, fileSize + (file.info.IsCompressed == 0 ? 0 : 4));
-    if (file.info.IsCompressed != 0) bytes = qUncompress(bytes);
+    *(uint32_t*)&data[0] = qToBigEndian(file->info.DecompressedSize);
+    QByteArray bytes(data, fileSize + (file->info.IsCompressed == 0 ? 0 : 4));
+    if (file->info.IsCompressed != 0) bytes = qUncompress(bytes);
     free(data);
     return bytes;
 }
 
 QByteArray MabiPackReader::ExtractFile(QString filename) {
     for (int i = 0; i < packageEntries.count(); i++) {
-        if (packageEntries[i]->name == filename) return ExtractFile(*packageEntries.at(i));
+        if (packageEntries[i]->name == filename) return ExtractFile(packageEntries.at(i));
     }
     return QByteArray();
 }

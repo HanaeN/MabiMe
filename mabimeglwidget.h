@@ -6,8 +6,7 @@
 #include <QPoint>
 #include <QVector3D>
 
-#include "PackReader/pmgreader.h"
-#include "PackReader/frmreader.h"
+#include "model.h"
 
 struct Rotation {
     int pitch = 0, yaw = 0, roll = 0;
@@ -17,17 +16,6 @@ struct CameraInfo {
     float x = 0, y = 40, zoom = -170;
     Rotation rotation;
 };
-struct PMGTexture {
-    QString name;
-    QImage img;
-    GLuint texture = -1;
-};
-
-struct PMGObject {
-    QList<PMG::Mesh*> meshes;
-    QList<PMGTexture*> textures;
-    QList<FRM::Bone*> bones;
-};
 
 class MabiMeGLWidget : public QGLWidget
 {
@@ -35,13 +23,14 @@ class MabiMeGLWidget : public QGLWidget
 public:
     explicit MabiMeGLWidget(QWidget *parent = 0);
     CameraInfo getCameraInfo();
-    bool addPMG(PMGObject *pmg);
+    bool addModel(Model *model);
+    int getModelCount();
 private:
     GLuint frmTexture;
     CameraInfo camera;
     QPoint drag;
     QPointF oldCameraPos = QPointF(0, 40);
-    QList<PMGObject*> objects = QList<PMGObject*>();
+    QList<Model*> models = QList<Model*>();
     Rotation oldCameraRotation;
     GLhandleARB boneShader;
     bool isLeftDragging = false;
@@ -105,7 +94,7 @@ protected:
     void paintGL();
     void draw();
     void resizeGL(int width, int height);
-    void renderPMGMesh(PMG::Mesh mesh, QList<FRM::Bone*> *bones = nullptr, PMGTexture *t = nullptr);
+    void renderPMGMesh(PMG::Mesh mesh, GLuint texture);
     GLhandleARB linkShader(QString vp_str, QString fp_str);
     void useShader(GLhandleARB shader);
     void endShader();
