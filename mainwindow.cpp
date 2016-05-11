@@ -45,7 +45,7 @@ void MainWindow::startTimer() {
 //        insertPMG("gfx\\char\\chapter4\\monster\\mesh\\ogre\\c4_ogre01_boss_mesh", "gfx\\char\\chapter4\\monster\\mesh\\ogre\\c4_ogre01_framework");
 
 //        PMGpath = "gfx\\char\\item\\mesh\\item_treasurechest01_i";
-//        insertPMG(PMGpath, PMGpath);
+//        insertPMG("box", PMGpath, PMGpath);
 
         PMGpath = "gfx\\char\\human\\female\\";
         insertPMG("human", PMGpath + "face\\female_adult01_f01", PMGpath + "female_framework");
@@ -54,7 +54,7 @@ void MainWindow::startTimer() {
         insertPMG("human", PMGpath + "shoes\\female_summercloth02_s04", PMGpath + "female_framework");
         insertPMG("human", "gfx\\char\\chapter4\\human\\female\\mantle\\uni_c4_wing01", PMGpath + "female_framework");
 
-//        ui->lMeshes->setText("Meshes: " + QString::number(r.meshes.count()));
+ //        ui->lMeshes->setText("Meshes: " + QString::number(r.meshes.count()));
 }
 
 void MainWindow::cameraChange(CameraInfo camera) {
