@@ -33,6 +33,8 @@ public:
     Bone* findBone(QString boneName);
     void addPMG(QString path);
     void setName(QString name);
+    QList<PMG::Vertex*> vertices;
+    bool hasBoneTree();
     QString getName();
 private:
     MabiPackReader *packReader;

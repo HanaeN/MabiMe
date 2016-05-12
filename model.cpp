@@ -54,3 +54,7 @@ void Model::setName(QString name) {
 QString Model::getName() {
     return name;
 }
+
+bool Model::hasBoneTree() {
+    return (boneTree == nullptr) ? false : true;
+}
