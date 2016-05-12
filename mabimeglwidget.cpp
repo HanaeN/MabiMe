@@ -75,7 +75,11 @@ void MabiMeGLWidget::draw() {
                         break;
                     }
                 }
-                renderPMGMesh(*pmgModel->meshes[n], o->findBone(pmgModel->meshes[n]->boneName), t.texture);
+                QList<Bone*> bones = QList<Bone*>();
+                for (int i = 0; i < pmgModel->meshes[n]->boneNames.count(); i++) {
+                    bones.append(o->findBone(pmgModel->meshes[n]->boneNames[i]));
+                }
+                renderPMGMesh(*pmgModel->meshes[n], bones, t.texture);
             }
         }
     }
@@ -116,6 +120,7 @@ void MabiMeGLWidget::paintGL() {
 void MabiMeGLWidget::initializeGL() {
     // load extensions
     glEnableVertexAttribArray   = (PFNGLENABLEVERTEXATTRIBARRAYPROC)GetAnyGLFuncAddress("glEnableVertexAttribArray");
+    glDisableVertexAttribArray  = (PFNGLDISABLEVERTEXATTRIBARRAYPROC)GetAnyGLFuncAddress("glDisableVertexAttribArray");
     glVertexAttribPointer       = (PFNGLVERTEXATTRIBPOINTERPROC)GetAnyGLFuncAddress("glVertexAttribPointer");
     glGetAttribLocation         = (PFNGLGETATTRIBLOCATIONPROC)GetAnyGLFuncAddress("glGetAttribLocation");
     glGetShaderInfoLog          = (PFNGLGETSHADERINFOLOGPROC)GetAnyGLFuncAddress("glGetShaderInfoLog");
@@ -147,6 +152,11 @@ void MabiMeGLWidget::initializeGL() {
     glGenBuffers                = (PFNGLGENBUFFERSPROC)GetAnyGLFuncAddress("glGenBuffers");
     glActiveTexture             = (PFNGLACTIVETEXTUREPROC)GetAnyGLFuncAddress("glActiveTexture");
     glClientActiveTexture       = (PFNGLCLIENTACTIVETEXTUREPROC)GetAnyGLFuncAddress("glClientActiveTexture");
+    glGetShaderiv               = (PFNGLGETSHADERIVPROC)GetAnyGLFuncAddress("glGetShaderiv");
+    glGenVertexArrays           = (PFNGLGENVERTEXARRAYSPROC)GetAnyGLFuncAddress("glGenVertexArrays");
+    glBindVertexArray           = (PFNGLBINDVERTEXARRAYPROC)GetAnyGLFuncAddress("glBindVertexArray");
+
+
     qglClearColor(QColor(200, 200, 200));
     glEnable(GL_DEPTH_TEST);
 //    glEnable(GL_CULL_FACE);
@@ -170,6 +180,16 @@ void MabiMeGLWidget::initializeGL() {
 
     frmTexture = loadTexture("Images/frm.png");
     boneShader = linkShader("Shaders/bone.v", "Shaders/bone.f");
+
+//    glGenBuffers(1, &vao);
+//    GLint attrib1 = 6;
+//    glBindAttribLocation(boneShader, attrib1, "vertexData");
+//    checkError("glglgl1");
+//    GLint attrib2 = 6;
+//    glBindAttribLocation(boneShader, attrib2, "vertexPos");
+//    GLint attrib3 = 7;
+//    glBindAttribLocation(boneShader, attrib3, "boneID");
+
     emit cameraChange(camera);
 }
 
@@ -201,21 +221,49 @@ void MabiMeGLWidget::resizeGL(int width, int height) {
     glMatrixMode(GL_MODELVIEW);
 }
 
-void MabiMeGLWidget::renderPMGMesh(PMG::Mesh mesh, Bone *bone, GLuint texture) {
+void MabiMeGLWidget::renderPMGMesh(PMG::Mesh mesh, QList<Bone*> bones, GLuint texture) {
     glPushMatrix();
     glRotatef(camera.rotation.pitch, 1.0, 0.0, 0.0);
     glRotatef(camera.rotation.yaw, 0.0, 1.0, 0.0);
-    if (bone != nullptr) {
-        glMultMatrixf(bone->getMatrix().constData());
-        glMultMatrixf(mesh.minorMatrix.constData());
+//    qDebug() << mesh.shaderVertices[0].x << mesh.shaderVertices[0].y << mesh.shaderVertices[0].z;
+//    qDebug() << mesh.cleanVertices[0] << mesh.cleanVertices[1] << mesh.cleanVertices[2];
+//    if (attrib1 != -1) glEnableVertexAttribArray(attrib1);
+//    glBindBuffer(GL_ARRAY_BUFFER, vao);
+//    glBufferData(GL_ARRAY_BUFFER, 16 * mesh.cleanVertexCount, mesh.shaderVertices, GL_STATIC_DRAW);
+//    glBindBuffer(GL_ARRAY_BUFFER, 0);
+//    glBindBuffer(GL_ARRAY_BUFFER, vao);
+//    glVertexAttribPointer(attrib1, 4, GL_FLOAT, GL_FALSE, 0, 0);
+//mesh.shaderVertices
+//    checkError("glglgl3");
+//    glVertexAttribPointer(attrib2, 3, GL_FLOAT, 0, GL_FALSE, mesh.cleanVertices);
+//    qDebug() << mesh.cleanBoneWeights[0] << mesh.cleanBoneWeights[1] << mesh.cleanBoneWeights[2] << mesh.cleanBoneWeights[3] << mesh.cleanBoneWeights[4] << mesh.cleanBoneWeights[5] << mesh.cleanBoneWeights[6] << mesh.cleanBoneWeights[7];
+//    checkError("glglgl4");
+//    if (attrib2 != -1) glEnableVertexAttribArray(attrib2);
+//    if (attrib2 != -1) glEnableVertexAttribArray(attrib2);
+
+    if (bones.count() > 0) {
+        QList<QMatrix4x4> matrices;
+        for (int n = 0; n < bones.count(); n++) {
+            setShaderVariableMatrix(boneShader, "boneMatrix[" + QString::number(n) + "]", bones[n]->getMatrix());
+            matrices.append(bones[n]->getMatrix());
+        }
+        //setShaderArrayMatrix(boneShader, "boneMatrix[0]", matrices);
+
+
+        setShaderVariableMatrix(boneShader, "worldMatrix", mesh.minorMatrix);
+        setShaderArrayFloat(boneShader, "boneWeight[0]", mesh.cleanBoneWeights, mesh.cleanVertexCount);
+        setShaderArrayInt(boneShader, "boneID[0]", mesh.cleanBoneIDs, mesh.cleanVertexCount);
+//        glMultMatrixf(bone->getMatrix().constData());
     } else {
         QMatrix4x4 m;
         m.setRow(0, QVector4D(1, 0, 0, 0));
         m.setRow(1, QVector4D(0, 1, 0, 0));
         m.setRow(2, QVector4D(0, 0, 1, 0));
         m.setRow(3, QVector4D(0, 0, 0, 1));
-        setShaderVariableMatrix(boneShader, "boneMatrix", m);
-        glMultMatrixf(mesh.majorMatrix.constData());
+        setShaderVariableMatrix(boneShader, "boneMatrix[0]", m);
+        setShaderVariableMatrix(boneShader, "boneMatrix[1]", m);
+        setShaderVariableMatrix(boneShader, "worldMatrix", mesh.majorMatrix.transposed());
+        setShaderArrayFloat(boneShader, "boneWeight[0]", mesh.cleanBoneWeights, mesh.cleanVertexCount * 2);
     }
     glVertexPointer(3, GL_FLOAT, 0, mesh.cleanVertices);
     glColorPointer(4, GL_FLOAT, 0, mesh.cleanColours);
@@ -231,6 +279,8 @@ void MabiMeGLWidget::renderPMGMesh(PMG::Mesh mesh, Bone *bone, GLuint texture) {
     }
     glDrawArrays(GL_TRIANGLES, 0, mesh.cleanVertexCount);
     glPopMatrix();
+//    glBindBuffer(GL_ARRAY_BUFFER, 0);
+//    glDisableVertexAttribArray(attrib1);
 }
 
 void MabiMeGLWidget::mousePressEvent(QMouseEvent *event) {
@@ -260,7 +310,7 @@ void MabiMeGLWidget::mouseMoveEvent(QMouseEvent *event) {
     if (isLeftDragging) {
         camera.x = oldCameraPos.x() + ((event->x() - drag.x()) / 4);
         camera.y = oldCameraPos.y() - ((event->y() - drag.y()) / 4);
-        //getModel("human")->findBone("chest")->setX(camera.x);
+        getModel("human")->findBone("footl")->setX(camera.x);
     }
     if (isRightDragging) {
         camera.rotation.pitch = oldCameraRotation.pitch + (event->y() - drag.y());
@@ -378,6 +428,34 @@ GLhandleARB MabiMeGLWidget::linkShader(QString vp_str, QString fp_str)
     vs.clear();
     fs.clear();
 
+    GLint success = 0;
+    glGetShaderiv(v, GL_COMPILE_STATUS, &success);
+    if(success == GL_FALSE)
+    {
+        qDebug() << "failed to compile vertex shader";
+        GLint maxLength = 0;
+        glGetShaderiv(v, GL_INFO_LOG_LENGTH, &maxLength);
+
+        // The maxLength includes the NULL character
+        std::vector<GLchar> errorLog(maxLength);
+        glGetShaderInfoLog(v, maxLength, &maxLength, &errorLog[0]);
+        qDebug() << errorLog.data();
+    }
+
+    success = 0;
+    glGetShaderiv(f, GL_COMPILE_STATUS, &success);
+    if(success == GL_FALSE)
+    {
+        qDebug() << "failed to compile fragment shader";
+        GLint maxLength = 0;
+        glGetShaderiv(f, GL_INFO_LOG_LENGTH, &maxLength);
+
+        // The maxLength includes the NULL character
+        std::vector<GLchar> errorLog(maxLength);
+        glGetShaderInfoLog(f, maxLength, &maxLength, &errorLog[0]);
+        qDebug() << errorLog.data();
+    }
+
     p = glCreateProgram();
     checkError("p = glCreateProgram()");
     glAttachShader(p,v);
@@ -386,6 +464,8 @@ GLhandleARB MabiMeGLWidget::linkShader(QString vp_str, QString fp_str)
     checkError("glAttachShader(p,f)");
     glLinkProgram(p);
     checkError("glLinkProgram(p)");
+
+
     return p;
 }
 
@@ -442,6 +522,19 @@ void MabiMeGLWidget::setShaderVariableMatrix(GLhandleARB shader, QString varname
         checkError("glUniformMatrix4fv(id [" + varname + "], <ptr>)", true); // suppress error - there is a quirk in openGL to always return 0 for this
     }
 }
+void MabiMeGLWidget::setShaderArrayMatrix(GLhandleARB shader, QString varname, QList<QMatrix4x4> matrices) {
+    GLint id = glGetUniformLocation(shader, varname.toLatin1());
+    checkError("glGetUniformLocation[" + varname + "]");
+    if (id != -1) {
+        GLfloat *matrix = (GLfloat*)malloc(64 * matrices.count());
+        for (int n = 0; n < matrices.count(); n++) {
+            memcpy(&matrix[n * 64], matrices[n].constData(), 64);
+        }
+        glUniformMatrix4fv(id, matrices.count(), GL_FALSE, matrix);
+        free(matrix);
+        checkError("glUniformMatrix4fv(id [" + varname + "], <ptr>)", true); // suppress error - there is a quirk in openGL to always return 0 for this
+    }
+}
 
 void MabiMeGLWidget::setShaderArrayFloat(GLhandleARB shader, QString varname, float *data, int arraySize) {
     GLint id = glGetUniformLocation(shader, varname.toLatin1());
@@ -449,6 +542,14 @@ void MabiMeGLWidget::setShaderArrayFloat(GLhandleARB shader, QString varname, fl
     if (id != -1) {
         glUniform1fv (id, arraySize, &data[0]);
         checkError("glUniform1fv(id [" + varname + "], <size>" + QString::number(arraySize) + ", <ptr>)", false);
+    }
+}
+void MabiMeGLWidget::setShaderArrayInt(GLhandleARB shader, QString varname, int *data, int arraySize) {
+    GLint id = glGetUniformLocation(shader, varname.toLatin1());
+    checkError("glGetUniformLocation[" + varname + "]");
+    if (id != -1) {
+        glUniform1iv (id, arraySize, &data[0]);
+        checkError("glUniform1iv(id [" + varname + "], <size>" + QString::number(arraySize) + ", <ptr>)", false);
     }
 }
 int MabiMeGLWidget::getModelCount() {

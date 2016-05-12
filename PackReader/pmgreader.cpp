@@ -55,9 +55,11 @@ bool PMGReader::loadPMG(QByteArray stream) {
                     if (pmVersion[0] == 1 && pmVersion[1] == 7) {
                         mesh->size = *(int*)&data[pos];
                         pos += 4;
-                        mesh->boneName = QString::fromLatin1(&data[pos], 32);
+                        if ((int)data[pos + 31] == 0) mesh->boneName = QString::fromLatin1(&data[pos]);
+                            else mesh->boneName = QString::fromLatin1(&data[pos], 32);
                         pos += 32;
-                        mesh->meshName = QString::fromLatin1(&data[pos], 128);
+                        if ((int)data[pos + 127] == 0) mesh->meshName = QString::fromLatin1(&data[pos]);
+                            else mesh->meshName = QString::fromLatin1(&data[pos], 128);
                         pos += 256;
                         memcpy(mesh->minorMatrix.data(), &data[pos], 64);
                         pos += 64;
@@ -65,7 +67,8 @@ bool PMGReader::loadPMG(QByteArray stream) {
                         pos += 64;
                         mesh->partNo = *(int*)&data[pos];
                         pos += 12;
-                        mesh->textureName = QString::fromLatin1(&data[pos], 32);
+                        if ((int)data[pos + 31] == 0) mesh->textureName = QString::fromLatin1(&data[pos]);
+                            else mesh->textureName = QString::fromLatin1(&data[pos], 32);
                         pos += 72;
                         mesh->faceVertexCount = *(int*)&data[pos];
                         pos += 4;
@@ -132,7 +135,9 @@ bool PMGReader::loadPMG(QByteArray stream) {
                         mesh->textureName = QString::fromLatin1(&data[pos], length);
                         pos += length;
                         pos += 64;
+                        qDebug() << mesh->meshName << mesh->boneName << mesh->boneName2 << mesh->statName << mesh->normalName << mesh->colourMap;
                     }
+                    mesh->boneNames = QStringList(mesh->boneName);
                     for (int n = 0; n < mesh->faceVertexCount; n++) {
                         short v = *(short*)&data[pos];
                         mesh->vertexList.append(v);
@@ -155,11 +160,22 @@ bool PMGReader::loadPMG(QByteArray stream) {
                     mesh->cleanNormals = (GLfloat*)malloc(4 * mesh->faceVertexCount * 3);
                     mesh->cleanTextureCoords = (GLfloat*)malloc(4 * mesh->faceVertexCount * 2);
                     mesh->cleanBoneWeights = (GLfloat*)malloc(4 * mesh->faceVertexCount);
+                    mesh->cleanBoneIDs = (GLint*)malloc(4 * mesh->faceVertexCount);
                     mesh->cleanVertexCount = mesh->faceVertexCount;
 
                     QVector2D uv;
                     QVector3D xyz;
                     QVector4D rgba;
+
+                    for (int n = 0; n < mesh->skinCount; n++) {
+                        PMG::Skin *s = new PMG::Skin();
+                        memcpy(s, &data[pos], sizeof(PMG::Skin));
+                        mesh->vertices[s->vertexID]->skin = *s;
+                        pos += sizeof(PMG::Skin);
+                        mesh->skins.append(s);
+                    }
+
+
                     for (int n = 0; n < mesh->faceVertexCount; n++) {
                         short off;
                         if (n < mesh->faceVertexCount) off = mesh->vertexList[n];
@@ -173,13 +189,8 @@ bool PMGReader::loadPMG(QByteArray stream) {
                         memcpy(&mesh->cleanNormals[n * 3], &xyz, 12);
                         uv = QVector2D(v->u, v->v);
                         memcpy(&mesh->cleanTextureCoords[n * 2], &uv, 8);
-                    }
-                    for (int n = 0; n < mesh->skinCount; n++) {
-                        PMG::Skin *s = new PMG::Skin();
-                        memcpy(s, &data[pos], sizeof(PMG::Skin));
-                        mesh->vertices[s->vertexID]->skin = *s;
-                        pos += sizeof(PMG::Skin);
-                        mesh->skins.append(s);
+                        mesh->cleanBoneWeights[n] = v->skin.boneWeight;
+                        mesh->cleanBoneIDs[n] = 0;
                     }
                     float d[16];
                     memcpy(d, mesh->majorMatrix.data(), 64);
@@ -196,6 +207,37 @@ bool PMGReader::loadPMG(QByteArray stream) {
                     memcpy(mesh->minorMatrix.data(), m.data(), 64);
                     meshes.append(mesh);
                 }
+                QString mName;
+                int mID;
+                int links = 0;
+                float tolerance = 0.000001;
+                for (int i = 0; i < meshes.count(); i++) {
+                    for (int n = 0; n < meshes[i]->faceVertexCount; n++) {
+                        PMG::Vertex *v = meshes[i]->vertices[meshes[i]->vertexList[n]];
+                        for (int ii = 0; ii < meshes.count(); ii++) {
+                            if (ii != i) {
+                                for (int nn = 0; nn < meshes[ii]->vertexCount; nn++) {
+                                    PMG::Vertex *v2 = meshes[ii]->vertices[nn];
+                                    if (fabs(v2->x - v->x) < tolerance && fabs(v2->y - v->y) < tolerance && fabs(v2->z - v->z) < tolerance) {
+                                        links++;
+                                        mName = meshes[ii]->boneName;
+                                        if (mName != meshes[i]->boneName) {
+                                            mID = meshes[i]->boneNames.indexOf(mName);
+                                            if (mID == -1) {
+                                                mID = meshes[i]->boneNames.count();
+                                                meshes[i]->boneNames.append(mName);
+                                            }
+                                            meshes[i]->cleanBoneIDs[n] = mID;
+                                            qDebug() << "mesh" << meshes[i]->meshName << "boneName" << meshes[i]->boneName << "to" << meshes[ii]->boneName << mID;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                qDebug() << links << "links";
                 return true;
             } else {
                 qDebug() << "unsupported PMG format";

@@ -18,7 +18,7 @@ namespace PMG {
     struct Skin {
         int vertexID = 0;
         int a = 0;
-        float scale = 0.5;
+        float boneWeight = 1.0;
         int b = 1;
     };
     #pragma pack(1)
@@ -29,9 +29,15 @@ namespace PMG {
         float u,v;
         Skin skin;
     };
+    #pragma pack(0)
+    struct ShaderVertex {
+        float x,y,z, weight;
+    };
+
     struct Mesh {
         int size;
         QString boneName, boneName2, statName, normalName, meshName, textureName, colourMap;
+        QStringList boneNames;
         char parts2Length;
         int count;
         QMatrix4x4 minorMatrix, majorMatrix;
@@ -50,6 +56,8 @@ namespace PMG {
         GLfloat *cleanNormals;
         GLfloat *cleanTextureCoords;
         GLfloat *cleanBoneWeights;
+        GLint *cleanBoneIDs;
+        GLfloat *shaderVertices;
         int cleanVertexCount;
         QList<Skin*> skins = QList<Skin*>();
     };
