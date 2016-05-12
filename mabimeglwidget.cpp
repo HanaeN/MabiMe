@@ -76,8 +76,10 @@ void MabiMeGLWidget::draw() {
                     }
                 }
                 QList<Bone*> bones = QList<Bone*>();
-                for (int i = 0; i < pmgModel->meshes[n]->boneNames.count(); i++) {
-                    bones.append(o->findBone(pmgModel->meshes[n]->boneNames[i]));
+                if (o->hasBoneTree()) {
+                    for (int i = 0; i < pmgModel->meshes[n]->boneNames.count(); i++) {
+                        bones.append(o->findBone(pmgModel->meshes[n]->boneNames[i]));
+                    }
                 }
                 renderPMGMesh(*pmgModel->meshes[n], bones, t.texture);
             }
@@ -240,7 +242,6 @@ void MabiMeGLWidget::renderPMGMesh(PMG::Mesh mesh, QList<Bone*> bones, GLuint te
 //    checkError("glglgl4");
 //    if (attrib2 != -1) glEnableVertexAttribArray(attrib2);
 //    if (attrib2 != -1) glEnableVertexAttribArray(attrib2);
-
     if (bones.count() > 0) {
         QList<QMatrix4x4> matrices;
         for (int n = 0; n < bones.count(); n++) {
@@ -262,8 +263,10 @@ void MabiMeGLWidget::renderPMGMesh(PMG::Mesh mesh, QList<Bone*> bones, GLuint te
         m.setRow(3, QVector4D(0, 0, 0, 1));
         setShaderVariableMatrix(boneShader, "boneMatrix[0]", m);
         setShaderVariableMatrix(boneShader, "boneMatrix[1]", m);
-        setShaderVariableMatrix(boneShader, "worldMatrix", mesh.majorMatrix.transposed());
-        setShaderArrayFloat(boneShader, "boneWeight[0]", mesh.cleanBoneWeights, mesh.cleanVertexCount * 2);
+        setShaderVariableMatrix(boneShader, "worldMatrix", m);
+        setShaderArrayFloat(boneShader, "boneWeight[0]", mesh.cleanBoneWeights, mesh.cleanVertexCount);
+        setShaderArrayInt(boneShader, "boneID[0]", mesh.cleanBoneIDs, mesh.cleanVertexCount);
+        glMultMatrixf(mesh.majorMatrix.constData());
     }
     glVertexPointer(3, GL_FLOAT, 0, mesh.cleanVertices);
     glColorPointer(4, GL_FLOAT, 0, mesh.cleanColours);
@@ -310,7 +313,7 @@ void MabiMeGLWidget::mouseMoveEvent(QMouseEvent *event) {
     if (isLeftDragging) {
         camera.x = oldCameraPos.x() + ((event->x() - drag.x()) / 4);
         camera.y = oldCameraPos.y() - ((event->y() - drag.y()) / 4);
-        getModel("human")->findBone("footl")->setX(camera.x);
+        //getModel("human")->findBone("footl")->setX(camera.x);
     }
     if (isRightDragging) {
         camera.rotation.pitch = oldCameraRotation.pitch + (event->y() - drag.y());
