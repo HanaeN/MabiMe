@@ -28,6 +28,7 @@ namespace PMG {
         unsigned char r,g,b,a;
         float u,v;
         Skin skin;
+        int globalID = 0;
     };
     #pragma pack(0)
     struct ShaderVertex {
@@ -51,6 +52,7 @@ namespace PMG {
         QList<short> vertexList = QList<short>();
         QList<short> stripVertexList = QList<short>();
         QList<Vertex*> vertices = QList<Vertex*>();
+        QList<int> globalVertices = QList<int>();
         GLfloat *cleanVertices;
         GLfloat *cleanColours;
         GLfloat *cleanNormals;
@@ -68,9 +70,11 @@ class PMGReader
 private:
     PMG::FileHeader header;
     bool hasLoaded = false;
+    int appendVertex(PMG::Vertex *v);
 public:
     void freePMG();
     QStringList textures;
+    QList<PMG::Vertex*> vertices = QList<PMG::Vertex*>();
     QList<PMG::Mesh*> meshes;
     PMGReader();
     ~PMGReader();
