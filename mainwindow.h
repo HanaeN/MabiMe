@@ -26,6 +26,7 @@ private slots:
 private:
     void insertPMG(QString modelName, QString PMG, QString FRM = "");
     MabiPackReader *p;
+    MabiPackReader *base;
     Ui::MainWindow *ui;
 };
 
