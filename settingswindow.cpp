@@ -12,7 +12,12 @@ SettingsWindow::SettingsWindow(QWidget *parent, QString path) :
     this->setWindowFlags(windowFlags() &~Qt::WindowContextHelpButtonHint);
     ui->setupUi(this);
     detectedPath = path;
-    ui->c_autodetect->setChecked(s.value("AutoDetectEnabled", true).toBool());
+#if defined(Q_OS_WIN)
+    bool canAutoDetect = true;
+#else
+    bool canAutoDetect = false;
+#endif
+    ui->c_autodetect->setChecked(s.value("AutoDetectEnabled", canAutoDetect).toBool());
     ui->e_autodetect->setText(s.value("ClientPath", "").toString());
 
     ui->l_categories->item(0)->setSizeHint(QSize(0, 40));
