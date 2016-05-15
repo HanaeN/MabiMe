@@ -1,10 +1,9 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include <QTimer>
 
-#include "PackReader/mabipackreader.h"
-#include "PackReader/pmgreader.h"
-#include "PackReader/packmanager.h"
+#include <QTimer>
+#include <QMessageBox>
+
 #include "model.h"
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -15,11 +14,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     connect(ui->glSurface, SIGNAL(cameraChange(CameraInfo)), SLOT(cameraChange(CameraInfo)));
     p = new PackManager();
-    if (p->loadPackages()) {
-        QTimer::singleShot(1, this, SLOT(startTimer()));
-    } else {
-        qDebug() << "failed to load";
-    }
+    QTimer::singleShot(1, this, SLOT(startTimer()));
 }
 
 MainWindow::~MainWindow()
@@ -36,12 +31,12 @@ void MainWindow::show() {
     QMainWindow::show();
 }
 
-void MainWindow::startTimer() {
+void MainWindow::loadPackages() {
+    if (!p->loadPackages()) {
 //        QString PMGpath = "gfx\\char\\item\\mesh\\item_treasurechest01_i";
 //        QString PMGpath = "gfx\\char\\monster\\mesh\\tabhartas\\tabhartas";
         QString PMGpath = "gfx\\char\\chapter4\\monster\\mesh\\ogre\\c4_ogre01";
 
-        // load a PMG
 //        insertPMG("gfx\\char\\chapter4\\monster\\mesh\\ogre\\c4_ogre01_boss_mesh", "gfx\\char\\chapter4\\monster\\mesh\\ogre\\c4_ogre01_framework");
 
 //        PMGpath = "gfx\\char\\item\\mesh\\item_treasurechest01_i";
@@ -53,8 +48,8 @@ void MainWindow::startTimer() {
 //        PMGpath = "gfx\\char\\chapter4\\pet\\mesh\\";
 //        insertPMG("fox", PMGpath + "bike\\pet_c4_scooter_imp_mesh", PMGpath + "bike\\pet_c4_scooter_imp_framework");
 
-        //PMGpath = "gfx\\char\\chapter4\\human\\female\\";
-        //insertPMG("human", PMGpath + "wear\\female_c4_captainyoo_bsl", PMGpath + "female_framework");
+//        PMGpath = "gfx\\char\\chapter4\\human\\female\\";
+//        insertPMG("human", PMGpath + "wear\\female_c4_captainyoo_bsl", PMGpath + "female_framework");
 //        PMGpath = "gfx\\char\\human\\female\\";
 //        insertPMG("human", PMGpath + "female_default_bss", PMGpath + "female_framework");
 //        insertPMG("human", PMGpath + "face\\female_adult01_f01", PMGpath + "female_framework");
@@ -62,8 +57,20 @@ void MainWindow::startTimer() {
 //        insertPMG("human", PMGpath + "wear\\female_summercloth01_bss", PMGpath + "female_framework");
 //        insertPMG("human", PMGpath + "shoes\\female_summercloth02_s04", PMGpath + "female_framework");
 //        insertPMG("human", "gfx\\char\\chapter4\\human\\female\\mantle\\uni_c4_wing01", PMGpath + "female_framework");
+//        ui->lMeshes->setText("Meshes: " + QString::number(r.meshes.count()));
+    } else {
+        QMessageBox msg(this);
+        msg.setText("Could not detect the Mabinogi client install path.");
+        msg.setInformativeText("Please check the settings and set a valid path.");
+        msg.setStandardButtons(QMessageBox::Ok);
+        msg.setWindowTitle("MabiMe - Warning");
+        msg.setIcon(QMessageBox::Warning);
+        msg.exec();
+    }
+}
 
- //        ui->lMeshes->setText("Meshes: " + QString::number(r.meshes.count()));
+void MainWindow::startTimer() {
+    loadPackages();
 }
 
 void MainWindow::cameraChange(CameraInfo camera) {
