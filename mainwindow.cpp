@@ -5,6 +5,7 @@
 #include <QMessageBox>
 
 #include "model.h"
+#include "settingswindow.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -66,6 +67,12 @@ void MainWindow::loadPackages() {
         msg.setWindowTitle("MabiMe - Warning");
         msg.setIcon(QMessageBox::Warning);
         msg.exec();
+
+        SettingsWindow* settings = new SettingsWindow(this, p->getPath());
+        settings->setWindowModality(Qt::WindowModal);
+        //QRect rect = QStyle::alignedRect(layoutDirection(), Qt::AlignBottom, QSize(width(), height()/3), geometry());
+        //popUp->setGeometry(rect);
+        settings->show();
     }
 }
 
