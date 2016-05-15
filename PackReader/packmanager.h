@@ -16,9 +16,14 @@ class PackManager
 public:
     PackManager();
     PackManager(QString path);
+    ~PackManager();
+    void freePackages();
     QString getPath();
+    bool loadPackages();
+    QString findTexture(QString name);
+    QByteArray extractFile(QString path);
 private:
-    QString path;
+    QString path = "";
     QList<Pack*> packs;
     bool packsLoaded = false;
     bool findMabinogiPath();

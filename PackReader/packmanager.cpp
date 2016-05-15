@@ -2,6 +2,7 @@
 
 #include <QSettings>
 #include <QDebug>
+#include <QDir>
 
 PackManager::PackManager()
 {
@@ -14,6 +15,13 @@ PackManager::PackManager()
 
 PackManager::PackManager(QString path) {
     // load from path
+    if (QDir(path).exists()) {
+        this->path = path;
+    }
+}
+
+QString PackManager::getPath() {
+    return path;
 }
 
 #if defined(Q_OS_WIN)
@@ -62,7 +70,7 @@ bool PackManager::findMabinogiPath() {
     if (p.length() == 0) return false;
     p.replace("\\", "/");
     p = p.endsWith("/") ? p + "package/" : p + "/package/";
-    if (QFile(p).exists()) {
+    if (QDir(p).exists()) {
         path = p;
         return true;
     } else {
@@ -74,3 +82,75 @@ bool PackManager::findMabinogiPath() {
     return false;
 }
 #endif
+
+bool PackManager::loadPackages() {
+    QDir f(path);
+    // search for packs if the dir exists
+    if (f.exists()) {
+        QStringList packList = f.entryList(QStringList("*.pack"), QDir::NoDotAndDotDot | QDir::Files, QDir::Name);
+        QStringList sortedPacks;
+        // sort the packs from lowest to highest order, important for later
+        int n = 0;
+        while (true) {
+            foreach (const QString &packName, packList) {
+                if (packName.startsWith(QString::number(n) + "_")) {
+                    sortedPacks.insert(0, packName);
+                }
+            }
+            if (sortedPacks.count() == packList.count() - 1) break;
+            n++;
+            if (n > 50000) {
+                qDebug() << "WARNING: COULD NOT FIND ALL PACKS";
+                break;
+            }
+        }
+        int id = 0;
+        foreach (const QString &packName, sortedPacks) {
+            Pack *p = new Pack();
+            p->id = id;
+            p->name = packName;
+            p->reader = new MabiPackReader();
+            p->reader->openPackage(path + packName);
+            id++;
+            packs.append(p);
+        }
+        return true;
+    } else {
+        qDebug() << path << "does not exist!";
+    }
+    return false;
+}
+
+PackManager::~PackManager() {
+    freePackages();
+}
+
+void PackManager::freePackages() {
+    foreach (Pack *p, packs) {
+        p->reader->closePackage();
+        delete p->reader;
+        delete p;
+    }
+    packs.clear();
+}
+
+QString PackManager::findTexture(QString name) {
+    QString packName;
+    foreach (const Pack *pack, packs) {
+        packName = pack->reader->findTexture(name);
+        if (packName.length() > 0) return packName;
+    }
+
+}
+
+QByteArray PackManager::extractFile(QString path) {
+    QByteArray f;
+    foreach (const Pack *pack, packs) {
+        f = pack->reader->extractFile(path);
+        if (f.length() > 0) {
+            qDebug() << pack << pack->name;
+            return f;
+        }
+    }
+    return f;
+}
