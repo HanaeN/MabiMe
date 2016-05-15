@@ -5,7 +5,7 @@
 
 #include <QtOpenGL>
 
-#include "PackReader/mabipackreader.h"
+#include "PackReader/packmanager.h"
 #include "PackReader/pmgreader.h"
 #include "PackReader/frmreader.h"
 #include "bone.h"
@@ -26,7 +26,7 @@ struct PMGModel {
 class Model
 {
 public:
-    Model(MabiPackReader *packReader, QString PMGpath, QString FRMpath = "");
+    Model(PackManager *packManager, QString PMGpath, QString FRMpath = "");
     Model();
     QList<PMGTexture> textures;
     QList<PMGModel*> models;
@@ -37,7 +37,7 @@ public:
     bool hasBoneTree();
     QString getName();
 private:
-    MabiPackReader *packReader;
+    PackManager *packManager;
     FRMReader frmReader;
     QString name = "<null>";
     Bone *boneTree = nullptr;

@@ -14,10 +14,8 @@ MainWindow::MainWindow(QWidget *parent) :
     qApp->setQuitOnLastWindowClosed(true);
     ui->setupUi(this);
     connect(ui->glSurface, SIGNAL(cameraChange(CameraInfo)), SLOT(cameraChange(CameraInfo)));
-    p = new MabiPackReader();
-    QString packPath = "C:/Nexon/Library/mabinogi/appdata/package/183_full.pack";
-//    packPath = "C:/Nexon/Library/mabinogi/appdata/package/226_to_227.pack";
-    if (p->OpenPackage(packPath)) {
+    p = new PackManager();
+    if (p->loadPackages()) {
         QTimer::singleShot(1, this, SLOT(startTimer()));
     } else {
         qDebug() << "failed to load";
@@ -30,7 +28,7 @@ MainWindow::~MainWindow()
 }
 void MainWindow::close() {
     QMainWindow::close();
-    p->ClosePackage();
+    delete p;
 }
 
 void MainWindow::show() {
@@ -49,18 +47,16 @@ void MainWindow::startTimer() {
 //        PMGpath = "gfx\\char\\item\\mesh\\item_treasurechest01_i";
 //        insertPMG("box", PMGpath, PMGpath);
 
-//        PMGpath = "gfx\\char\\pet\\mesh\\";
-//        insertPMG("fox", PMGpath + "fox\\pet_star_fox_01_mesh", PMGpath + "fox\\pet_star_fox_01_mesh");
+        PMGpath = "gfx\\char\\pet\\mesh\\";
+        insertPMG("fox", PMGpath + "fox\\pet_star_fox_01_mesh", PMGpath + "fox\\pet_star_fox_01_mesh");
 
 //        PMGpath = "gfx\\char\\chapter4\\pet\\mesh\\";
 //        insertPMG("fox", PMGpath + "bike\\pet_c4_scooter_imp_mesh", PMGpath + "bike\\pet_c4_scooter_imp_framework");
 
         //PMGpath = "gfx\\char\\chapter4\\human\\female\\";
         //insertPMG("human", PMGpath + "wear\\female_c4_captainyoo_bsl", PMGpath + "female_framework");
-        PackManager *m = new PackManager();
-
-        PMGpath = "gfx\\char\\human\\female\\";
-        insertPMG("human", PMGpath + "female_default_bss", PMGpath + "female_framework");
+//        PMGpath = "gfx\\char\\human\\female\\";
+//        insertPMG("human", PMGpath + "female_default_bss", PMGpath + "female_framework");
 //        insertPMG("human", PMGpath + "face\\female_adult01_f01", PMGpath + "female_framework");
 //        insertPMG("human", PMGpath + "hair\\female_hair46_t46", PMGpath + "female_framework");
 //        insertPMG("human", PMGpath + "wear\\female_summercloth01_bss", PMGpath + "female_framework");

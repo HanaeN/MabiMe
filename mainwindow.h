@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include "mabimeglwidget.h"
+#include "PackReader/packmanager.h"
 #include "PackReader/mabipackreader.h"
 #include "PackReader/pmgreader.h"
 #include "PackReader/frmreader.h"
@@ -25,8 +26,7 @@ private slots:
     void cameraChange(CameraInfo camera);
 private:
     void insertPMG(QString modelName, QString PMG, QString FRM = "");
-    MabiPackReader *p;
-    MabiPackReader *base;
+    PackManager *p;
     Ui::MainWindow *ui;
 };
 

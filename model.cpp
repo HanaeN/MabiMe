@@ -4,10 +4,10 @@ Model::Model()
 {
 }
 
-Model::Model(MabiPackReader *packReader, QString PMGpath, QString FRMpath)
+Model::Model(PackManager *packManager, QString PMGpath, QString FRMpath)
 {
-    this->packReader = packReader;
-    frmReader.loadFRM(packReader->ExtractFile(FRMpath + ".frm"));
+    this->packManager = packManager;
+    frmReader.loadFRM(packManager->extractFile(FRMpath + ".frm"));
     // loop through and find parent bone
     for (int i = 0; i < frmReader.bones.count(); i++) {
         FRM::Bone *bone = frmReader.bones[i];
@@ -27,15 +27,15 @@ Bone* Model::findBone(QString boneName) {
 
 void Model::addPMG(QString path) {
     PMGModel *m = new PMGModel();
-    m->pmgReader.loadPMG(packReader->ExtractFile(path + ".pmg"));
+    m->pmgReader.loadPMG(packManager->extractFile(path + ".pmg"));
     m->name = path;
     // load textures ready for rendering
     for (int i = 0; i < m->pmgReader.textures.count(); i++) {
         PMGTexture t;
         t.name = m->pmgReader.textures[i];
-        QString textureName = packReader->FindTexture(t.name);
+        QString textureName = packManager->findTexture(t.name);
         QPixmap pix;
-        QByteArray bytes = packReader->ExtractFile(textureName);
+        QByteArray bytes = packManager->extractFile(textureName);
         if (bytes.length() > 0) {
             pix.loadFromData(bytes);
             QImage img = pix.toImage();
