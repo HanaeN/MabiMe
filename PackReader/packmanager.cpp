@@ -62,7 +62,12 @@ bool PackManager::findMabinogiPath() {
     if (p.length() == 0) return false;
     p.replace("\\", "/");
     p = p.endsWith("/") ? p + "package/" : p + "/package/";
-    return true;
+    if (QFile(p).exists()) {
+        path = p;
+        return true;
+    } else {
+        return false;
+    }
 }
 #elif defined (Q_OS_LINUX)
 bool PackManager::findMabinogiPath() {
