@@ -9,26 +9,25 @@ MabiPackReader::MabiPackReader()
     packageEntries = QList<MabiPack::PackageEntry*>();
 }
 
-bool MabiPackReader::OpenPackage(QString filename) {
-    if (fileOpen) ClosePackage(); // close old package first
+bool MabiPackReader::openPackage(QString filename) {
+    if (fileOpen) closePackage(); // close old package first
     packFile = new QFile(filename);
     if (packFile->exists()) {
         if (packFile->open(QIODevice::ReadOnly)) {
-            qDebug() << "Successfully opened " + filename + " for reading.";
             fileOpen = true;
             io.setDevice(packFile);
-            if (ReadFileHeader()) {
-                if (ReadPackageHeader()) {
-                    ReadPackageInfos();
+            if (readFileHeader()) {
+                if (readPackageHeader()) {
+                    readPackageInfos();
                     pos = packFile->pos();
-                } else this->ClosePackage();
-            } else this->ClosePackage();
+                } else this->closePackage();
+            } else this->closePackage();
         }
     }
     return fileOpen;
 }
 
-void MabiPackReader::ClosePackage() {
+void MabiPackReader::closePackage() {
     if (fileOpen) {
         packFile->close();
         if (packageEntries.count() > 0) {
@@ -39,11 +38,10 @@ void MabiPackReader::ClosePackage() {
         }
         delete packFile;
         fileOpen = false;
-        qDebug() << "pack has been closed.";
     }
 }
 
-bool MabiPackReader::ReadFileHeader() {
+bool MabiPackReader::readFileHeader() {
     if (!fileOpen) return false;
     try {
         MabiPack::FileHeader h;
@@ -63,7 +61,7 @@ bool MabiPackReader::ReadFileHeader() {
     return true;
 }
 
-bool MabiPackReader::ReadPackageHeader() {
+bool MabiPackReader::readPackageHeader() {
     if (!fileOpen) return false;
     try {
         MabiPack::PackageHeader p;
@@ -77,7 +75,7 @@ bool MabiPackReader::ReadPackageHeader() {
     return true;
 }
 
-bool MabiPackReader::ReadPackageInfos() {
+bool MabiPackReader::readPackageInfos() {
     if (!fileOpen) return false;
     try {
         char* infoHeader = (char*)malloc(headers.packageHeader.InfoHeaderSize);
@@ -117,7 +115,7 @@ bool MabiPackReader::ReadPackageInfos() {
     return true;
 }
 
-QByteArray MabiPackReader::ExtractFile(MabiPack::PackageEntry *file) {
+QByteArray MabiPackReader::extractFile(MabiPack::PackageEntry *file) {
     int fileSize = file->info.CompressedSize;
     if (file->info.IsCompressed == 0) fileSize = file->info.DecompressedSize;
     char *data = (char*)malloc(fileSize + (file->info.IsCompressed == 0 ? 0 : 4));
@@ -134,14 +132,14 @@ QByteArray MabiPackReader::ExtractFile(MabiPack::PackageEntry *file) {
     return bytes;
 }
 
-QByteArray MabiPackReader::ExtractFile(QString filename) {
+QByteArray MabiPackReader::extractFile(QString filename) {
     for (int i = 0; i < packageEntries.count(); i++) {
-        if (packageEntries[i]->name == filename) return ExtractFile(packageEntries.at(i));
+        if (packageEntries[i]->name == filename) return extractFile(packageEntries.at(i));
     }
     return QByteArray();
 }
 
-QString MabiPackReader::FindTexture(QString texture) {
+QString MabiPackReader::findTexture(QString texture) {
     for (int n = 0; n < packageEntries.count(); n++) {
         if (packageEntries[n]->name.endsWith(".dds")) {
             if (packageEntries[n]->name.split("\\", QString::SkipEmptyParts).last() == texture + ".dds") {

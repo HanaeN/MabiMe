@@ -59,15 +59,15 @@ private:
     MabiPack::Headers headers;
     QList<MabiPack::PackageEntry*> packageEntries;
     bool fileOpen = false;
-    bool ReadFileHeader();
-    bool ReadPackageHeader();
-    bool ReadPackageInfos();
-    QByteArray ExtractFile(MabiPack::PackageEntry *file);
+    bool readFileHeader();
+    bool readPackageHeader();
+    bool readPackageInfos();
+    QByteArray extractFile(MabiPack::PackageEntry *file);
 public:
-    QByteArray ExtractFile(QString filename);
-    bool OpenPackage(QString filename);
-    QString FindTexture(QString texture);
-    void ClosePackage();
+    QByteArray extractFile(QString filename);
+    bool openPackage(QString filename);
+    QString findTexture(QString texture);
+    void closePackage();
     MabiPackReader();
 
 };
