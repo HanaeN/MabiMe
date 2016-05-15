@@ -2,9 +2,9 @@
 #include "ui_mainwindow.h"
 #include <QTimer>
 
-
 #include "PackReader/mabipackreader.h"
 #include "PackReader/pmgreader.h"
+#include "PackReader/packmanager.h"
 #include "model.h"
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -57,7 +57,7 @@ void MainWindow::startTimer() {
 
         //PMGpath = "gfx\\char\\chapter4\\human\\female\\";
         //insertPMG("human", PMGpath + "wear\\female_c4_captainyoo_bsl", PMGpath + "female_framework");
-
+        PackManager *m = new PackManager();
 
         PMGpath = "gfx\\char\\human\\female\\";
         insertPMG("human", PMGpath + "female_default_bss", PMGpath + "female_framework");
