@@ -22,6 +22,7 @@ SOURCES += main.cpp\
     PackReader/packmanager.cpp \
     bone.cpp \
     model.cpp \
+    settingswindow.cpp
 
 HEADERS  += mainwindow.h \
     PackReader/mabipackreader.h \
@@ -32,8 +33,10 @@ HEADERS  += mainwindow.h \
     PackReader/packmanager.h \
     bone.h \
     model.h \
+    settingswindow.h
 
-FORMS    += mainwindow.ui
+FORMS    += mainwindow.ui \
+    settingswindow.ui
 
 win32:LIBS += -lopengl32
 unix:LIBS += -lGL
