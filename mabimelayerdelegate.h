@@ -26,6 +26,13 @@
 #include <QTreeWidgetItem>
 #include <QStyledItemDelegate>
 
+namespace LayerRole {
+    const int BUTTON_DOWN = 0x100;
+    const int BUTTON_HOVER = 0x101;
+    const int BUTTON_HOVER_VISIBLE = 0x102;
+    const int LAYER_VISIBLE = 0x103;
+}
+
 class MabiMeLayerDelegate : public QStyledItemDelegate
 {
     Q_OBJECT
@@ -43,8 +50,11 @@ private:
     QImage smallButtonHover = QImage(":/images/Images/button-small-hover.png");
     QImage smallButtonPressed = QImage(":/images/Images/button-small-down.png");
     QImage smallButtonX = QImage(":/images/Images/button-small-x.png");
+    QImage smallButtonVisible = QImage(":/images/Images/button-small-visible.png");
+    QImage smallButtonInvisible = QImage(":/images/Images/button-small-invisible.png");
 signals:
     void closeButtonClicked(QTreeWidgetItem *i);
+    void visibilityButtonClicked(QTreeWidgetItem *i);
     void repaintWidget();
 public slots:
 };

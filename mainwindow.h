@@ -45,6 +45,7 @@ private slots:
 
     void on_action_Exit_MabiMe_triggered();
     void onLayerCloseButtonClicked(QTreeWidgetItem *i);
+    void onLayerVisibilityButtonClicked(QTreeWidgetItem *i);
     void repaintLayers();
 
 private:

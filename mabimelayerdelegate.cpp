@@ -59,22 +59,45 @@ void MabiMeLayerDelegate::paint(QPainter *painter, const QStyleOptionViewItem &o
     fgGradientGrey.setColorAt(0.1, QColor(230, 230, 230));
     fgGradientGrey.setColorAt(1, QColor(240, 240, 240));
 
+    QLinearGradient fgGradientGreyLighter(0, sY, 0, sY + option.rect.height());
+    fgGradientGreyLighter.setColorAt(0, QColor(255, 255, 255));
+    fgGradientGreyLighter.setColorAt(0.1, QColor(240, 240, 240));
+    fgGradientGreyLighter.setColorAt(1, QColor(250, 250, 250));
+
+
     if (isModel) {
         painter->fillRect(option.rect, fgGradientGrey);
         if (option.state & QStyle::State_Selected) painter->fillRect(option.rect, fgGradient);
         if (option.state & QStyle::State_MouseOver) {
             painter->fillRect(option.rect, fgGradientHover);
         }
-        bool buttonHover = t->data(0, 0x0100).toBool();
-        bool buttonDown = t->data(0, 0x0101).toBool();
+        bool buttonHover = t->data(0, LayerRole::BUTTON_HOVER).toBool();
+        bool buttonDown = t->data(0, LayerRole::BUTTON_DOWN).toBool();
+        bool isVisible = t->data(0, LayerRole::LAYER_VISIBLE).toBool();
         if (buttonHover && !buttonDown) {
             painter->drawImage(QRect(option.rect.right() - 24, sY + 14, 20, 20), smallButtonHover);
-        } else if (buttonDown) {
+        } else if (buttonHover && buttonDown) {
             painter->drawImage(QRect(option.rect.right() - 24, sY + 14, 20, 20), smallButtonPressed);
         } else {
             painter->drawImage(QRect(option.rect.right() - 24, sY + 14, 20, 20), smallButton);
         }
         painter->drawImage(QRect(option.rect.right() - 24, sY + 14, 20, 20), smallButtonX);
+
+
+        buttonHover = t->data(0, LayerRole::BUTTON_HOVER_VISIBLE).toBool();
+        if (buttonHover && !buttonDown) {
+            painter->drawImage(QRect(option.rect.right() - 48, sY + 14, 20, 20), smallButtonHover);
+        } else if (buttonHover && buttonDown) {
+            painter->drawImage(QRect(option.rect.right() - 48, sY + 14, 20, 20), smallButtonPressed);
+        } else {
+            painter->drawImage(QRect(option.rect.right() - 48, sY + 14, 20, 20), smallButton);
+        }
+        painter->drawImage(QRect(option.rect.right() - 48, sY + 14, 20, 20), isVisible ? smallButtonVisible : smallButtonInvisible);
+    } else {
+        bool isVisible = t->parent()->data(0, LayerRole::LAYER_VISIBLE).toBool();
+        if (!isVisible) {
+            painter->fillRect(option.rect, fgGradientGreyLighter);
+        }
     }
 
     QFont f = painter->font();
@@ -100,22 +123,23 @@ bool MabiMeLayerDelegate::editorEvent(QEvent *event, QAbstractItemModel *model, 
     if (isModel) {
         QMouseEvent *e = (QMouseEvent*)event;
         int sY = option.rect.top();
-        bool bH = t->data(0, 0x0100).toBool();
-        buttonDown = t->data(0, 0x0101).toBool();
+        buttonDown = t->data(0, LayerRole::BUTTON_DOWN).toBool();
         buttonHover = false;
-        if (e->pos().x() >= option.rect.right() - 24 && e->pos().x() < option.rect.right() - 4) {
-            if (e->pos().y() >= sY + 14 && e->pos().y() < sY + 34) buttonHover = true;
+        bool buttonHover2 = false;
+        if (e->pos().y() >= sY + 14 && e->pos().y() < sY + 34) {
+            if (e->pos().x() >= option.rect.right() - 24 && e->pos().x() < option.rect.right() - 4) buttonHover = true;
+            if (e->pos().x() >= option.rect.right() - 48 && e->pos().x() < option.rect.right() - 28) buttonHover2 = true;
         }
-        if (buttonDown && !buttonHover) {
+        if (buttonDown && !buttonHover && !buttonHover2) {
             buttonDown = false;
-            t->setData(0, 0x0101, buttonDown);
-            emit repaintWidget();
+            t->setData(0, LayerRole::BUTTON_DOWN, buttonDown);
         }
-        t->setData(0, 0x0100, buttonHover);
+        t->setData(0, LayerRole::BUTTON_HOVER, buttonHover);
+        t->setData(0, LayerRole::BUTTON_HOVER_VISIBLE, buttonHover2);
         if (event->type() == QEvent::MouseButtonPress) {
-            if (e->buttons() == Qt::LeftButton && buttonHover) {
+            if (e->buttons() == Qt::LeftButton && (buttonHover || buttonHover2)) {
                 buttonDown = true;
-                t->setData(0, 0x0101, buttonDown);
+                t->setData(0, LayerRole::BUTTON_DOWN, buttonDown);
                 emit repaintWidget();
                 return true;
             }
@@ -123,9 +147,15 @@ bool MabiMeLayerDelegate::editorEvent(QEvent *event, QAbstractItemModel *model, 
         if (event->type() == QEvent::MouseButtonRelease) {
             if (e->buttons() != Qt::LeftButton) {
                 emit closeButtonClicked((buttonDown && buttonHover) ? t : nullptr);
+                emit visibilityButtonClicked((buttonDown && buttonHover2) ? t : nullptr);
+                buttonDown = false;
+                t->setData(0, LayerRole::BUTTON_DOWN, buttonDown);
+                emit repaintWidget();
                 return true;
             }
         }
         emit repaintWidget();
+        if (buttonHover || buttonHover2) return true;
     }
+    return false;
 }

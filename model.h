@@ -56,6 +56,7 @@ public:
     QList<PMG::Vertex*> vertices;
     bool hasBoneTree();
     QString getName();
+    bool isVisible = true;
 private:
     PackManager *packManager;
     FRMReader frmReader;

@@ -39,6 +39,7 @@ MainWindow::MainWindow(QWidget *parent) :
     MabiMeLayerDelegate *d = new MabiMeLayerDelegate();
     connect(d, SIGNAL(repaintWidget()), SLOT(repaintLayers()));
     connect(d, SIGNAL(closeButtonClicked(QTreeWidgetItem*)), SLOT(onLayerCloseButtonClicked(QTreeWidgetItem*)));
+    connect(d, SIGNAL(visibilityButtonClicked(QTreeWidgetItem*)), SLOT(onLayerVisibilityButtonClicked(QTreeWidgetItem*)));
     ui->l_layers->setItemDelegate(d);
     connect(ui->glSurface, SIGNAL(cameraChange(CameraInfo)), SLOT(cameraChange(CameraInfo)));
     p = new PackManager();
@@ -115,6 +116,7 @@ void MainWindow::insertPMG(QString modelName, QString PMG, QString FRM) {
         QTreeWidgetItem *i = new QTreeWidgetItem(ui->l_layers, 0);
         ui->l_layers->setRootIsDecorated(false);
         i->setExpanded(true);
+        i->setData(0, LayerRole::LAYER_VISIBLE, true);
         i->setText(0, "$MODEL$" + modelName);
 
         m = new Model(p, PMG, FRM);
@@ -122,12 +124,14 @@ void MainWindow::insertPMG(QString modelName, QString PMG, QString FRM) {
 
         i = new QTreeWidgetItem();
         i->setFlags(Qt::NoItemFlags);
+        i->setData(0, LayerRole::LAYER_VISIBLE, true);
         i->setText(0, PMG.split("\\", QString::SkipEmptyParts).last());
         ui->l_layers->findItems("$MODEL$" + modelName, Qt::MatchExactly)[0]->addChild(i);
         ui->glSurface->addModel(m);
     } else {
         QTreeWidgetItem *i = new QTreeWidgetItem();
         i->setText(0, PMG.split("\\", QString::SkipEmptyParts).last());
+        i->setData(0, LayerRole::LAYER_VISIBLE, true);
         i->setFlags(Qt::NoItemFlags);
         ui->l_layers->findItems("$MODEL$" + modelName, Qt::MatchExactly)[0]->addChild(i);
         m->addPMG(PMG);
@@ -154,12 +158,6 @@ void MainWindow::repaintLayers() {
 }
 
 void MainWindow::onLayerCloseButtonClicked(QTreeWidgetItem *i) {
-    QTreeWidgetItemIterator it(ui->l_layers);
-    while (*it) {
-        (*it)->setData(0, 0x101, false);
-        ++it;
-    }
-    ui->l_layers->repaint();
     if (i != nullptr) {
         QMessageBox msg(this);
         QString model = i->text(0).remove("$MODEL$");
@@ -180,4 +178,19 @@ void MainWindow::onLayerCloseButtonClicked(QTreeWidgetItem *i) {
                 break;
         }
     }
+}
+
+void MainWindow::onLayerVisibilityButtonClicked(QTreeWidgetItem *i) {
+    if (i != nullptr) {
+        Model *m = ui->glSurface->getModel(i->text(0).remove("$MODEL$"));
+        m->isVisible = !m->isVisible;
+        i->setData(0, LayerRole::LAYER_VISIBLE, m->isVisible);
+        ui->glSurface->repaint();
+        for (int n = 0; n < i->childCount(); n++) {
+            i->setData(0, LayerRole::LAYER_VISIBLE, m->isVisible);
+        }
+        ui->l_layers->resizeColumnToContents(0);
+//        ui->l_layers->repaint();
+    }
+
 }

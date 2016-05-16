@@ -84,23 +84,25 @@ MabiMeGLWidget::MabiMeGLWidget(QWidget *parent) : QGLWidget(QGLFormat(QGL::Depth
 void MabiMeGLWidget::draw() {
     for (int i = 0; i < models.count(); i++) {
         Model *o = models[i];
-        for (int index = 0; index < o->models.count(); index++) {
-            PMGModel *pmgModel = o->models[index];
-            for (int n = 0; n < pmgModel->meshes.count(); n++) {
-                PMGTexture t;
-                for (int i = 0; i < o->textures.count(); i++) {
-                    if (o->textures[i].name == pmgModel->meshes[n]->textureName) {
-                        t = o->textures.at(i);
-                        break;
+        if (o->isVisible) {
+            for (int index = 0; index < o->models.count(); index++) {
+                PMGModel *pmgModel = o->models[index];
+                for (int n = 0; n < pmgModel->meshes.count(); n++) {
+                    PMGTexture t;
+                    for (int i = 0; i < o->textures.count(); i++) {
+                        if (o->textures[i].name == pmgModel->meshes[n]->textureName) {
+                            t = o->textures.at(i);
+                            break;
+                        }
                     }
-                }
-                QList<Bone*> bones = QList<Bone*>();
-                if (o->hasBoneTree()) {
-                    for (int i = 0; i < pmgModel->meshes[n]->boneNames.count(); i++) {
-                        bones.append(o->findBone(pmgModel->meshes[n]->boneNames[i]));
+                    QList<Bone*> bones = QList<Bone*>();
+                    if (o->hasBoneTree()) {
+                        for (int i = 0; i < pmgModel->meshes[n]->boneNames.count(); i++) {
+                            bones.append(o->findBone(pmgModel->meshes[n]->boneNames[i]));
+                        }
                     }
+                    renderPMGMesh(*pmgModel->meshes[n], bones, t.texture);
                 }
-                renderPMGMesh(*pmgModel->meshes[n], bones, t.texture);
             }
         }
     }
