@@ -23,6 +23,7 @@
 #include <QImage>
 #include <QObject>
 #include <QStyleOptionViewItem>
+#include <QTreeWidgetItem>
 #include <QStyledItemDelegate>
 
 class MabiMeLayerDelegate : public QStyledItemDelegate
@@ -32,11 +33,19 @@ public:
     explicit MabiMeLayerDelegate(QObject *parent = 0);
     QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const;
     void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+     bool editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option, const QModelIndex &index);
 private:
+    bool buttonDown = false;
+    bool buttonHover = false;
     QImage branchOpen = QImage(":/images/Images/branch-open.png");
     QImage branchClosed = QImage(":/images/Images/branch-closed.png");
+    QImage smallButton = QImage(":/images/Images/button-small.png");
+    QImage smallButtonHover = QImage(":/images/Images/button-small-hover.png");
+    QImage smallButtonPressed = QImage(":/images/Images/button-small-down.png");
+    QImage smallButtonX = QImage(":/images/Images/button-small-x.png");
 signals:
-
+    void closeButtonClicked(QTreeWidgetItem *i);
+    void repaintWidget();
 public slots:
 };
 

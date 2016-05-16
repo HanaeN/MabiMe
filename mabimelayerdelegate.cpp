@@ -20,14 +20,13 @@
 #include "mabimelayerdelegate.h"
 
 #include <QStyledItemDelegate>
-#include <QTreeWidgetItem>
 #include <QLinearGradient>
 #include <QPainter>
-#include <QDebug>
+#include <QEvent>
+#include <QMouseEvent>
 
 MabiMeLayerDelegate::MabiMeLayerDelegate(QObject *parent) : QStyledItemDelegate(parent)
 {
-
 }
 
 QSize MabiMeLayerDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const {
@@ -40,7 +39,6 @@ QSize MabiMeLayerDelegate::sizeHint(const QStyleOptionViewItem &option, const QM
 }
 
 void MabiMeLayerDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const {
-    //:/images/Images/cog.png
     QTreeWidgetItem *t = (QTreeWidgetItem*)index.internalPointer();
     bool isModel = t->text(0).startsWith("$MODEL$") ? true : false;
     int marginL = 15;
@@ -61,13 +59,22 @@ void MabiMeLayerDelegate::paint(QPainter *painter, const QStyleOptionViewItem &o
     fgGradientGrey.setColorAt(0.1, QColor(230, 230, 230));
     fgGradientGrey.setColorAt(1, QColor(240, 240, 240));
 
-
-    QString colourString = "#F6F6F6";
-//    painter->setBrush(QBrush(fgGradient, Qt::SolidPattern));
     if (isModel) {
         painter->fillRect(option.rect, fgGradientGrey);
         if (option.state & QStyle::State_Selected) painter->fillRect(option.rect, fgGradient);
-        if (option.state & QStyle::State_MouseOver) painter->fillRect(option.rect, fgGradientHover);
+        if (option.state & QStyle::State_MouseOver) {
+            painter->fillRect(option.rect, fgGradientHover);
+        }
+        bool buttonHover = t->data(0, 0x0100).toBool();
+        bool buttonDown = t->data(0, 0x0101).toBool();
+        if (buttonHover && !buttonDown) {
+            painter->drawImage(QRect(option.rect.right() - 24, sY + 14, 20, 20), smallButtonHover);
+        } else if (buttonDown) {
+            painter->drawImage(QRect(option.rect.right() - 24, sY + 14, 20, 20), smallButtonPressed);
+        } else {
+            painter->drawImage(QRect(option.rect.right() - 24, sY + 14, 20, 20), smallButton);
+        }
+        painter->drawImage(QRect(option.rect.right() - 24, sY + 14, 20, 20), smallButtonX);
     }
 
     QFont f = painter->font();
@@ -84,5 +91,41 @@ void MabiMeLayerDelegate::paint(QPainter *painter, const QStyleOptionViewItem &o
         painter->drawText(QRect(sX + 12, sY, option.rect.width(), option.rect.height()), t->text(0).mid(7), QTextOption(Qt::AlignVCenter));
     } else {
         painter->drawText(QRect(sX + 12, sY, option.rect.width(), option.rect.height()), t->text(0), QTextOption(Qt::AlignVCenter));
+    }
+}
+
+bool MabiMeLayerDelegate::editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option, const QModelIndex &index) {
+    QTreeWidgetItem *t = (QTreeWidgetItem*)index.internalPointer();
+    bool isModel = t->text(0).startsWith("$MODEL$") ? true : false;
+    if (isModel) {
+        QMouseEvent *e = (QMouseEvent*)event;
+        int sY = option.rect.top();
+        bool bH = t->data(0, 0x0100).toBool();
+        buttonDown = t->data(0, 0x0101).toBool();
+        buttonHover = false;
+        if (e->pos().x() >= option.rect.right() - 24 && e->pos().x() < option.rect.right() - 4) {
+            if (e->pos().y() >= sY + 14 && e->pos().y() < sY + 34) buttonHover = true;
+        }
+        if (buttonDown && !buttonHover) {
+            buttonDown = false;
+            t->setData(0, 0x0101, buttonDown);
+            emit repaintWidget();
+        }
+        t->setData(0, 0x0100, buttonHover);
+        if (event->type() == QEvent::MouseButtonPress) {
+            if (e->buttons() == Qt::LeftButton && buttonHover) {
+                buttonDown = true;
+                t->setData(0, 0x0101, buttonDown);
+                emit repaintWidget();
+                return true;
+            }
+        }
+        if (event->type() == QEvent::MouseButtonRelease) {
+            if (e->buttons() != Qt::LeftButton) {
+                emit closeButtonClicked((buttonDown && buttonHover) ? t : nullptr);
+                return true;
+            }
+        }
+        emit repaintWidget();
     }
 }
