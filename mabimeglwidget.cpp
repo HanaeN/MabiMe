@@ -218,7 +218,6 @@ void MabiMeGLWidget::initializeGL() {
 
     frmTexture = loadTexture("Images/frm.png");
     boneShader = linkShader("Shaders/bone.v", "Shaders/bone.f");
-    gridShader = linkShader("Shaders/grid.v", "Shaders/grid.f");
 
 //    glGenBuffers(1, &vao);
 //    GLint attrib1 = 6;

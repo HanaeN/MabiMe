@@ -53,7 +53,7 @@ private:
     QPointF oldCameraPos = QPointF(0, 40);
     QList<Model*> models = QList<Model*>();
     Rotation oldCameraRotation;
-    GLhandleARB boneShader, gridShader;
+    GLhandleARB boneShader;
     bool isLeftDragging = false;
     bool isRightDragging = false;
     void wheelEvent(QWheelEvent* event);
