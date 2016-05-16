@@ -154,7 +154,7 @@ bool PMGReader::loadPMG(QByteArray stream) {
                         mesh->textureName = QString::fromLatin1(&data[pos], length);
                         pos += length;
                         pos += 64;
-                        qDebug() << mesh->meshName << mesh->boneName << mesh->boneName2 << mesh->statName << mesh->normalName << mesh->colourMap << mesh->textureName;
+//                        qDebug() << mesh->meshName << mesh->boneName << mesh->boneName2 << mesh->statName << mesh->normalName << mesh->colourMap << mesh->textureName;
                     }
                     mesh->boneNames = QStringList(mesh->boneName);
                     for (int n = 0; n < mesh->faceVertexCount; n++) {

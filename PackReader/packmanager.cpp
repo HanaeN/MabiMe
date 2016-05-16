@@ -167,7 +167,7 @@ QByteArray PackManager::extractFile(QString path) {
     foreach (const Pack *pack, packs) {
         f = pack->reader->extractFile(path);
         if (f.length() > 0) {
-            qDebug() << pack << pack->name;
+            qDebug() << pack << pack->name << path;
             return f;
         }
     }
