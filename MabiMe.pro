@@ -12,6 +12,8 @@ TARGET = MabiMe
 TEMPLATE = app
 CONFIG += c++11
 
+RC_FILE = mabime.rc
+
 SOURCES += main.cpp\
     mainwindow.cpp \
     PackReader/mabipackreader.cpp \
