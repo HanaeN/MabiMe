@@ -40,6 +40,10 @@ public:
 private slots:
     void startTimer();
     void cameraChange(CameraInfo camera);
+    void on_action_Options_triggered();
+
+    void on_action_Exit_MabiMe_triggered();
+
 private:
     void insertPMG(QString modelName, QString PMG, QString FRM = "");
     void loadPackages();
