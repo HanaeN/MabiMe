@@ -43,6 +43,7 @@ public:
     explicit MabiMeGLWidget(QWidget *parent = 0);
     CameraInfo getCameraInfo();
     bool addModel(Model *model);
+    void deleteModel(QString modelName);
     void updateModel(QString modelName);
     int getModelCount();
     Model* getModel(QString modelName);

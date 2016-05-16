@@ -585,3 +585,10 @@ Model* MabiMeGLWidget::getModel(QString modelName) {
     }
     return nullptr;
 }
+
+void MabiMeGLWidget::deleteModel(QString modelName) {
+    Model *m = getModel(modelName);
+    int index = models.indexOf(m);
+    if (m != nullptr) delete m;
+    models.removeAt(index);
+}
