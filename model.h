@@ -47,6 +47,7 @@ class Model
 public:
     Model(PackManager *packManager, QString PMGpath, QString FRMpath = "");
     Model();
+    ~Model();
     QList<PMGTexture> textures;
     QList<PMGModel*> models;
     Bone* findBone(QString boneName);
