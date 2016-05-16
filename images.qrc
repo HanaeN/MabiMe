@@ -8,5 +8,7 @@
         <file>Images/button-small-down.png</file>
         <file>Images/button-small-hover.png</file>
         <file>Images/button-small-x.png</file>
+        <file>Images/button-small-invisible.png</file>
+        <file>Images/button-small-visible.png</file>
     </qresource>
 </RCC>
