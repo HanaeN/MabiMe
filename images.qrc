@@ -4,5 +4,9 @@
         <file>Images/branch-open.png</file>
         <file>Images/cog.png</file>
         <file>Images/frm.png</file>
+        <file>Images/button-small.png</file>
+        <file>Images/button-small-down.png</file>
+        <file>Images/button-small-hover.png</file>
+        <file>Images/button-small-x.png</file>
     </qresource>
 </RCC>
