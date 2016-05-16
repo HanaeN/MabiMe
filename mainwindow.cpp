@@ -33,7 +33,7 @@ void MainWindow::show() {
 }
 
 void MainWindow::loadPackages() {
-    if (!p->loadPackages()) {
+    if (p->loadPackages()) {
 //        QString PMGpath = "gfx\\char\\item\\mesh\\item_treasurechest01_i";
 //        QString PMGpath = "gfx\\char\\monster\\mesh\\tabhartas\\tabhartas";
         QString PMGpath = "gfx\\char\\chapter4\\monster\\mesh\\ogre\\c4_ogre01";
@@ -43,21 +43,21 @@ void MainWindow::loadPackages() {
 //        PMGpath = "gfx\\char\\item\\mesh\\item_treasurechest01_i";
 //        insertPMG("box", PMGpath, PMGpath);
 
-        PMGpath = "gfx\\char\\pet\\mesh\\";
-        insertPMG("fox", PMGpath + "fox\\pet_star_fox_01_mesh", PMGpath + "fox\\pet_star_fox_01_mesh");
+//        PMGpath = "gfx\\char\\pet\\mesh\\";
+//        insertPMG("fox", PMGpath + "fox\\pet_star_fox_01_mesh", PMGpath + "fox\\pet_star_fox_01_mesh");
 
-//        PMGpath = "gfx\\char\\chapter4\\pet\\mesh\\";
-//        insertPMG("fox", PMGpath + "bike\\pet_c4_scooter_imp_mesh", PMGpath + "bike\\pet_c4_scooter_imp_framework");
+//        PMGpath = "gfx\\char\\pet\\mesh\\bear\\";
+//        insertPMG("bear", PMGpath + "pet_ubipanda_mesh", PMGpath + "pet_redpanda_framework");
 
 //        PMGpath = "gfx\\char\\chapter4\\human\\female\\";
 //        insertPMG("human", PMGpath + "wear\\female_c4_captainyoo_bsl", PMGpath + "female_framework");
-//        PMGpath = "gfx\\char\\human\\female\\";
+        PMGpath = "gfx\\char\\human\\female\\";
 //        insertPMG("human", PMGpath + "female_default_bss", PMGpath + "female_framework");
-//        insertPMG("human", PMGpath + "face\\female_adult01_f01", PMGpath + "female_framework");
-//        insertPMG("human", PMGpath + "hair\\female_hair46_t46", PMGpath + "female_framework");
-//        insertPMG("human", PMGpath + "wear\\female_summercloth01_bss", PMGpath + "female_framework");
-//        insertPMG("human", PMGpath + "shoes\\female_summercloth02_s04", PMGpath + "female_framework");
-//        insertPMG("human", "gfx\\char\\chapter4\\human\\female\\mantle\\uni_c4_wing01", PMGpath + "female_framework");
+        insertPMG("human", PMGpath + "face\\female_adult01_f01", PMGpath + "female_framework");
+        insertPMG("human", PMGpath + "hair\\female_hair46_t46", PMGpath + "female_framework");
+        insertPMG("human", PMGpath + "wear\\female_summercloth01_bss", PMGpath + "female_framework");
+        insertPMG("human", PMGpath + "shoes\\female_summercloth02_s04", PMGpath + "female_framework");
+        insertPMG("human", "gfx\\char\\chapter4\\human\\female\\mantle\\uni_c4_ego_swordwing01", PMGpath + "female_framework");
 //        ui->lMeshes->setText("Meshes: " + QString::number(r.meshes.count()));
     } else {
         QMessageBox msg(this);
