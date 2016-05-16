@@ -35,7 +35,11 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     ui->l_layers->header()->close();
     ui->l_layers->setIndentation(0);
-    ui->l_layers->setItemDelegate(new MabiMeLayerDelegate());
+    ui->l_layers->setMouseTracking(true);
+    MabiMeLayerDelegate *d = new MabiMeLayerDelegate();
+    connect(d, SIGNAL(repaintWidget()), SLOT(repaintLayers()));
+    connect(d, SIGNAL(closeButtonClicked(QTreeWidgetItem*)), SLOT(onLayerCloseButtonClicked(QTreeWidgetItem*)));
+    ui->l_layers->setItemDelegate(d);
     connect(ui->glSurface, SIGNAL(cameraChange(CameraInfo)), SLOT(cameraChange(CameraInfo)));
     p = new PackManager();
     QTimer::singleShot(1, this, SLOT(startTimer()));
@@ -112,7 +116,6 @@ void MainWindow::insertPMG(QString modelName, QString PMG, QString FRM) {
         ui->l_layers->setRootIsDecorated(false);
         i->setExpanded(true);
         i->setText(0, "$MODEL$" + modelName);
-        ui->l_layers->addTopLevelItem(i);
 
         m = new Model(p, PMG, FRM);
         m->setName(modelName);
@@ -144,4 +147,37 @@ void MainWindow::on_action_Options_triggered()
 void MainWindow::on_action_Exit_MabiMe_triggered()
 {
     this->close();
+}
+
+void MainWindow::repaintLayers() {
+    ui->l_layers->repaint();
+}
+
+void MainWindow::onLayerCloseButtonClicked(QTreeWidgetItem *i) {
+    QTreeWidgetItemIterator it(ui->l_layers);
+    while (*it) {
+        (*it)->setData(0, 0x101, false);
+        ++it;
+    }
+    ui->l_layers->repaint();
+    if (i != nullptr) {
+        QMessageBox msg(this);
+        QString model = i->text(0).remove("$MODEL$");
+        msg.setText("You are about to remove the '" + model + "' layer.");
+        msg.setInformativeText("Are you sure?");
+        msg.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+        msg.setWindowTitle("MabiMe - Confirmation");
+        msg.setIcon(QMessageBox::Warning);
+        int result = msg.exec();
+        switch (result) {
+            case QMessageBox::Yes:
+                ui->glSurface->deleteModel(model);
+                delete i;
+                break;
+            case QMessageBox::No:
+                break;
+            default:
+                break;
+        }
+    }
 }

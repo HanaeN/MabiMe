@@ -21,6 +21,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QTreeWidgetItem>
 #include "mabimeglwidget.h"
 #include "PackReader/packmanager.h"
 
@@ -43,6 +44,8 @@ private slots:
     void on_action_Options_triggered();
 
     void on_action_Exit_MabiMe_triggered();
+    void onLayerCloseButtonClicked(QTreeWidgetItem *i);
+    void repaintLayers();
 
 private:
     void insertPMG(QString modelName, QString PMG, QString FRM = "");
