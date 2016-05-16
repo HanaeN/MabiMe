@@ -169,8 +169,8 @@
              <string>General</string>
             </property>
             <property name="icon">
-             <iconset>
-              <normaloff>Images/cog.png</normaloff>Images/cog.png</iconset>
+             <iconset resource="images.qrc">
+              <normaloff>:/images/Images/cog.png</normaloff>:/images/Images/cog.png</iconset>
             </property>
            </item>
           </widget>
@@ -421,6 +421,8 @@
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="images.qrc"/>
+ </resources>
  <connections/>
 </ui>
