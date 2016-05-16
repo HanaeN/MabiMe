@@ -90,6 +90,23 @@ void MabiMeGLWidget::draw() {
 void MabiMeGLWidget::paintGL() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     glLoadIdentity();
+
+    // draw grid
+    glDisable(GL_LIGHTING);
+    glDisableClientState(GL_COLOR_ARRAY);
+    glDisableClientState(GL_NORMAL_ARRAY);
+    glVertexPointer(3, GL_FLOAT, 0, vertexList);
+    glTexCoordPointer(2, GL_FLOAT, 0, vertexUV);
+    glActiveTexture(GL_TEXTURE0);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glBindTexture(GL_TEXTURE_2D, frmTexture);
+    glDrawArrays(GL_QUADS, 0, 4);
+    glEnableClientState(GL_COLOR_ARRAY);
+    glEnableClientState(GL_NORMAL_ARRAY);
+    glEnable(GL_LIGHTING);
+    glClear(GL_DEPTH_BUFFER_BIT);
+
     glTranslatef(camera.x, camera.y, camera.zoom);
     qglColor(Qt::red);
 
@@ -182,6 +199,7 @@ void MabiMeGLWidget::initializeGL() {
 
     frmTexture = loadTexture("Images/frm.png");
     boneShader = linkShader("Shaders/bone.v", "Shaders/bone.f");
+    gridShader = linkShader("Shaders/grid.v", "Shaders/grid.f");
 
 //    glGenBuffers(1, &vao);
 //    GLint attrib1 = 6;
@@ -227,21 +245,6 @@ void MabiMeGLWidget::renderPMGMesh(PMG::Mesh mesh, QList<Bone*> bones, GLuint te
     glPushMatrix();
     glRotatef(camera.rotation.pitch, 1.0, 0.0, 0.0);
     glRotatef(camera.rotation.yaw, 0.0, 1.0, 0.0);
-//    qDebug() << mesh.shaderVertices[0].x << mesh.shaderVertices[0].y << mesh.shaderVertices[0].z;
-//    qDebug() << mesh.cleanVertices[0] << mesh.cleanVertices[1] << mesh.cleanVertices[2];
-//    if (attrib1 != -1) glEnableVertexAttribArray(attrib1);
-//    glBindBuffer(GL_ARRAY_BUFFER, vao);
-//    glBufferData(GL_ARRAY_BUFFER, 16 * mesh.cleanVertexCount, mesh.shaderVertices, GL_STATIC_DRAW);
-//    glBindBuffer(GL_ARRAY_BUFFER, 0);
-//    glBindBuffer(GL_ARRAY_BUFFER, vao);
-//    glVertexAttribPointer(attrib1, 4, GL_FLOAT, GL_FALSE, 0, 0);
-//mesh.shaderVertices
-//    checkError("glglgl3");
-//    glVertexAttribPointer(attrib2, 3, GL_FLOAT, 0, GL_FALSE, mesh.cleanVertices);
-//    qDebug() << mesh.cleanBoneWeights[0] << mesh.cleanBoneWeights[1] << mesh.cleanBoneWeights[2] << mesh.cleanBoneWeights[3] << mesh.cleanBoneWeights[4] << mesh.cleanBoneWeights[5] << mesh.cleanBoneWeights[6] << mesh.cleanBoneWeights[7];
-//    checkError("glglgl4");
-//    if (attrib2 != -1) glEnableVertexAttribArray(attrib2);
-//    if (attrib2 != -1) glEnableVertexAttribArray(attrib2);
     if (bones.count() > 0) {
         QList<QMatrix4x4> matrices;
         for (int n = 0; n < bones.count(); n++) {
@@ -282,8 +285,6 @@ void MabiMeGLWidget::renderPMGMesh(PMG::Mesh mesh, QList<Bone*> bones, GLuint te
     }
     glDrawArrays(GL_TRIANGLES, 0, mesh.cleanVertexCount);
     glPopMatrix();
-//    glBindBuffer(GL_ARRAY_BUFFER, 0);
-//    glDisableVertexAttribArray(attrib1);
 }
 
 void MabiMeGLWidget::mousePressEvent(QMouseEvent *event) {

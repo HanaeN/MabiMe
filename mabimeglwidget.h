@@ -34,7 +34,7 @@ private:
     QPointF oldCameraPos = QPointF(0, 40);
     QList<Model*> models = QList<Model*>();
     Rotation oldCameraRotation;
-    GLhandleARB boneShader;
+    GLhandleARB boneShader, gridShader;
     bool isLeftDragging = false;
     bool isRightDragging = false;
     void wheelEvent(QWheelEvent* event);
@@ -44,19 +44,11 @@ private:
     void checkError(QString error, bool suppress = false);
     bool loadTexture(PMGTexture *t, bool useFiltering = false);
     GLuint loadTexture(QString filename, bool useFiltering = false);
-    GLfloat vertexList[72] = {
-        1, -1, -1, 1, 1, -1, -1, 1, -1, -1, -1, -1,
-        1, -1, 1, 1, 1, 1, -1, 1, 1, -1, -1, 1,
-        1, -1, -1, 1, 1, -1, 1, 1, 1, 1, -1, 1,
-        -1, -1, 1, -1, 1, 1, -1, 1, -1, -1, -1, -1,
-        1, 1, 1, 1, 1, -1, -1, 1, -1, -1, 1, 1,
-        1, -1, -1, 1, -1, 1, -1, -1, 1, -1, -1, -1
+    GLfloat vertexList[12] = {
+       -50, -50, -10, -50, 50, -10, 50, 50, -10, 50, -50, -10
     };
-    GLfloat vertexUV[48] = {
-        0, 0, 0, 1, 1, 0, 1, 1,
-        0, 0, 0, 1, 1, 0, 1, 1,
-        0, 0, 0, 1, 1, 0, 1, 1,
-        0, 0, 0, 1, 1, 0, 1, 1
+    GLfloat vertexUV[8] = {
+        0, 0, 0, 50, 50, 50, 50, 0
     };
     float ti = 0 ;
     PFNGLCLIENTACTIVETEXTUREPROC        glClientActiveTexture;
@@ -99,7 +91,6 @@ protected:
     void initializeGL();
     void paintGL();
     void draw();
-    GLint attrib1, attrib2, attrib3;
     void resizeGL(int width, int height);
     void renderPMGMesh(PMG::Mesh mesh, QList<Bone *> bones = QList<Bone*>(), GLuint texture = 0);
     GLhandleARB linkShader(QString vp_str, QString fp_str);
