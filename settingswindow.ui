@@ -97,6 +97,36 @@
           <number>0</number>
          </property>
          <item>
+          <widget class="QLabel" name="label_2">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>40</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>40</height>
+            </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QLabel {
+	background-color: #F6F6F6;
+	border: 0px solid;
+	border-bottom: 1px solid #CCCCCC;
+	padding: 8px;
+}</string>
+           </property>
+           <property name="text">
+            <string>Category</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item>
           <widget class="QListWidget" name="l_categories">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
@@ -134,41 +164,6 @@
            <property name="currentRow">
             <number>-1</number>
            </property>
-           <item>
-            <property name="text">
-             <string>Category</string>
-            </property>
-            <property name="font">
-             <font>
-              <weight>75</weight>
-              <bold>true</bold>
-             </font>
-            </property>
-            <property name="textAlignment">
-             <set>AlignCenter</set>
-            </property>
-            <property name="background">
-             <brush brushstyle="SolidPattern">
-              <color alpha="255">
-               <red>246</red>
-               <green>246</green>
-               <blue>246</blue>
-              </color>
-             </brush>
-            </property>
-            <property name="foreground">
-             <brush brushstyle="SolidPattern">
-              <color alpha="255">
-               <red>0</red>
-               <green>0</green>
-               <blue>0</blue>
-              </color>
-             </brush>
-            </property>
-            <property name="flags">
-             <set>NoItemFlags</set>
-            </property>
-           </item>
            <item>
             <property name="text">
              <string>General</string>

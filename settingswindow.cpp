@@ -19,13 +19,11 @@ SettingsWindow::SettingsWindow(QWidget *parent, QString path) :
 #endif
     ui->c_autodetect->setChecked(s.value("AutoDetectEnabled", canAutoDetect).toBool());
     ui->e_autodetect->setText(s.value("ClientPath", "").toString());
-
-    ui->l_categories->item(0)->setSizeHint(QSize(0, 40));
     ui->l_categories->setIconSize(QSize(24, 24));
     for (int i = 1; i < ui->l_categories->count(); i++) {
-        ui->l_categories->item(i)->setSizeHint(QSize(0, 24));
+        ui->l_categories->item(i)->setSizeHint(QSize(0, 40));
     }
-    ui->l_categories->setCurrentRow(1);
+    ui->l_categories->setCurrentRow(0);
     this->on_c_autodetect_toggled(ui->c_autodetect->isChecked());
 
 }
