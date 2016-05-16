@@ -173,6 +173,12 @@
        </item>
        <item>
         <widget class="QTreeWidget" name="l_layers">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+           <horstretch>0</horstretch>
+           <verstretch>1</verstretch>
+          </sizepolicy>
+         </property>
          <property name="styleSheet">
           <string notr="true">QTreeWidget::branch:has-children:!has-siblings:closed,QTreeWidget::branch:closed:has-children:has-siblings {
         border-image: none;
@@ -225,6 +231,69 @@ QTreeWidget::branch:open:has-children:!has-siblings,QTreeWidget::branch:open:has
           </property>
          </column>
         </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_5">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>40</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>40</height>
+          </size>
+         </property>
+         <property name="font">
+          <font>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">QLabel {
+	background-color: #F6F6F6;
+	border: 0px solid;
+	border-bottom: 1px solid #CCCCCC;
+	border-top: 1px solid #CCCCCC;
+	padding: 8px;
+}</string>
+         </property>
+         <property name="text">
+          <string>Layer Properties</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QFormLayout" name="formLayout">
+         <property name="horizontalSpacing">
+          <number>9</number>
+         </property>
+         <property name="verticalSpacing">
+          <number>9</number>
+         </property>
+         <property name="leftMargin">
+          <number>9</number>
+         </property>
+         <property name="topMargin">
+          <number>9</number>
+         </property>
+         <property name="rightMargin">
+          <number>9</number>
+         </property>
+         <property name="bottomMargin">
+          <number>9</number>
+         </property>
+         <item row="0" column="0">
+          <widget class="QLabel" name="label_6">
+           <property name="text">
+            <string>Mesh Name:</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
       </layout>
      </widget>
