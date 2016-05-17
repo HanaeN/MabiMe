@@ -64,6 +64,10 @@ void MabiMeLayerDelegate::paint(QPainter *painter, const QStyleOptionViewItem &o
     fgGradientGreyLighter.setColorAt(0.1, QColor(240, 240, 240));
     fgGradientGreyLighter.setColorAt(1, QColor(250, 250, 250));
 
+    QLinearGradient fgGradientYellow(0, sY, 0, sY + option.rect.height());
+    fgGradientYellow.setColorAt(0, QColor(255, 255, 255));
+    fgGradientYellow.setColorAt(0.1, QColor(255, 255, 180));
+    fgGradientYellow.setColorAt(1, QColor(255, 255, 220));
 
     if (isModel) {
         painter->fillRect(option.rect, fgGradientGrey);
@@ -94,9 +98,13 @@ void MabiMeLayerDelegate::paint(QPainter *painter, const QStyleOptionViewItem &o
         }
         painter->drawImage(QRect(option.rect.right() - 48, sY + 14, 20, 20), isVisible ? smallButtonVisible : smallButtonInvisible);
     } else {
+        bool hasBones = t->data(0, LayerRole::HAS_BONES).toBool();
         bool isVisible = t->parent()->data(0, LayerRole::LAYER_VISIBLE).toBool();
-        if (!isVisible) {
-            painter->fillRect(option.rect, fgGradientGreyLighter);
+        if (hasBones) {
+            painter->fillRect(option.rect, fgGradientYellow);
+            painter->drawImage(QRect(sX - 10, sY + 7, 20, 20), smallButtonHasBones);
+        } else {
+            if (!isVisible) painter->fillRect(option.rect, fgGradientGreyLighter);
         }
     }
 
@@ -126,9 +134,16 @@ bool MabiMeLayerDelegate::editorEvent(QEvent *event, QAbstractItemModel *model, 
         buttonDown = t->data(0, LayerRole::BUTTON_DOWN).toBool();
         buttonHover = false;
         bool buttonHover2 = false;
+        t->setToolTip(0, "");
         if (e->pos().y() >= sY + 14 && e->pos().y() < sY + 34) {
-            if (e->pos().x() >= option.rect.right() - 24 && e->pos().x() < option.rect.right() - 4) buttonHover = true;
-            if (e->pos().x() >= option.rect.right() - 48 && e->pos().x() < option.rect.right() - 28) buttonHover2 = true;
+            if (e->pos().x() >= option.rect.right() - 24 && e->pos().x() < option.rect.right() - 4) {
+                buttonHover = true;
+                t->setToolTip(0, "Delete layer");
+            }
+            if (e->pos().x() >= option.rect.right() - 48 && e->pos().x() < option.rect.right() - 28) {
+                buttonHover2 = true;
+                t->setToolTip(0, "Hide/show layer");
+            }
         }
         if (buttonDown && !buttonHover && !buttonHover2) {
             buttonDown = false;

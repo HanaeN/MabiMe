@@ -31,6 +31,7 @@ namespace LayerRole {
     const int BUTTON_HOVER = 0x101;
     const int BUTTON_HOVER_VISIBLE = 0x102;
     const int LAYER_VISIBLE = 0x103;
+    const int HAS_BONES = 0x104;
 }
 
 class MabiMeLayerDelegate : public QStyledItemDelegate
@@ -52,6 +53,8 @@ private:
     QImage smallButtonX = QImage(":/images/Images/button-small-x.png");
     QImage smallButtonVisible = QImage(":/images/Images/button-small-visible.png");
     QImage smallButtonInvisible = QImage(":/images/Images/button-small-invisible.png");
+    QImage smallButtonHasBones = QImage(":/images/Images/button-small-has-bones.png");
+    QImage smallButtonNoBones = QImage(":/images/Images/button-small-no-bones.png");
 signals:
     void closeButtonClicked(QTreeWidgetItem *i);
     void visibilityButtonClicked(QTreeWidgetItem *i);
