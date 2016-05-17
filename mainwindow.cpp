@@ -40,6 +40,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(d, SIGNAL(repaintWidget()), SLOT(repaintLayers()));
     connect(d, SIGNAL(closeButtonClicked(QTreeWidgetItem*)), SLOT(onLayerCloseButtonClicked(QTreeWidgetItem*)));
     connect(d, SIGNAL(visibilityButtonClicked(QTreeWidgetItem*)), SLOT(onLayerVisibilityButtonClicked(QTreeWidgetItem*)));
+    connect(ui->l_layers, SIGNAL(currentItemChanged(QTreeWidgetItem*,QTreeWidgetItem*)), SLOT(onLayerItemChanged(QTreeWidgetItem*,QTreeWidgetItem*)));
     ui->l_layers->setItemDelegate(d);
     connect(ui->glSurface, SIGNAL(cameraChange(CameraInfo)), SLOT(cameraChange(CameraInfo)));
     p = new PackManager();
@@ -118,8 +119,8 @@ void MainWindow::insertPMG(QString modelName, QString PMG, QString FRM) {
         i->setExpanded(true);
         i->setData(0, LayerRole::LAYER_VISIBLE, true);
         i->setText(0, "$MODEL$" + modelName);
-
         m = new Model(p, PMG, FRM);
+        ui->l_layers->setCurrentItem(i);
         m->setName(modelName);
 
         i = new QTreeWidgetItem();
@@ -193,4 +194,43 @@ void MainWindow::onLayerVisibilityButtonClicked(QTreeWidgetItem *i) {
 //        ui->l_layers->repaint();
     }
 
+}
+
+void MainWindow::onLayerItemChanged(QTreeWidgetItem *current, QTreeWidgetItem *previous) {
+    selectedLayer = nullptr;
+    if (current != nullptr) {
+        if (current->text(0).startsWith("$MODEL$")) selectedLayer = current;
+    }
+    bool enableButtons = (current != nullptr) ? true : false;
+    ui->b_duplicate_layer->setEnabled(enableButtons);
+    ui->b_move_layer_up->setEnabled((ui->l_layers->indexOfTopLevelItem(current) > 0) ? enableButtons : false);
+    ui->b_move_layer_down->setEnabled((ui->l_layers->indexOfTopLevelItem(current) < ui->l_layers->topLevelItemCount() - 1) ? enableButtons : false);
+}
+
+void MainWindow::on_b_move_layer_up_clicked()
+{
+    if (selectedLayer != nullptr) {
+        int index = ui->l_layers->indexOfTopLevelItem(selectedLayer);
+        if (index > 0) {
+            selectedLayer = ui->l_layers->takeTopLevelItem(index);
+            ui->l_layers->insertTopLevelItem(index - 1, selectedLayer);
+            selectedLayer->setExpanded(true);
+            ui->l_layers->setCurrentItem(selectedLayer);
+            ui->l_layers->repaint();
+        }
+    }
+}
+
+void MainWindow::on_b_move_layer_down_clicked()
+{
+    if (selectedLayer != nullptr) {
+        int index = ui->l_layers->indexOfTopLevelItem(selectedLayer);
+        if (index < ui->l_layers->topLevelItemCount() - 1) {
+            selectedLayer = ui->l_layers->takeTopLevelItem(index);
+            ui->l_layers->insertTopLevelItem(index + 1, selectedLayer);
+            selectedLayer->setExpanded(true);
+            ui->l_layers->setCurrentItem(selectedLayer);
+            ui->l_layers->repaint();
+        }
+    }
 }

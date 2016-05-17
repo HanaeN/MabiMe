@@ -198,6 +198,12 @@ QTreeWidget::branch:open:has-children:!has-siblings,QTreeWidget::branch:open:has
          <property name="editTriggers">
           <set>QAbstractItemView::NoEditTriggers</set>
          </property>
+         <property name="showDropIndicator" stdset="0">
+          <bool>false</bool>
+         </property>
+         <property name="defaultDropAction">
+          <enum>Qt::TargetMoveAction</enum>
+         </property>
          <property name="iconSize">
           <size>
            <width>16</width>
@@ -220,7 +226,7 @@ QTreeWidget::branch:open:has-children:!has-siblings,QTreeWidget::branch:open:has
           <bool>false</bool>
          </property>
          <property name="animated">
-          <bool>false</bool>
+          <bool>true</bool>
          </property>
          <property name="headerHidden">
           <bool>false</bool>
@@ -230,6 +236,154 @@ QTreeWidget::branch:open:has-children:!has-siblings,QTreeWidget::branch:open:has
            <string notr="true">1</string>
           </property>
          </column>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="groupBox">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>30</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>30</height>
+          </size>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">QGroupBox#groupBox {
+	border: none;
+}</string>
+         </property>
+         <property name="title">
+          <string/>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_2">
+          <property name="leftMargin">
+           <number>2</number>
+          </property>
+          <property name="topMargin">
+           <number>2</number>
+          </property>
+          <property name="rightMargin">
+           <number>2</number>
+          </property>
+          <property name="bottomMargin">
+           <number>2</number>
+          </property>
+          <property name="horizontalSpacing">
+           <number>2</number>
+          </property>
+          <property name="verticalSpacing">
+           <number>9</number>
+          </property>
+          <item row="0" column="1">
+           <widget class="QLabel" name="label_7">
+            <property name="styleSheet">
+             <string notr="true">QLabel {
+	padding-left: 2px;
+}</string>
+            </property>
+            <property name="text">
+             <string>With selected:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="4">
+           <widget class="QToolButton" name="b_move_layer_down">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="toolTip">
+             <string>Move Layer Down</string>
+            </property>
+            <property name="text">
+             <string>...</string>
+            </property>
+            <property name="icon">
+             <iconset resource="images.qrc">
+              <normaloff>:/images/Images/move-layer-down.png</normaloff>:/images/Images/move-layer-down.png</iconset>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>20</width>
+              <height>20</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="5">
+           <widget class="QToolButton" name="b_duplicate_layer">
+            <property name="toolTip">
+             <string>Duplicate Layer</string>
+            </property>
+            <property name="text">
+             <string>...</string>
+            </property>
+            <property name="icon">
+             <iconset resource="images.qrc">
+              <normaloff>:/images/Images/duplicate-layer.png</normaloff>:/images/Images/duplicate-layer.png</iconset>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>20</width>
+              <height>20</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="3">
+           <widget class="QToolButton" name="b_move_layer_up">
+            <property name="toolTip">
+             <string>Move Layer Up</string>
+            </property>
+            <property name="text">
+             <string>...</string>
+            </property>
+            <property name="icon">
+             <iconset resource="images.qrc">
+              <normaloff>:/images/Images/move-layer-up.png</normaloff>:/images/Images/move-layer-up.png</iconset>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>20</width>
+              <height>20</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="2">
+           <widget class="QToolButton" name="b_new_layer">
+            <property name="toolTip">
+             <string>New Layer</string>
+            </property>
+            <property name="text">
+             <string>...</string>
+            </property>
+            <property name="icon">
+             <iconset resource="images.qrc">
+              <normaloff>:/images/Images/new-layer.png</normaloff>:/images/Images/new-layer.png</iconset>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>20</width>
+              <height>20</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </widget>
        </item>
        <item>
@@ -462,6 +616,8 @@ QTreeWidget::branch:open:has-children:!has-siblings,QTreeWidget::branch:open:has
    <container>1</container>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="images.qrc"/>
+ </resources>
  <connections/>
 </ui>

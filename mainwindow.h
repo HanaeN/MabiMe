@@ -47,11 +47,16 @@ private slots:
     void onLayerCloseButtonClicked(QTreeWidgetItem *i);
     void onLayerVisibilityButtonClicked(QTreeWidgetItem *i);
     void repaintLayers();
+    void onLayerItemChanged(QTreeWidgetItem *current, QTreeWidgetItem *previous);
+    void on_b_move_layer_up_clicked();
+
+    void on_b_move_layer_down_clicked();
 
 private:
     void insertPMG(QString modelName, QString PMG, QString FRM = "");
     void loadPackages();
     PackManager *p;
+    QTreeWidgetItem *selectedLayer;
     Ui::MainWindow *ui;
 };
 

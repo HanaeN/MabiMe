@@ -10,5 +10,9 @@
         <file>Images/button-small-x.png</file>
         <file>Images/button-small-invisible.png</file>
         <file>Images/button-small-visible.png</file>
+        <file>Images/move-layer-down.png</file>
+        <file>Images/move-layer-up.png</file>
+        <file>Images/duplicate-layer.png</file>
+        <file>Images/new-layer.png</file>
     </qresource>
 </RCC>
