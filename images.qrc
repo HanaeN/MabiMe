@@ -17,5 +17,6 @@
         <file>Images/search.png</file>
         <file>Images/button-small-has-bones.png</file>
         <file>Images/button-small-no-bones.png</file>
+        <file>Images/search-small.png</file>
     </qresource>
 </RCC>
