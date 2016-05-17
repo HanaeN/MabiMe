@@ -14,5 +14,6 @@
         <file>Images/move-layer-up.png</file>
         <file>Images/duplicate-layer.png</file>
         <file>Images/new-layer.png</file>
+        <file>Images/search.png</file>
     </qresource>
 </RCC>
