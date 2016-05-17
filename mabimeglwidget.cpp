@@ -98,7 +98,8 @@ void MabiMeGLWidget::draw() {
                     QList<Bone*> bones = QList<Bone*>();
                     if (o->hasBoneTree()) {
                         for (int i = 0; i < pmgModel->meshes[n]->boneNames.count(); i++) {
-                            bones.append(o->findBone(pmgModel->meshes[n]->boneNames[i]));
+                            Bone *b = o->findBone(pmgModel->meshes[n]->boneNames[i]);
+                            bones.append(b != nullptr ? b : o->getRootBone());
                         }
                     }
                     renderPMGMesh(*pmgModel->meshes[n], bones, t.texture);

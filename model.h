@@ -57,6 +57,7 @@ public:
     bool hasBoneTree();
     QString getName();
     bool isVisible = true;
+    Bone *getRootBone();
 private:
     PackManager *packManager;
     FRMReader frmReader;

@@ -78,6 +78,10 @@ bool Model::hasBoneTree() {
     return (boneTree == nullptr) ? false : true;
 }
 
+Bone* Model::getRootBone() {
+    return boneTree;
+}
+
 Model::~Model() {
     if (boneTree != nullptr) delete boneTree;
     for (int i = 0; i < textures.count(); i++) {

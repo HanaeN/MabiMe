@@ -27,7 +27,6 @@ Bone::Bone(QList<FRM::Bone*> *boneData, int boneIndex, Bone* parent)
     id = bone->boneID;
     name = bone->name;
     parentBone = parent;
-
     // extract the bone data from the FRM raw and convert it into easy to use values
     QMatrix4x4 matrix(bone->link);
     worldMatrix = matrix.transposed();

@@ -66,10 +66,14 @@ void MainWindow::loadPackages() {
 //        QString PMGpath = "gfx\\char\\item\\mesh\\item_treasurechest01_i";
         QString PMGpath = "gfx\\char\\monster\\mesh\\tabhartas\\tabhartas";
         insertPMG("tabhartas", PMGpath + "_mesh", PMGpath + "_framework");
-//        QString PMGpath = "gfx\\char\\chapter4\\monster\\mesh\\ogre\\c4_ogre01";
+
+        //        QString PMGpath = "gfx\\char\\chapter4\\monster\\mesh\\ogre\\c4_ogre01";
 
 //        insertPMG("gfx\\char\\chapter4\\monster\\mesh\\ogre\\c4_ogre01_boss_mesh", "gfx\\char\\chapter4\\monster\\mesh\\ogre\\c4_ogre01_framework");
 
+
+        PMGpath = "gfx\\char\\chapter4\\monster\\mesh\\golem\\";
+        insertPMG("golem", PMGpath + "mon_c4_albangolem_mesh", PMGpath + "mon_c4_albangolem_framework");
 
         PMGpath = "gfx\\char\\pet\\mesh\\";
         insertPMG("fox", PMGpath + "fox\\pet_star_fox_01_mesh", PMGpath + "fox\\pet_star_fox_01_mesh");
@@ -117,22 +121,32 @@ void MainWindow::insertPMG(QString modelName, QString PMG, QString FRM) {
         QTreeWidgetItem *i = new QTreeWidgetItem(ui->l_layers, 0);
         ui->l_layers->setRootIsDecorated(false);
         i->setExpanded(true);
+        m = new Model(p, PMG, FRM);
         i->setData(0, LayerRole::LAYER_VISIBLE, true);
         i->setText(0, "$MODEL$" + modelName);
-        m = new Model(p, PMG, FRM);
+        i->setData(0, LayerRole::HAS_BONES, m->hasBoneTree());
         ui->l_layers->setCurrentItem(i);
         m->setName(modelName);
-
+        if (m->hasBoneTree()) {
+            i = new QTreeWidgetItem();
+            i->setFlags(Qt::NoItemFlags);
+            i->setData(0, LayerRole::LAYER_VISIBLE, true);
+            i->setText(0, FRM.split("\\", QString::SkipEmptyParts).last());
+            i->setData(0, LayerRole::HAS_BONES, true);
+            ui->l_layers->findItems("$MODEL$" + modelName, Qt::MatchExactly)[0]->addChild(i);
+        }
         i = new QTreeWidgetItem();
         i->setFlags(Qt::NoItemFlags);
         i->setData(0, LayerRole::LAYER_VISIBLE, true);
         i->setText(0, PMG.split("\\", QString::SkipEmptyParts).last());
+        i->setData(0, LayerRole::HAS_BONES, false);
         ui->l_layers->findItems("$MODEL$" + modelName, Qt::MatchExactly)[0]->addChild(i);
         ui->glSurface->addModel(m);
     } else {
         QTreeWidgetItem *i = new QTreeWidgetItem();
         i->setText(0, PMG.split("\\", QString::SkipEmptyParts).last());
         i->setData(0, LayerRole::LAYER_VISIBLE, true);
+        i->setData(0, LayerRole::HAS_BONES, false);
         i->setFlags(Qt::NoItemFlags);
         ui->l_layers->findItems("$MODEL$" + modelName, Qt::MatchExactly)[0]->addChild(i);
         m->addPMG(PMG);
