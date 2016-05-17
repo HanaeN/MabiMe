@@ -112,6 +112,9 @@ void MainWindow::startTimer() {
 }
 
 void MainWindow::cameraChange(CameraInfo camera) {
+    if (floor(camera.zoom) != ui->s_zoom->value()) {
+        ui->s_zoom->setValue(floor(camera.zoom));
+    }
 }
 
 void MainWindow::insertPMG(QString modelName, QString PMG, QString FRM) {
@@ -247,4 +250,14 @@ void MainWindow::on_b_move_layer_down_clicked()
             ui->l_layers->repaint();
         }
     }
+}
+
+void MainWindow::on_s_zoom_sliderMoved(int position)
+{
+    if (floor(ui->glSurface->getCameraInfo().zoom) != position) ui->glSurface->setCameraZ(position);
+}
+
+void MainWindow::on_s_zoom_valueChanged(int value)
+{
+    on_s_zoom_sliderMoved(value);
 }

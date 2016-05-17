@@ -47,6 +47,7 @@ public:
     void updateModel(QString modelName);
     int getModelCount();
     Model* getModel(QString modelName);
+    void setCameraZ(float z);
 private:
     GLuint frmTexture;
     CameraInfo camera;

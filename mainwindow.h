@@ -49,8 +49,10 @@ private slots:
     void repaintLayers();
     void onLayerItemChanged(QTreeWidgetItem *current, QTreeWidgetItem *previous);
     void on_b_move_layer_up_clicked();
-
     void on_b_move_layer_down_clicked();
+    void on_s_zoom_sliderMoved(int position);
+
+    void on_s_zoom_valueChanged(int value);
 
 private:
     void insertPMG(QString modelName, QString PMG, QString FRM = "");

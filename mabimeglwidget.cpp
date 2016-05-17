@@ -595,3 +595,12 @@ void MabiMeGLWidget::deleteModel(QString modelName) {
     if (m != nullptr) delete m;
     models.removeAt(index);
 }
+
+void MabiMeGLWidget::setCameraZ(float z) {
+    camera.zoom = z;
+    this->repaint();
+}
+
+CameraInfo MabiMeGLWidget::getCameraInfo() {
+    return camera;
+}
