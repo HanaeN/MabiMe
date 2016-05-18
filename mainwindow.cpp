@@ -104,7 +104,7 @@ void MainWindow::loadPackages() {
         msg.setWindowTitle("MabiMe - Warning");
         msg.setIcon(QMessageBox::Warning);
         msg.exec();
-
+        on_action_Options_triggered();
     }
 }
 
