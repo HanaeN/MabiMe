@@ -25,7 +25,8 @@ SOURCES += main.cpp\
     bone.cpp \
     model.cpp \
     settingswindow.cpp \
-    mabimelayerdelegate.cpp
+    mabimelayerdelegate.cpp \
+    PackReader/packxmlmanager.cpp
 
 HEADERS  += mainwindow.h \
     PackReader/mabipackreader.h \
@@ -37,7 +38,8 @@ HEADERS  += mainwindow.h \
     bone.h \
     model.h \
     settingswindow.h \
-    mabimelayerdelegate.h
+    mabimelayerdelegate.h \
+    PackReader/packxmlmanager.h
 
 FORMS    += mainwindow.ui \
     settingswindow.ui

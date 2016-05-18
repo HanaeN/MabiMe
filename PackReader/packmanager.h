@@ -23,6 +23,7 @@
 #include <QList>
 
 #include "PackReader/mabipackreader.h"
+#include "PackReader/packxmlmanager.h"
 
 struct Pack {
     MabiPackReader *reader = nullptr;
@@ -33,6 +34,7 @@ struct Pack {
 struct LanguagePack {
     MabiPackReader *reader = nullptr;
     QString name = "";
+    QList<PackXMLManager*> files;
 };
 
 class PackManager

@@ -160,6 +160,8 @@ void PackManager::freePackages() {
         languagePack.reader->closePackage();
         delete languagePack.reader;
     }
+    foreach (const PackXMLManager *xml, languagePack.files) delete xml;
+    languagePack.files.clear();
     packs.clear();
 }
 
