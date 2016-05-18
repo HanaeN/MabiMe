@@ -63,6 +63,8 @@ void MainWindow::show() {
 
 void MainWindow::loadPackages() {
     if (p->loadPackages()) {
+
+/*
 //        QString PMGpath = "gfx\\char\\item\\mesh\\item_treasurechest01_i";
         QString PMGpath = "gfx\\char\\monster\\mesh\\tabhartas\\tabhartas";
         insertPMG("tabhartas", PMGpath + "_mesh", PMGpath + "_framework");
@@ -93,8 +95,7 @@ void MainWindow::loadPackages() {
 
         PMGpath = "gfx\\char\\item\\mesh\\item_treasurechest01_i";
         insertPMG("box", PMGpath, PMGpath);
-
-        //        ui->lMeshes->setText("Meshes: " + QString::number(r.meshes.count()));
+*/
     } else {
         QMessageBox msg(this);
         msg.setText("Could not detect the Mabinogi client install path.");
