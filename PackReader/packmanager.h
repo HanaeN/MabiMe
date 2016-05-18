@@ -25,9 +25,14 @@
 #include "PackReader/mabipackreader.h"
 
 struct Pack {
-    MabiPackReader *reader;
+    MabiPackReader *reader = nullptr;
     QString name;
     int id;
+};
+
+struct LanguagePack {
+    MabiPackReader *reader = nullptr;
+    QString name = "";
 };
 
 class PackManager
@@ -44,6 +49,7 @@ public:
 private:
     QString path = "";
     QList<Pack*> packs;
+    LanguagePack languagePack;
     bool packsLoaded = false;
     bool findMabinogiPath();
 };

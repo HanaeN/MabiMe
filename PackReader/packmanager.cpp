@@ -25,6 +25,7 @@
 
 PackManager::PackManager()
 {
+    // try to automatically find the path
     if (!findMabinogiPath()) {
         qDebug() << "could not find path";
     } else {
@@ -114,7 +115,7 @@ bool PackManager::loadPackages() {
             foreach (const QString &packName, packList) {
                 if (packName.startsWith(QString::number(n) + "_")) {
                     sortedPacks.insert(0, packName);
-                }
+                } else if (packName.compare("language.pack", Qt::CaseInsensitive) == 0) languagePack.name = packName;
             }
             if (sortedPacks.count() == packList.count() - 1) break;
             n++;
@@ -133,6 +134,11 @@ bool PackManager::loadPackages() {
             id++;
             packs.append(p);
         }
+        if (languagePack.name.length() > 0) {
+            qDebug() << "opening language pack";
+            languagePack.reader = new MabiPackReader();
+            languagePack.reader->openPackage(path + languagePack.name);
+        }
         return true;
     } else {
         qDebug() << path << "does not exist!";
@@ -149,6 +155,10 @@ void PackManager::freePackages() {
         p->reader->closePackage();
         delete p->reader;
         delete p;
+    }
+    if (languagePack.reader != nullptr) {
+        languagePack.reader->closePackage();
+        delete languagePack.reader;
     }
     packs.clear();
 }
