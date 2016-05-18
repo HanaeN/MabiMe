@@ -150,7 +150,7 @@ QByteArray MabiPackReader::extractFile(MabiPack::PackageEntry *file) {
 QByteArray MabiPackReader::extractFile(QString filename) {
     // if it contains a *, allow a wildcard search
     if (filename.contains("*")) {
-        QStringList s = filename.split("*", QString::SkipEmptyParts);
+        QStringList s = filename.split("*", QString::KeepEmptyParts);
         if (s.count() == 2) {
             foreach(MabiPack::PackageEntry *entry, packageEntries) {
                 if (entry->name.startsWith(s[0]) && entry->name.endsWith(s[1])) return extractFile(entry);
