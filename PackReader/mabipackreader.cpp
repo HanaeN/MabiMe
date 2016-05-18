@@ -147,22 +147,38 @@ QByteArray MabiPackReader::extractFile(MabiPack::PackageEntry *file) {
     return bytes;
 }
 
-QByteArray MabiPackReader::extractFile(QString filename) {
+MabiPack::PackageEntry* MabiPackReader::findInternalFile(QString filename) {
     // if it contains a *, allow a wildcard search
     if (filename.contains("*")) {
         QStringList s = filename.split("*", QString::KeepEmptyParts);
         if (s.count() == 2) {
             foreach(MabiPack::PackageEntry *entry, packageEntries) {
-                if (entry->name.startsWith(s[0]) && entry->name.endsWith(s[1])) return extractFile(entry);
+                if (entry->name.startsWith(s[0]) && entry->name.endsWith(s[1])) return entry;
             }
-        } else {
-            qDebug() << "could not use wildcard, invalid count" << filename;
-        }
+        } else qDebug() << "could not use wildcard, invalid count" << filename;
     } else {
         foreach(MabiPack::PackageEntry *entry, packageEntries) {
-            if (entry->name.compare(filename, Qt::CaseInsensitive) == 0) return extractFile(entry);
+            if (entry->name.compare(filename, Qt::CaseInsensitive) == 0) return entry;
         }
     }
+    return nullptr;
+}
+
+
+QString MabiPackReader::findFile(QString filename) {
+    // if it contains a *, allow a wildcard search
+    MabiPack::PackageEntry *f = findInternalFile(filename);
+    if (f != nullptr) return f->name;
+    return "";
+}
+
+bool MabiPackReader::fileExists(QString filename) {
+    return findFile(filename).length() > 0 ? true : false;
+}
+
+QByteArray MabiPackReader::extractFile(QString filename) {
+    MabiPack::PackageEntry *entry = findInternalFile(filename);
+    if (entry != nullptr) return extractFile(entry);
     return QByteArray();
 }
 
@@ -174,4 +190,12 @@ QString MabiPackReader::findTexture(QString texture) {
         }
     }
     return "";
+}
+
+QStringList MabiPackReader::getFileNames(QString beginsWith, QString endsWith) {
+    QStringList fileNames;
+    foreach(MabiPack::PackageEntry *entry, packageEntries) {
+        if (entry->name.startsWith(beginsWith) && entry->name.endsWith(endsWith)) fileNames.append(entry->name);
+    }
+    return fileNames;
 }
