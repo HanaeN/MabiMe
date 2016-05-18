@@ -49,12 +49,8 @@ bool MabiPackReader::openPackage(QString filename) {
 void MabiPackReader::closePackage() {
     if (fileOpen) {
         packFile->close();
-        if (packageEntries.count() > 0) {
-            for (int i = 0; i < packageEntries.count(); i++) {
-                delete packageEntries[0];
-                packageEntries.removeAt(0);
-            }
-        }
+        foreach(MabiPack::PackageEntry *entry, packageEntries) delete entry;
+        packageEntries.clear();
         delete packFile;
         fileOpen = false;
     }
@@ -152,18 +148,29 @@ QByteArray MabiPackReader::extractFile(MabiPack::PackageEntry *file) {
 }
 
 QByteArray MabiPackReader::extractFile(QString filename) {
-    for (int i = 0; i < packageEntries.count(); i++) {
-        if (packageEntries[i]->name == filename) return extractFile(packageEntries.at(i));
+    // if it contains a *, allow a wildcard search
+    if (filename.contains("*")) {
+        QStringList s = filename.split("*", QString::SkipEmptyParts);
+        if (s.count() == 2) {
+            foreach(MabiPack::PackageEntry *entry, packageEntries) {
+                if (entry->name.startsWith(s[0]) && entry->name.endsWith(s[1])) return extractFile(entry);
+            }
+        } else {
+            qDebug() << "could not use wildcard, invalid count" << filename;
+        }
+    } else {
+        foreach(MabiPack::PackageEntry *entry, packageEntries) {
+            if (entry->name.compare(filename, Qt::CaseInsensitive) == 0) return extractFile(entry);
+        }
     }
     return QByteArray();
 }
 
 QString MabiPackReader::findTexture(QString texture) {
-    for (int n = 0; n < packageEntries.count(); n++) {
-        if (packageEntries[n]->name.endsWith(".dds")) {
-            if (packageEntries[n]->name.split("\\", QString::SkipEmptyParts).last() == texture + ".dds") {
-                return packageEntries[n]->name;
-            }
+    foreach(MabiPack::PackageEntry *entry, packageEntries) {
+        QString entryName = entry->name;
+        if (entryName.endsWith(".dds")) {
+            if (entryName.split("\\", QString::SkipEmptyParts).last() == texture + ".dds") return entryName;
         }
     }
     return "";
