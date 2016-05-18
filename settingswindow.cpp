@@ -38,6 +38,8 @@ SettingsWindow::SettingsWindow(QWidget *parent, QString path) :
 #endif
     ui->c_autodetect->setChecked(s.value("AutoDetectEnabled", canAutoDetect).toBool());
     ui->e_autodetect->setText(s.value("ClientPath", "").toString());
+    ui->c_language_pack->setChecked(s.value("CustomLanguagePackEnabled", false).toBool());
+    ui->e_language_pack->setText(s.value("CustomLanguagePackPath", "").toString());
     ui->l_categories->setIconSize(QSize(24, 24));
     for (int i = 1; i < ui->l_categories->count(); i++) {
         ui->l_categories->item(i)->setSizeHint(QSize(0, 40));
@@ -69,5 +71,14 @@ void SettingsWindow::on_b_savesettings_clicked()
 {
     s.setValue("AutoDetectEnabled", ui->c_autodetect->isChecked());
     s.setValue("ClientPath", ui->c_autodetect->isChecked() ? "" : ui->e_autodetect->text());
+    s.setValue("CustomLanguagePackEnabled", ui->c_language_pack->isChecked());
+    s.setValue("CustomLanguagePackPath", ui->e_language_pack->text());
     this->close();
+}
+
+void SettingsWindow::on_c_language_pack_toggled(bool checked)
+{
+    ui->l_language_pack->setEnabled(checked);
+    ui->b_language_pack->setEnabled(checked);
+    ui->e_language_pack->setEnabled(checked);
 }

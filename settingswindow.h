@@ -43,6 +43,8 @@ private slots:
 
     void on_b_savesettings_clicked();
 
+    void on_c_language_pack_toggled(bool checked);
+
 private:
     Ui::SettingsWindow *ui;
     QSettings s;
