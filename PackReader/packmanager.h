@@ -47,11 +47,13 @@ public:
     QString getPath();
     bool loadPackages();
     QString findTexture(QString name);
-    QByteArray extractFile(QString path);
+    bool fileExists(QString path, bool useLanguagePack = false);
+    QByteArray extractFile(QString path, bool useLanguagePack = false);
 private:
     QString path = "";
     QList<Pack*> packs;
     LanguagePack languagePack;
+    void loadXMLData();
     bool packsLoaded = false;
     bool findMabinogiPath();
 };

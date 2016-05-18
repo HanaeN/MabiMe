@@ -139,6 +139,7 @@ bool PackManager::loadPackages() {
             languagePack.reader = new MabiPackReader();
             languagePack.reader->openPackage(path + languagePack.name);
         }
+        loadXMLData();
         return true;
     } else {
         qDebug() << path << "does not exist!";
@@ -174,11 +175,31 @@ QString PackManager::findTexture(QString name) {
 
 }
 
-QByteArray PackManager::extractFile(QString path) {
-    QByteArray f;
+bool PackManager::fileExists(QString path, bool useLanguagePack) {
+    if (useLanguagePack) return languagePack.reader->fileExists(path);
     foreach (const Pack *pack, packs) {
-        f = pack->reader->extractFile(path);
+        bool exists = pack->reader->fileExists(path);
+        if (exists) return true;
+    }
+    return false;
+}
+
+QByteArray PackManager::extractFile(QString path, bool useLanguagePack) {
+    if (useLanguagePack) return languagePack.reader->extractFile(path);
+    foreach (const Pack *pack, packs) {
+        QByteArray f = pack->reader->extractFile(path);
         if (f.length() > 0) return f;
     }
-    return f;
+    return QByteArray();
+}
+
+void PackManager::loadXMLData() {
+    QStringList xmlFiles = languagePack.reader->getFileNames("xml\\", ".txt");
+    // generate XML data objects with a clean name to load both xml and txt
+    foreach (QString filename, xmlFiles) {
+        QString cleanName = filename.split(".", QString::SkipEmptyParts)[0];
+        cleanName = cleanName.split("\\", QString::SkipEmptyParts).last();
+        PackXMLManager *m = new PackXMLManager(cleanName);
+        languagePack.files.append(m);
+    }
 }

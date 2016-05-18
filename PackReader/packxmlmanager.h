@@ -24,7 +24,9 @@
 class PackXMLManager
 {
 public:
-    PackXMLManager();
+    PackXMLManager(QString name);
+private:
+    QString name;
 };
 
 #endif // PACKXMLMANAGER_H

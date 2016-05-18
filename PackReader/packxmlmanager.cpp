@@ -19,8 +19,8 @@
 
 #include "packxmlmanager.h"
 
-PackXMLManager::PackXMLManager()
+PackXMLManager::PackXMLManager(QString name)
 {
-
+    this->name = name;
 }
 
