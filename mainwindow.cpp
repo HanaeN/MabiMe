@@ -65,14 +65,8 @@ void MainWindow::loadPackages() {
     if (p->loadPackages()) {
 
 /*
-//        QString PMGpath = "gfx\\char\\item\\mesh\\item_treasurechest01_i";
         QString PMGpath = "gfx\\char\\monster\\mesh\\tabhartas\\tabhartas";
         insertPMG("tabhartas", PMGpath + "_mesh", PMGpath + "_framework");
-
-        //        QString PMGpath = "gfx\\char\\chapter4\\monster\\mesh\\ogre\\c4_ogre01";
-
-//        insertPMG("gfx\\char\\chapter4\\monster\\mesh\\ogre\\c4_ogre01_boss_mesh", "gfx\\char\\chapter4\\monster\\mesh\\ogre\\c4_ogre01_framework");
-
 
         PMGpath = "gfx\\char\\chapter4\\monster\\mesh\\golem\\";
         insertPMG("golem", PMGpath + "mon_c4_albangolem_mesh", PMGpath + "mon_c4_albangolem_framework");
@@ -83,8 +77,6 @@ void MainWindow::loadPackages() {
         PMGpath = "gfx\\char\\pet\\mesh\\bear\\";
         insertPMG("bear", PMGpath + "pet_ubipanda_mesh", PMGpath + "pet_redpanda_framework");
 
-//        PMGpath = "gfx\\char\\chapter4\\human\\female\\";
-//        insertPMG("human", PMGpath + "wear\\female_c4_captainyoo_bsl", PMGpath + "female_framework");
         PMGpath = "gfx\\char\\human\\female\\";
 //        insertPMG("human", PMGpath + "female_default_bss", PMGpath + "female_framework");
         insertPMG("human", PMGpath + "face\\female_adult01_f01", PMGpath + "female_framework");
