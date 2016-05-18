@@ -48,6 +48,7 @@ void Model::addPMG(QString path) {
     PMGModel *m = new PMGModel();
     m->pmgReader.loadPMG(packManager->extractFile(path + ".pmg"));
     m->name = path;
+
     // load textures ready for rendering
     for (int i = 0; i < m->pmgReader.textures.count(); i++) {
         PMGTexture t;
@@ -63,6 +64,62 @@ void Model::addPMG(QString path) {
         }
     }
     m->meshes = m->pmgReader.meshes;
+    bool handleLinks = false;
+    if (handleLinks) {
+        QString mName;
+        int mID;
+        int links = 0;
+        if (hasBoneTree()) {
+            for (int i = 0; i < m->meshes.count(); i++) {
+                Bone *b = boneTree->findBone(m->meshes[i]->boneName);
+                for (int n = 0; n < m->meshes[i]->faceVertexCount; n++) {
+                    PMG::Vertex *v = m->meshes[i]->vertices[m->meshes[i]->vertexList[n]];
+                    if (v->skin.boneWeight < 1) {
+                        float smallestDistance = 999;
+                        PMG::Vertex *closestVertex = nullptr;
+                        QString otherBoneName = "";
+                        for (int ii = 0; ii < m->meshes.count(); ii++) {
+                            bool allowed = false;
+                            if (b->getParent() != nullptr) {
+                                if (m->meshes[ii]->boneName == b->getParent()->getName()) allowed = true;
+                            }
+                            foreach (Bone *childBone, b->getChildren()) {
+                                if (m->meshes[ii]->boneName == childBone->getName()) allowed = true;
+                            }
+                            if (ii == i) allowed = true;
+                            if (allowed) {
+                                foreach (PMG::Vertex *v2, m->meshes[ii]->vertices) {
+                                    if (v2 != v && fabs((v->skin.boneWeight + v2->skin.boneWeight) - 1) < 0.001) {
+                                        float distance = QVector3D(v2->x, v2->y, v2->z).distanceToPoint(QVector3D(v->x, v->y, v->z));
+                                        if (distance <= smallestDistance) {
+                                            smallestDistance = distance;
+                                            closestVertex = v2;
+                                            otherBoneName = m->meshes[ii]->boneName;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        if (closestVertex != nullptr) {
+                            links++;
+                            mName = otherBoneName;
+                            mID = m->meshes[i]->boneNames.indexOf(mName);
+                            if (mID == -1) {
+                                mID = m->meshes[i]->boneNames.count();
+                                m->meshes[i]->boneNames.append(mName);
+                            }
+                            m->meshes[i]->cleanBoneIDs[n] = mID;
+    //                        qDebug() << v->skin.a << v->skin.b << v->skin.boneWeight << closestVertex->skin.a << closestVertex->skin.b << closestVertex->skin.boneWeight;
+                        } else {
+                            qDebug() << "failed to find link" << n << v->globalID << m->meshes[i]->boneName;
+                        }
+                    }
+                }
+            }
+        }
+        qDebug() << links << "links";
+    }
+
     models.append(m);
 }
 

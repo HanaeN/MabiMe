@@ -20,6 +20,7 @@
 #ifndef PACKXMLMANAGER_H
 #define PACKXMLMANAGER_H
 
+#include <QString>
 
 class PackXMLManager
 {

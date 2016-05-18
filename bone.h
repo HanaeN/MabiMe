@@ -34,6 +34,8 @@ public:
     const QMatrix4x4 getMatrix();
     void setX(GLfloat x);
     Bone *findBone(QString boneName);
+    Bone *getParent();
+    QList<Bone*> getChildren();
 private:
     QVector3D translation;
     QVector3D scale;

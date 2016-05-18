@@ -82,3 +82,11 @@ void Bone::setX(GLfloat x) {
     translation.setX(x);
     updateBone();
 }
+
+Bone* Bone::getParent() {
+    return parentBone;
+}
+
+QList<Bone*> Bone::getChildren() {
+    return children;
+}
