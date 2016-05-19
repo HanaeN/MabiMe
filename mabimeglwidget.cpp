@@ -223,11 +223,11 @@ void MabiMeGLWidget::initializeGL() {
 //    glEnableClientState(GL_NORMAL_ARRAY);
 //    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
-    glEnable(GL_LIGHTING);
-    glEnable(GL_LIGHT0);
+//    glEnable(GL_LIGHTING);
+//    glEnable(GL_LIGHT0);
 
-    static GLfloat lightPosition[4] = { 0, 0, 10, 1.0 };
-    glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
+//    static GLfloat lightPosition[4] = { 0, 0, 10, 1.0 };
+//    glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
 
     frmTexture = loadTexture("Images/frm.png");
     boneShader = linkShader("Shaders/bone.v", "Shaders/bone.f");
@@ -237,14 +237,14 @@ void MabiMeGLWidget::initializeGL() {
 
     glGenBuffers(1, &vbo);
 //    GLint attrib1 = 6;
-    attribVertexXYZ = 0;//glGetAttribLocation(boneShader, "vertexPos");
-    attribVertexNXYZ = 1;//glGetAttribLocation(boneShader, "vertexNormal");
-    attribVertexRGBA = 2;//glGetAttribLocation(boneShader, "vertexRGBA");
-    attribVertexUV = 3;//glGetAttribLocation(boneShader, "vertexUV");
-    glBindAttribLocation(boneShader, 0, "vertexPos");
-    glBindAttribLocation(boneShader, 1, "vertexNormal");
-    glBindAttribLocation(boneShader, 2, "vertexRGBA");
-    glBindAttribLocation(boneShader, 3, "vertexUV");
+    attribVertexXYZ = glGetAttribLocation(boneShader, "vertexPos");
+    attribVertexNXYZ = glGetAttribLocation(boneShader, "vertexNormal");
+    attribVertexRGBA = glGetAttribLocation(boneShader, "vertexRGBA");
+    attribVertexUV = glGetAttribLocation(boneShader, "vertexUV");
+//    glBindAttribLocation(boneShader, 6, "vertexPos");
+//    glBindAttribLocation(boneShader, 7, "vertexNormal");
+//    glBindAttribLocation(boneShader, 8, "vertexRGBA");
+//    glBindAttribLocation(boneShader, attribVertexUV, "vertexUV");
 
     qDebug() << attribVertexXYZ;
     qDebug() << attribVertexNXYZ << attribVertexRGBA << attribVertexUV;
@@ -326,19 +326,27 @@ void MabiMeGLWidget::renderPMGMesh(PMG::Mesh mesh, QList<Bone*> bones, GLuint te
     }
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBufferData(GL_ARRAY_BUFFER, sizeof(PMG::ShaderVertex) * mesh.vertexCount, mesh.shaderVertices, GL_STATIC_DRAW);
-    glEnableVertexAttribArray(attribVertexXYZ);
-    glEnableVertexAttribArray(attribVertexNXYZ);
-    glEnableVertexAttribArray(attribVertexUV);
-    glEnableVertexAttribArray(attribVertexRGBA);
-    glVertexAttribPointer(attribVertexXYZ, 3, GL_FLOAT, GL_FALSE, sizeof(PMG::ShaderVertex), 0);
-    glVertexAttribPointer(attribVertexNXYZ, 3, GL_FLOAT, GL_FALSE, sizeof(PMG::ShaderVertex), reinterpret_cast<void *>(offsetof(PMG::ShaderVertex, nxyz)));
-    glVertexAttribPointer(attribVertexRGBA, 4, GL_FLOAT, GL_FALSE, sizeof(PMG::ShaderVertex), reinterpret_cast<void *>(offsetof(PMG::ShaderVertex, rgba)));
-    glVertexAttribPointer(attribVertexUV, 2, GL_FLOAT, GL_FALSE, sizeof(PMG::ShaderVertex), reinterpret_cast<void *>(offsetof(PMG::ShaderVertex, uv)));
+    if (attribVertexRGBA != -1) {
+        glEnableVertexAttribArray(attribVertexRGBA);
+        glVertexAttribPointer(attribVertexRGBA, 4, GL_FLOAT, GL_FALSE, sizeof(PMG::ShaderVertex), (void*)(offsetof(PMG::ShaderVertex, rgba)));
+    }
+    if (attribVertexXYZ != -1) {
+        glEnableVertexAttribArray(attribVertexXYZ);
+        glVertexAttribPointer(attribVertexXYZ, 3, GL_FLOAT, GL_FALSE, sizeof(PMG::ShaderVertex), 0);
+    }
+    if (attribVertexNXYZ != -1) {
+        glEnableVertexAttribArray(attribVertexNXYZ);
+        glVertexAttribPointer(attribVertexNXYZ, 3, GL_FLOAT, GL_FALSE, sizeof(PMG::ShaderVertex), (void*)(offsetof(PMG::ShaderVertex, nxyz)));
+    }
+    if (attribVertexUV != -1) {
+        glEnableVertexAttribArray(attribVertexUV);
+        glVertexAttribPointer(attribVertexUV, 2, GL_FLOAT, GL_FALSE, sizeof(PMG::ShaderVertex), (void*)(offsetof(PMG::ShaderVertex, uv)));
+    }
     glDrawElements(GL_TRIANGLES, mesh.faceVertexCount, GL_UNSIGNED_INT, mesh.vertexList);
-    glDisableVertexAttribArray(attribVertexXYZ);
-    glDisableVertexAttribArray(attribVertexNXYZ);
-    glDisableVertexAttribArray(attribVertexUV);
-    glDisableVertexAttribArray(attribVertexRGBA);
+    if (attribVertexXYZ != -1) glDisableVertexAttribArray(attribVertexXYZ);
+    if (attribVertexNXYZ != -1) glDisableVertexAttribArray(attribVertexNXYZ);
+    if (attribVertexUV != -1) glDisableVertexAttribArray(attribVertexUV);
+    if (attribVertexRGBA != -1) glDisableVertexAttribArray(attribVertexRGBA);
     glPopMatrix();
 }
 
