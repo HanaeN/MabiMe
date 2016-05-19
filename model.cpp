@@ -79,18 +79,18 @@ void Model::addPMG(QString path) {
                     m->meshes[i]->shaderVertices[n].xyz[1] = vertexPos.y();
                     m->meshes[i]->shaderVertices[n].xyz[2] = vertexPos.z();
                     if (v->skin.boneWeight < 1) {
-                        float smallestDistance = 1;
+                        float smallestDistance = 2;
                         PMG::Vertex *closestVertex = nullptr;
                         QString otherBoneName = "";
                         for (int ii = 0; ii < m->meshes.count(); ii++) {
-                            bool allowed = false;
+                            bool allowed = true;
                             if (b->getParent() != nullptr) {
                                 if (m->meshes[ii]->boneName == b->getParent()->getName()) allowed = true;
                             }
                             foreach (Bone *childBone, b->getChildren()) {
                                 if (m->meshes[ii]->boneName == childBone->getName()) allowed = true;
                             }
-                            if (ii == i) allowed = true;
+                            if (ii == i) allowed = false;
                             if (allowed) {
                                 foreach (PMG::Vertex *v2, m->meshes[ii]->vertices) {
                                     if (v2 != v) {
@@ -115,7 +115,7 @@ void Model::addPMG(QString path) {
                             }
                             m->meshes[i]->shaderVertices[n].boneID = mID;
                         } else {
-                            qDebug() << "failed to find link" << n << v->globalID << m->meshes[i]->boneName;
+//                            qDebug() << "failed to find link" << n << v->globalID << m->meshes[i]->boneName;
                         }
                     }
                 }

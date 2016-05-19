@@ -376,7 +376,7 @@ void MabiMeGLWidget::mouseMoveEvent(QMouseEvent *event) {
     if (isLeftDragging) {
         camera.x = oldCameraPos.x() + ((event->x() - drag.x()) / 4);
         camera.y = oldCameraPos.y() - ((event->y() - drag.y()) / 4);
-//        getModel("human")->findBone("chest")->setX(camera.x);
+        getModel("human")->findBone("chest")->setY(camera.x);
 //        getModel("human")->findBone("leg1l")->setX(camera.x);
 //        getModel("human")->findBone("leg1r")->setX(-camera.x);
     }
