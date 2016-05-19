@@ -37,7 +37,7 @@ namespace PMG {
     struct Skin {
         int vertexID = 0;
         int a = 0;
-        float boneWeight = 1.0;
+        float boneWeight = 0.5;
         int b = 1;
     };
     #pragma pack(1)
@@ -55,7 +55,7 @@ namespace PMG {
         GLfloat rgba[4];
         GLfloat uv[2];
         GLfloat boneWeight[2];
-        int boneID;
+        GLfloat boneID;
     };
     #pragma pack(pop)
 

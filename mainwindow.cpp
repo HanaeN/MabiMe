@@ -65,12 +65,12 @@ void MainWindow::loadPackages() {
     if (p->loadPackages()) {
 
         QString PMGpath = "gfx\\char\\human\\female\\";
-        insertPMG("human", PMGpath + "female_default_bss", PMGpath + "female_framework");
-//        insertPMG("human", PMGpath + "face\\female_adult01_f01", PMGpath + "female_framework");
-//        insertPMG("human", PMGpath + "hair\\female_hair46_t46", PMGpath + "female_framework");
-//        insertPMG("human", PMGpath + "wear\\female_summercloth01_bss", PMGpath + "female_framework");
-//        insertPMG("human", PMGpath + "shoes\\female_summercloth02_s04", PMGpath + "female_framework");
-//        insertPMG("human", "gfx\\char\\chapter4\\human\\female\\mantle\\uni_c4_ego_swordwing01", PMGpath + "female_framework");
+//        insertPMG("human", PMGpath + "female_default_bss", PMGpath + "female_framework");
+        insertPMG("human", PMGpath + "face\\female_adult01_f01", PMGpath + "female_framework");
+        insertPMG("human", PMGpath + "hair\\female_hair46_t46", PMGpath + "female_framework");
+        insertPMG("human", PMGpath + "wear\\female_summercloth01_bss", PMGpath + "female_framework");
+        insertPMG("human", PMGpath + "shoes\\female_summercloth02_s04", PMGpath + "female_framework");
+        insertPMG("human", "gfx\\char\\chapter4\\human\\female\\mantle\\uni_c4_ego_swordwing01", PMGpath + "female_framework");
 /*
         QString PMGpath = "gfx\\char\\monster\\mesh\\tabhartas\\tabhartas";
         insertPMG("tabhartas", PMGpath + "_mesh", PMGpath + "_framework");

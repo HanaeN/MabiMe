@@ -126,8 +126,14 @@ protected:
     void setShaderArrayFloat(GLhandleARB shader, QString varname, float *data, int arraySize);
     void setShaderArrayInt(GLhandleARB shader, QString varname, int *data, int arraySize);
     void setShaderVariableMatrix(GLhandleARB shader, QString varname, QMatrix4x4 matrix);
-    void setShaderArrayMatrix(GLhandleARB shader, QString varname, QList<QMatrix4x4> matrices);
+    void setShaderArrayMatrix(GLhandleARB shader, QString varname);
     void setShaderTextures(GLhandleARB shader, int count = 1);
+    GLfloat boneMatriceBuffer[64 * 4] = {
+        1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1,
+        1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1,
+        1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1,
+        1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1
+    };
 signals:
     void cameraChange(CameraInfo camera);
 public slots:

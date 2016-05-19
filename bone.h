@@ -32,6 +32,7 @@ public:
     Bone(QList<FRM::Bone*> *boneData, int boneIndex, Bone *parent = nullptr);
     const QString getName();
     const QMatrix4x4 getMatrix();
+    const QMatrix4x4 getLocalMatrix();
     void setX(GLfloat x);
     Bone *findBone(QString boneName);
     Bone *getParent();
@@ -41,6 +42,7 @@ private:
     QVector3D scale;
     QQuaternion rotation;
     QMatrix4x4 worldMatrix;
+    QMatrix4x4 bindMatrix;
     QString name;
     int id;
     Bone *parentBone;

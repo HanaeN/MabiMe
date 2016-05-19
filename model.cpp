@@ -74,8 +74,12 @@ void Model::addPMG(QString path) {
                 Bone *b = boneTree->findBone(m->meshes[i]->boneName);
                 for (int n = 0; n < m->meshes[i]->vertexCount; n++) {
                     PMG::Vertex *v = m->meshes[i]->vertices[n];
-                    if (v->skin.boneWeight < 1) {
-                        float smallestDistance = 2;
+                    QVector3D vertexPos = QMatrix4x4(boneTree->findBone(m->meshes[i]->boneName)->getMatrix() * m->meshes[i]->minorMatrix).map(QVector3D(v->x, v->y, v->z));
+                    m->meshes[i]->shaderVertices[n].xyz[0] = vertexPos.x();
+                    m->meshes[i]->shaderVertices[n].xyz[1] = vertexPos.y();
+                    m->meshes[i]->shaderVertices[n].xyz[2] = vertexPos.z();
+                    if (v->skin.boneWeight < 2) {
+                        float smallestDistance = 1;
                         PMG::Vertex *closestVertex = nullptr;
                         QString otherBoneName = "";
                         for (int ii = 0; ii < m->meshes.count(); ii++) {
@@ -90,7 +94,8 @@ void Model::addPMG(QString path) {
                             if (allowed) {
                                 foreach (PMG::Vertex *v2, m->meshes[ii]->vertices) {
                                     if (v2 != v) {// && fabs((v->skin.boneWeight + v2->skin.boneWeight) - 1) < 0.001) {
-                                        float distance = QVector3D(v2->x, v2->y, v2->z).distanceToPoint(QVector3D(v->x, v->y, v->z));
+                                        QVector3D vertexPos2 = QMatrix4x4(boneTree->findBone(m->meshes[ii]->boneName)->getMatrix() * m->meshes[ii]->minorMatrix).map(QVector3D(v2->x, v2->y, v2->z));
+                                        float distance = vertexPos.distanceToPoint(vertexPos2);
                                         if (distance <= smallestDistance) {
                                             smallestDistance = distance;
                                             closestVertex = v2;
@@ -109,10 +114,11 @@ void Model::addPMG(QString path) {
                                 m->meshes[i]->boneNames.append(mName);
                             }
                             m->meshes[i]->shaderVertices[n].boneID = mID;
-                            //m->meshes[i]->shaderVertices[n].boneWeight[1] = closestVertex->skin.boneWeight;
-                            qDebug() << m->meshes[i]->meshName << v->skin.boneWeight << otherBoneName << closestVertex->skin.b << closestVertex->skin.boneWeight;
+//                            m->meshes[i]->shaderVertices[n].boneWeight[0] = 0.5;
+//                              m->meshes[i]->shaderVertices[n].boneWeight[1] = 0.5;
+//                            qDebug() << m->meshes[i]->meshName << v->skin.boneWeight << otherBoneName << closestVertex->skin.b << closestVertex->skin.boneWeight;
                         } else {
-                            qDebug() << "failed to find link" << n << v->globalID << m->meshes[i]->boneName;
+//                            qDebug() << "failed to find link" << n << v->globalID << m->meshes[i]->boneName;
                         }
                     }
                 }

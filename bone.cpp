@@ -30,6 +30,8 @@ Bone::Bone(QList<FRM::Bone*> *boneData, int boneIndex, Bone* parent)
     // extract the bone data from the FRM raw and convert it into easy to use values
     QMatrix4x4 matrix(bone->link);
     worldMatrix = matrix.transposed();
+    bool inv = true;
+    bindMatrix = worldMatrix.inverted(&inv);
     translation = matrix.transposed().column(3).toVector3D();
     scale = QVector3D(matrix.transposed().row(0).toVector3D().length(),
                       matrix.transposed().row(1).toVector3D().length(),
@@ -67,6 +69,12 @@ void Bone::updateBone() {
 const QMatrix4x4 Bone::getMatrix() {
     if (parentBone != nullptr) return parentBone->getMatrix() * worldMatrix;
     return worldMatrix;
+}
+
+const QMatrix4x4 Bone::getLocalMatrix() {
+    if (parentBone != nullptr) return parentBone->getLocalMatrix() * (bindMatrix * worldMatrix);
+//    qDebug() << (bindMatrix * worldMatrix);
+    return (bindMatrix * worldMatrix);
 }
 
 Bone* Bone::findBone(QString boneName) {

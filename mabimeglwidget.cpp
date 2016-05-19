@@ -293,19 +293,16 @@ void MabiMeGLWidget::renderPMGMesh(PMG::Mesh mesh, QList<Bone*> bones, GLuint te
     glRotatef(camera.rotation.pitch, 1.0, 0.0, 0.0);
     glRotatef(camera.rotation.yaw, 0.0, 1.0, 0.0);
     if (bones.count() > 0) {
-        QList<QMatrix4x4> matrices;
+//        qDebug() << bones.count() << "BONES";
+//        for (int n = 0; n < mesh.vertexCount; n++) {
+//            qDebug() << mesh.shaderVertices[n].boneID;
+//        }
         for (int n = 0; n < bones.count(); n++) {
-            setShaderVariableMatrix(boneShader, "boneMatrix[" + QString::number(n) + "]", bones[n]->getMatrix());
-            matrices.append(bones[n]->getMatrix());
+            setShaderVariableMatrix(boneShader, "boneMatrix[" + QString::number(n) + "]", bones[n]->getLocalMatrix());
+//            qDebug() << bones[n]->getLocalMatrix();
         }
-        setShaderVariableMatrix(boneShader, "worldMatrix", mesh.minorMatrix);
+//        setShaderArrayMatrix(boneShader, "boneMatrix");
     } else {
-        QMatrix4x4 m;
-        m.setRow(0, QVector4D(1, 0, 0, 0));
-        m.setRow(1, QVector4D(0, 1, 0, 0));
-        m.setRow(2, QVector4D(0, 0, 1, 0));
-        m.setRow(3, QVector4D(0, 0, 0, 1));
-        setShaderVariableMatrix(boneShader, "worldMatrix", m);
         glMultMatrixf(mesh.majorMatrix.constData());
     }
     glActiveTexture(GL_TEXTURE0);
@@ -340,7 +337,7 @@ void MabiMeGLWidget::renderPMGMesh(PMG::Mesh mesh, QList<Bone*> bones, GLuint te
     }
     if (attribVertexBoneID != -1) {
         glEnableVertexAttribArray(attribVertexBoneID);
-        glVertexAttribPointer(attribVertexBoneID, 1, GL_INT, GL_FALSE, sizeof(PMG::ShaderVertex), (void*)(offsetof(PMG::ShaderVertex, boneID)));
+        glVertexAttribPointer(attribVertexBoneID, 1, GL_FLOAT, GL_FALSE, sizeof(PMG::ShaderVertex), (void*)(offsetof(PMG::ShaderVertex, boneID)));
     }
     glDrawElements(GL_TRIANGLES, mesh.faceVertexCount, GL_UNSIGNED_INT, mesh.vertexList);
     if (attribVertexXYZ != -1) glDisableVertexAttribArray(attribVertexXYZ);
@@ -380,6 +377,8 @@ void MabiMeGLWidget::mouseMoveEvent(QMouseEvent *event) {
         camera.x = oldCameraPos.x() + ((event->x() - drag.x()) / 4);
         camera.y = oldCameraPos.y() - ((event->y() - drag.y()) / 4);
 //        getModel("human")->findBone("chest")->setX(camera.x);
+//        getModel("human")->findBone("leg1l")->setX(camera.x);
+//        getModel("human")->findBone("leg1r")->setX(-camera.x);
     }
     if (isRightDragging) {
         camera.rotation.pitch = oldCameraRotation.pitch + (event->y() - drag.y());
@@ -588,19 +587,19 @@ void MabiMeGLWidget::setShaderVariableMatrix(GLhandleARB shader, QString varname
     checkError("glGetUniformLocation[" + varname + "]");
     if (id != -1) {
         glUniformMatrix4fv(id, 1, GL_FALSE, matrix.constData());
-        checkError("glUniformMatrix4fv(id [" + varname + "], <ptr>)", true); // suppress error - there is a quirk in openGL to always return 0 for this
-    }
+        checkError("glUniformMatrix4fv(id [" + varname + "], <ptr>)"); // suppress error - there is a quirk in openGL to always return 0 for this
+    } else qDebug() << "setShaderVariableMatrix - could not find " << varname;
 }
-void MabiMeGLWidget::setShaderArrayMatrix(GLhandleARB shader, QString varname, QList<QMatrix4x4> matrices) {
+void MabiMeGLWidget::setShaderArrayMatrix(GLhandleARB shader, QString varname) {
     GLint id = glGetUniformLocation(shader, varname.toLatin1());
     checkError("glGetUniformLocation[" + varname + "]");
     if (id != -1) {
-        GLfloat *matrix = (GLfloat*)malloc(64 * matrices.count());
-        for (int n = 0; n < matrices.count(); n++) {
-            memcpy(&matrix[n * 64], matrices[n].constData(), 64);
-        }
-        glUniformMatrix4fv(id, matrices.count(), GL_FALSE, matrix);
-        free(matrix);
+//        GLfloat *matrix = (GLfloat*)malloc(64 * matrices.count());
+//        for (int n = 0; n < matrices.count(); n++) {
+//            memcpy(&matrix + (n * 64), matrices[n].constData(), 64);
+//        }
+        glUniformMatrix4fv(id, 4, GL_FALSE, &boneMatriceBuffer[0]);
+//        free(matrix);
         checkError("glUniformMatrix4fv(id [" + varname + "], <ptr>)", true); // suppress error - there is a quirk in openGL to always return 0 for this
     }
 }
