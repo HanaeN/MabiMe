@@ -241,13 +241,15 @@ void MabiMeGLWidget::initializeGL() {
     attribVertexNXYZ = glGetAttribLocation(boneShader, "vertexNormal");
     attribVertexRGBA = glGetAttribLocation(boneShader, "vertexRGBA");
     attribVertexUV = glGetAttribLocation(boneShader, "vertexUV");
+    attribVertexBoneWeight = glGetAttribLocation(boneShader, "boneWeight");
+    attribVertexBoneID = glGetAttribLocation(boneShader, "boneID");
 //    glBindAttribLocation(boneShader, 6, "vertexPos");
 //    glBindAttribLocation(boneShader, 7, "vertexNormal");
 //    glBindAttribLocation(boneShader, 8, "vertexRGBA");
 //    glBindAttribLocation(boneShader, attribVertexUV, "vertexUV");
 
     qDebug() << attribVertexXYZ;
-    qDebug() << attribVertexNXYZ << attribVertexRGBA << attribVertexUV;
+    qDebug() << attribVertexNXYZ << attribVertexRGBA << attribVertexUV << attribVertexBoneWeight << attribVertexBoneID;
 
 //    checkError("glglgl1");
 //    GLint attrib2 = 6;
@@ -293,27 +295,17 @@ void MabiMeGLWidget::renderPMGMesh(PMG::Mesh mesh, QList<Bone*> bones, GLuint te
     if (bones.count() > 0) {
         QList<QMatrix4x4> matrices;
         for (int n = 0; n < bones.count(); n++) {
-//            setShaderVariableMatrix(boneShader, "boneMatrix[" + QString::number(n) + "]", bones[n]->getMatrix());
+            setShaderVariableMatrix(boneShader, "boneMatrix[" + QString::number(n) + "]", bones[n]->getMatrix());
             matrices.append(bones[n]->getMatrix());
         }
-        //setShaderArrayMatrix(boneShader, "boneMatrix[0]", matrices);
-
-
-        setShaderVariableMatrix(boneShader, "worldMatrix", mesh.majorMatrix);
-//        setShaderArrayFloat(boneShader, "boneWeight[0]", mesh.cleanBoneWeights, mesh.cleanVertexCount);
-//        setShaderArrayInt(boneShader, "boneID[0]", mesh.cleanBoneIDs, mesh.cleanVertexCount);
-//        glMultMatrixf(bone->getMatrix().constData());
+        setShaderVariableMatrix(boneShader, "worldMatrix", mesh.minorMatrix);
     } else {
         QMatrix4x4 m;
         m.setRow(0, QVector4D(1, 0, 0, 0));
         m.setRow(1, QVector4D(0, 1, 0, 0));
         m.setRow(2, QVector4D(0, 0, 1, 0));
         m.setRow(3, QVector4D(0, 0, 0, 1));
-        setShaderVariableMatrix(boneShader, "boneMatrix[0]", m);
-        setShaderVariableMatrix(boneShader, "boneMatrix[1]", m);
         setShaderVariableMatrix(boneShader, "worldMatrix", m);
-//        setShaderArrayFloat(boneShader, "boneWeight[0]", mesh.cleanBoneWeights, mesh.cleanVertexCount);
-//        setShaderArrayInt(boneShader, "boneID[0]", mesh.cleanBoneIDs, mesh.cleanVertexCount);
         glMultMatrixf(mesh.majorMatrix.constData());
     }
     glActiveTexture(GL_TEXTURE0);
@@ -342,11 +334,21 @@ void MabiMeGLWidget::renderPMGMesh(PMG::Mesh mesh, QList<Bone*> bones, GLuint te
         glEnableVertexAttribArray(attribVertexUV);
         glVertexAttribPointer(attribVertexUV, 2, GL_FLOAT, GL_FALSE, sizeof(PMG::ShaderVertex), (void*)(offsetof(PMG::ShaderVertex, uv)));
     }
+    if (attribVertexBoneWeight != -1) {
+        glEnableVertexAttribArray(attribVertexBoneWeight);
+        glVertexAttribPointer(attribVertexBoneWeight, 2, GL_FLOAT, GL_FALSE, sizeof(PMG::ShaderVertex), (void*)(offsetof(PMG::ShaderVertex, boneWeight)));
+    }
+    if (attribVertexBoneID != -1) {
+        glEnableVertexAttribArray(attribVertexBoneID);
+        glVertexAttribPointer(attribVertexBoneID, 1, GL_INT, GL_FALSE, sizeof(PMG::ShaderVertex), (void*)(offsetof(PMG::ShaderVertex, boneID)));
+    }
     glDrawElements(GL_TRIANGLES, mesh.faceVertexCount, GL_UNSIGNED_INT, mesh.vertexList);
     if (attribVertexXYZ != -1) glDisableVertexAttribArray(attribVertexXYZ);
     if (attribVertexNXYZ != -1) glDisableVertexAttribArray(attribVertexNXYZ);
     if (attribVertexUV != -1) glDisableVertexAttribArray(attribVertexUV);
     if (attribVertexRGBA != -1) glDisableVertexAttribArray(attribVertexRGBA);
+    if (attribVertexBoneWeight != -1) glDisableVertexAttribArray(attribVertexBoneWeight);
+    if (attribVertexBoneID != -1) glDisableVertexAttribArray(attribVertexBoneID);
     glPopMatrix();
 }
 
