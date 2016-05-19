@@ -31,11 +31,8 @@ void PMGReader::freePMG() {
     hasLoaded = false;
     for (int n = 0; n < meshes.count(); n++) {
         PMG::Mesh *m = meshes[n];
-        free(m->cleanColours);
-        free(m->cleanNormals);
-        free(m->cleanTextureCoords);
-        free(m->cleanVertices);
-        free(m->cleanBoneWeights);
+        free(m->shaderVertices);
+        free(m->vertexList);
         for (int i = 0; i < m->skins.count(); i++) {
             delete m->skins[i];
         }
@@ -157,9 +154,10 @@ bool PMGReader::loadPMG(QByteArray stream) {
 //                        qDebug() << mesh->meshName << mesh->boneName << mesh->boneName2 << mesh->statName << mesh->normalName << mesh->colourMap << mesh->textureName;
                     }
                     mesh->boneNames = QStringList(mesh->boneName);
+                    mesh->vertexList = (GLuint*)malloc(4 * mesh->faceVertexCount);
                     for (int n = 0; n < mesh->faceVertexCount; n++) {
                         short v = *(short*)&data[pos];
-                        mesh->vertexList.append(v);
+                        mesh->vertexList[n] = (GLuint) v;
                         pos += 2;
                     }
                     for (int n = 0; n < mesh->stripFaceVertexCount; n++) {
@@ -176,13 +174,8 @@ bool PMGReader::loadPMG(QByteArray stream) {
                         mesh->vertices.append(v);
                     }
                     if (!textures.contains(mesh->textureName)) textures.append(mesh->textureName);
-                    mesh->cleanVertices = (GLfloat*)malloc(4 * mesh->faceVertexCount * 3);
-                    mesh->cleanColours = (GLfloat*)malloc(4 * mesh->faceVertexCount * 4);
-                    mesh->cleanNormals = (GLfloat*)malloc(4 * mesh->faceVertexCount * 3);
-                    mesh->cleanTextureCoords = (GLfloat*)malloc(4 * mesh->faceVertexCount * 2);
-                    mesh->cleanBoneWeights = (GLfloat*)malloc(4 * mesh->faceVertexCount);
-                    mesh->cleanBoneIDs = (GLint*)malloc(4 * mesh->faceVertexCount);
-                    mesh->cleanVertexCount = mesh->faceVertexCount;
+                    mesh->shaderVertices = (PMG::ShaderVertex*)malloc(sizeof(PMG::ShaderVertex) * mesh->vertexCount);
+                    mesh->cleanVertexCount = mesh->vertexCount;
 
                     QVector2D uv;
                     QVector3D xyz;
@@ -192,24 +185,24 @@ bool PMGReader::loadPMG(QByteArray stream) {
                         PMG::Skin *s = new PMG::Skin();
                         memcpy(s, &data[pos], sizeof(PMG::Skin));
                         mesh->vertices[s->vertexID]->skin = *s;
-//                        vertices[mesh->globalVertices[s->vertexID]]->skin = *s;
                         pos += sizeof(PMG::Skin);
                         mesh->skins.append(s);
                     }
 
 
-                    for (int n = 0; n < mesh->faceVertexCount; n++) {
-                        PMG::Vertex *v = mesh->vertices[mesh->vertexList[n]];
+                    for (int n = 0; n < mesh->vertexCount; n++) {
+                        PMG::Vertex *v = mesh->vertices[n];
                         xyz = QVector3D(v->x, v->y, v->z);
-                        memcpy(&mesh->cleanVertices[n * 3], &xyz, 12);
+                        memcpy(&mesh->shaderVertices[n].xyz, &xyz, 12);
                         rgba = QVector4D((GLfloat)v->r / 255.0, (GLfloat)v->g / 255.0, (GLfloat)v->b / 255.0, (GLfloat)v->a / 255.0);
-                        memcpy(&mesh->cleanColours[n * 4], &rgba, 16);
+                        memcpy(&mesh->shaderVertices[n].rgba, &rgba, 16);
                         xyz = QVector3D(v->nx, v->ny, v->nz);
-                        memcpy(&mesh->cleanNormals[n * 3], &xyz, 12);
+                        memcpy(&mesh->shaderVertices[n].nxyz, &xyz, 12);
                         uv = QVector2D(v->u, v->v);
-                        memcpy(&mesh->cleanTextureCoords[n * 2], &uv, 8);
-                        mesh->cleanBoneWeights[n] = v->skin.boneWeight;
-                        mesh->cleanBoneIDs[n] = 0;
+                        memcpy(&mesh->shaderVertices[n].uv, &uv, 8);
+                        mesh->shaderVertices[n].boneWeight[0] = v->skin.boneWeight;
+                        mesh->shaderVertices[n].boneWeight[1] = 1.0 - v->skin.boneWeight;
+                        mesh->shaderVertices[n].boneID = 0;
                     }
                     float d[16];
                     memcpy(d, mesh->majorMatrix.data(), 64);

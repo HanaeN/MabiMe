@@ -49,10 +49,15 @@ namespace PMG {
         Skin skin;
         int globalID = 0;
     };
-    #pragma pack(0)
+    #pragma pack(1)
     struct ShaderVertex {
-        float x,y,z, weight;
+        GLfloat xyz[3], nxyz[3];
+        GLfloat rgba[4];
+        GLfloat uv[2];
+        GLfloat boneWeight[2];
+        int boneID;
     };
+    #pragma pack(pop)
 
     struct Mesh {
         int size;
@@ -68,17 +73,11 @@ namespace PMG {
         int stripFaceCount       = 0;
         int vertexCount          = 0;
         int skinCount            = 0;
-        QList<short> vertexList = QList<short>();
+        GLuint *vertexList;
         QList<short> stripVertexList = QList<short>();
         QList<Vertex*> vertices = QList<Vertex*>();
         QList<int> globalVertices = QList<int>();
-        GLfloat *cleanVertices;
-        GLfloat *cleanColours;
-        GLfloat *cleanNormals;
-        GLfloat *cleanTextureCoords;
-        GLfloat *cleanBoneWeights;
-        GLint *cleanBoneIDs;
-        GLfloat *shaderVertices;
+        ShaderVertex *shaderVertices;
         int cleanVertexCount;
         QList<Skin*> skins = QList<Skin*>();
     };

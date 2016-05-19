@@ -108,7 +108,7 @@ void Model::addPMG(QString path) {
                                 mID = m->meshes[i]->boneNames.count();
                                 m->meshes[i]->boneNames.append(mName);
                             }
-                            m->meshes[i]->cleanBoneIDs[n] = mID;
+                            //m->meshes[i]->cleanBoneIDs[n] = mID;
     //                        qDebug() << v->skin.a << v->skin.b << v->skin.boneWeight << closestVertex->skin.a << closestVertex->skin.b << closestVertex->skin.boneWeight;
                         } else {
                             qDebug() << "failed to find link" << n << v->globalID << m->meshes[i]->boneName;

@@ -20,6 +20,8 @@
 #include "mabimeglwidget.h"
 #include <QtWidgets>
 #include <QtOpenGL>
+#include <QOpenGLDebugLogger>
+#include <QOpenGLContext>
 #include <QDebug>
 #include <QMouseEvent>
 #include "GL/gl.h"
@@ -112,11 +114,12 @@ void MabiMeGLWidget::draw() {
 void MabiMeGLWidget::paintGL() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     glLoadIdentity();
-
     // draw grid
     glDisable(GL_LIGHTING);
-    glDisableClientState(GL_COLOR_ARRAY);
-    glDisableClientState(GL_NORMAL_ARRAY);
+//    glDisableClientState(GL_COLOR_ARRAY);
+//    glDisableClientState(GL_NORMAL_ARRAY);
+
+/*
     glVertexPointer(3, GL_FLOAT, 0, vertexList);
     glTexCoordPointer(2, GL_FLOAT, 0, vertexUV);
     glActiveTexture(GL_TEXTURE0);
@@ -124,8 +127,9 @@ void MabiMeGLWidget::paintGL() {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glBindTexture(GL_TEXTURE_2D, frmTexture);
     glDrawArrays(GL_QUADS, 0, 4);
-    glEnableClientState(GL_COLOR_ARRAY);
-    glEnableClientState(GL_NORMAL_ARRAY);
+*/
+//    glEnableClientState(GL_COLOR_ARRAY);
+//    glEnableClientState(GL_NORMAL_ARRAY);
     glEnable(GL_LIGHTING);
     glClear(GL_DEPTH_BUFFER_BIT);
 
@@ -150,11 +154,11 @@ void MabiMeGLWidget::paintGL() {
     glLineWidth(2.5f);
     glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
     glColor3f(0.0f, 0.0f, 0.0f );
-    glDisableClientState(GL_COLOR_ARRAY);
+//    glDisableClientState(GL_COLOR_ARRAY);
     setShaderVariableInt(boneShader, "isOutline", 1);
     draw();
     endShader();
-    glEnableClientState(GL_COLOR_ARRAY);
+//    glEnableClientState(GL_COLOR_ARRAY);
     glPopAttrib();
 }
 
@@ -196,7 +200,13 @@ void MabiMeGLWidget::initializeGL() {
     glGetShaderiv               = (PFNGLGETSHADERIVPROC)GetAnyGLFuncAddress("glGetShaderiv");
     glGenVertexArrays           = (PFNGLGENVERTEXARRAYSPROC)GetAnyGLFuncAddress("glGenVertexArrays");
     glBindVertexArray           = (PFNGLBINDVERTEXARRAYPROC)GetAnyGLFuncAddress("glBindVertexArray");
+    glDebugMessageControl       = (PFNGLDEBUGMESSAGECONTROLPROC)GetAnyGLFuncAddress("glDebugMessageControl");
 
+
+    QOpenGLDebugLogger *logger = new QOpenGLDebugLogger(this);
+    connect(logger, SIGNAL(messageLogged(QOpenGLDebugMessage)), SLOT(debugLog(QOpenGLDebugMessage)));
+    logger->initialize();
+    logger->startLogging();
 
     qglClearColor(QColor(200, 200, 200));
     glEnable(GL_DEPTH_TEST);
@@ -208,10 +218,10 @@ void MabiMeGLWidget::initializeGL() {
     glEnable(GL_ALPHA_TEST);
     glAlphaFunc(GL_GEQUAL, 1);
 
-    glEnableClientState(GL_VERTEX_ARRAY);
-    glEnableClientState(GL_COLOR_ARRAY);
-    glEnableClientState(GL_NORMAL_ARRAY);
-    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+//    glEnableClientState(GL_VERTEX_ARRAY);
+//    glEnableClientState(GL_COLOR_ARRAY);
+//    glEnableClientState(GL_NORMAL_ARRAY);
+//    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
     glEnable(GL_LIGHTING);
     glEnable(GL_LIGHT0);
@@ -222,9 +232,23 @@ void MabiMeGLWidget::initializeGL() {
     frmTexture = loadTexture("Images/frm.png");
     boneShader = linkShader("Shaders/bone.v", "Shaders/bone.f");
 
-//    glGenBuffers(1, &vao);
+    glGenVertexArrays(1, &vao);
+    glBindVertexArray(vao);
+
+    glGenBuffers(1, &vbo);
 //    GLint attrib1 = 6;
-//    glBindAttribLocation(boneShader, attrib1, "vertexData");
+    attribVertexXYZ = 0;//glGetAttribLocation(boneShader, "vertexPos");
+    attribVertexNXYZ = 1;//glGetAttribLocation(boneShader, "vertexNormal");
+    attribVertexRGBA = 2;//glGetAttribLocation(boneShader, "vertexRGBA");
+    attribVertexUV = 3;//glGetAttribLocation(boneShader, "vertexUV");
+    glBindAttribLocation(boneShader, 0, "vertexPos");
+    glBindAttribLocation(boneShader, 1, "vertexNormal");
+    glBindAttribLocation(boneShader, 2, "vertexRGBA");
+    glBindAttribLocation(boneShader, 3, "vertexUV");
+
+    qDebug() << attribVertexXYZ;
+    qDebug() << attribVertexNXYZ << attribVertexRGBA << attribVertexUV;
+
 //    checkError("glglgl1");
 //    GLint attrib2 = 6;
 //    glBindAttribLocation(boneShader, attrib2, "vertexPos");
@@ -269,15 +293,15 @@ void MabiMeGLWidget::renderPMGMesh(PMG::Mesh mesh, QList<Bone*> bones, GLuint te
     if (bones.count() > 0) {
         QList<QMatrix4x4> matrices;
         for (int n = 0; n < bones.count(); n++) {
-            setShaderVariableMatrix(boneShader, "boneMatrix[" + QString::number(n) + "]", bones[n]->getMatrix());
+//            setShaderVariableMatrix(boneShader, "boneMatrix[" + QString::number(n) + "]", bones[n]->getMatrix());
             matrices.append(bones[n]->getMatrix());
         }
         //setShaderArrayMatrix(boneShader, "boneMatrix[0]", matrices);
 
 
-        setShaderVariableMatrix(boneShader, "worldMatrix", mesh.minorMatrix);
-        setShaderArrayFloat(boneShader, "boneWeight[0]", mesh.cleanBoneWeights, mesh.cleanVertexCount);
-        setShaderArrayInt(boneShader, "boneID[0]", mesh.cleanBoneIDs, mesh.cleanVertexCount);
+        setShaderVariableMatrix(boneShader, "worldMatrix", mesh.majorMatrix);
+//        setShaderArrayFloat(boneShader, "boneWeight[0]", mesh.cleanBoneWeights, mesh.cleanVertexCount);
+//        setShaderArrayInt(boneShader, "boneID[0]", mesh.cleanBoneIDs, mesh.cleanVertexCount);
 //        glMultMatrixf(bone->getMatrix().constData());
     } else {
         QMatrix4x4 m;
@@ -288,14 +312,10 @@ void MabiMeGLWidget::renderPMGMesh(PMG::Mesh mesh, QList<Bone*> bones, GLuint te
         setShaderVariableMatrix(boneShader, "boneMatrix[0]", m);
         setShaderVariableMatrix(boneShader, "boneMatrix[1]", m);
         setShaderVariableMatrix(boneShader, "worldMatrix", m);
-        setShaderArrayFloat(boneShader, "boneWeight[0]", mesh.cleanBoneWeights, mesh.cleanVertexCount);
-        setShaderArrayInt(boneShader, "boneID[0]", mesh.cleanBoneIDs, mesh.cleanVertexCount);
+//        setShaderArrayFloat(boneShader, "boneWeight[0]", mesh.cleanBoneWeights, mesh.cleanVertexCount);
+//        setShaderArrayInt(boneShader, "boneID[0]", mesh.cleanBoneIDs, mesh.cleanVertexCount);
         glMultMatrixf(mesh.majorMatrix.constData());
     }
-    glVertexPointer(3, GL_FLOAT, 0, mesh.cleanVertices);
-    glColorPointer(4, GL_FLOAT, 0, mesh.cleanColours);
-    glNormalPointer(GL_FLOAT, 0, mesh.cleanNormals);
-    glTexCoordPointer(2, GL_FLOAT, 0, mesh.cleanTextureCoords);
     glActiveTexture(GL_TEXTURE0);
     if (texture > 0) {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
@@ -304,7 +324,21 @@ void MabiMeGLWidget::renderPMGMesh(PMG::Mesh mesh, QList<Bone*> bones, GLuint te
     } else {
         glBindTexture(GL_TEXTURE_2D, 0);
     }
-    glDrawArrays(GL_TRIANGLES, 0, mesh.cleanVertexCount);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(PMG::ShaderVertex) * mesh.vertexCount, mesh.shaderVertices, GL_STATIC_DRAW);
+    glEnableVertexAttribArray(attribVertexXYZ);
+    glEnableVertexAttribArray(attribVertexNXYZ);
+    glEnableVertexAttribArray(attribVertexUV);
+    glEnableVertexAttribArray(attribVertexRGBA);
+    glVertexAttribPointer(attribVertexXYZ, 3, GL_FLOAT, GL_FALSE, sizeof(PMG::ShaderVertex), 0);
+    glVertexAttribPointer(attribVertexNXYZ, 3, GL_FLOAT, GL_FALSE, sizeof(PMG::ShaderVertex), reinterpret_cast<void *>(offsetof(PMG::ShaderVertex, nxyz)));
+    glVertexAttribPointer(attribVertexRGBA, 4, GL_FLOAT, GL_FALSE, sizeof(PMG::ShaderVertex), reinterpret_cast<void *>(offsetof(PMG::ShaderVertex, rgba)));
+    glVertexAttribPointer(attribVertexUV, 2, GL_FLOAT, GL_FALSE, sizeof(PMG::ShaderVertex), reinterpret_cast<void *>(offsetof(PMG::ShaderVertex, uv)));
+    glDrawElements(GL_TRIANGLES, mesh.faceVertexCount, GL_UNSIGNED_INT, mesh.vertexList);
+    glDisableVertexAttribArray(attribVertexXYZ);
+    glDisableVertexAttribArray(attribVertexNXYZ);
+    glDisableVertexAttribArray(attribVertexUV);
+    glDisableVertexAttribArray(attribVertexRGBA);
     glPopMatrix();
 }
 
@@ -603,4 +637,9 @@ void MabiMeGLWidget::setCameraZ(float z) {
 
 CameraInfo MabiMeGLWidget::getCameraInfo() {
     return camera;
+}
+
+void MabiMeGLWidget::debugLog(QOpenGLDebugMessage msg) {
+    if (msg.type() == QOpenGLDebugMessage::OtherType) return;
+    qDebug() << "GLERROR" << msg;
 }

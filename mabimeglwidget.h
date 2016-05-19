@@ -23,6 +23,7 @@
 #include <QGLWidget>
 #include <QList>
 #include <QPoint>
+#include <QOpenGLDebugMessage>
 #include <QVector3D>
 
 #include "model.h"
@@ -56,6 +57,7 @@ private:
     QList<Model*> models = QList<Model*>();
     Rotation oldCameraRotation;
     GLhandleARB boneShader;
+    GLint attribVertexXYZ, attribVertexNXYZ, attribVertexRGBA, attribVertexUV, attribVertexBoneWeight, attribVertexBoneID;
     bool isLeftDragging = false;
     bool isRightDragging = false;
     void wheelEvent(QWheelEvent* event);
@@ -108,6 +110,7 @@ private:
     PFNGLGETSHADERIVPROC                glGetShaderiv;
     PFNGLGENVERTEXARRAYSPROC            glGenVertexArrays;
     PFNGLBINDVERTEXARRAYPROC            glBindVertexArray;
+    PFNGLDEBUGMESSAGECONTROLPROC        glDebugMessageControl;
 protected:
     void initializeGL();
     void paintGL();
@@ -117,7 +120,7 @@ protected:
     GLhandleARB linkShader(QString vp_str, QString fp_str);
     void useShader(GLhandleARB shader);
     void endShader();
-    GLuint vao;
+    GLuint vao, vbo;
     void setShaderVariableInt(GLhandleARB shader, QString varname, int data);
     void setShaderVariableFloat(GLhandleARB shader, QString varname, float data);
     void setShaderArrayFloat(GLhandleARB shader, QString varname, float *data, int arraySize);
@@ -128,6 +131,7 @@ protected:
 signals:
     void cameraChange(CameraInfo camera);
 public slots:
+    void debugLog(QOpenGLDebugMessage msg);
 };
 
 #endif // MABIMEGLWIDGET_H
