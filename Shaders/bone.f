@@ -11,7 +11,7 @@ varying vec2 tex;
 void main (void)  
 {
   if (isOutline == 1) {
-    gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
+    gl_FragColor = vec4(0.0, 0.0, 0.0, texture2D(textureIn, tex.xy).a);
   } else {
     vec3 L = normalize(gl_LightSource[0].position.xyz - v);
     vec3 E = normalize(-v); // we are in Eye Coordinates, so EyePos is (0,0,0)
