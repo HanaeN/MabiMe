@@ -34,6 +34,7 @@ public:
     const QMatrix4x4 getMatrix();
     const QMatrix4x4 getLocalMatrix();
     void setX(GLfloat x);
+    void setY(GLfloat y);
     Bone *findBone(QString boneName);
     Bone *getParent();
     QList<Bone*> getChildren();

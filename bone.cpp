@@ -90,6 +90,10 @@ void Bone::setX(GLfloat x) {
     translation.setX(x);
     updateBone();
 }
+void Bone::setY(GLfloat y) {
+    translation.setY(y);
+    updateBone();
+}
 
 Bone* Bone::getParent() {
     return parentBone;
