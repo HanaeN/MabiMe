@@ -20,7 +20,6 @@
 #include "mabimeglwidget.h"
 #include <QtWidgets>
 #include <QtOpenGL>
-#include <QOpenGLDebugLogger>
 #include <QOpenGLContext>
 #include <QDebug>
 #include <QMouseEvent>
@@ -114,6 +113,8 @@ void MabiMeGLWidget::draw() {
 void MabiMeGLWidget::paintGL() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     glLoadIdentity();
+
+
     // draw grid
     glDisable(GL_LIGHTING);
 //    glDisableClientState(GL_COLOR_ARRAY);
@@ -154,11 +155,9 @@ void MabiMeGLWidget::paintGL() {
     glLineWidth(2.5f);
     glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
     glColor3f(0.0f, 0.0f, 0.0f );
-//    glDisableClientState(GL_COLOR_ARRAY);
     setShaderVariableInt(boneShader, "isOutline", 1);
     draw();
     endShader();
-//    glEnableClientState(GL_COLOR_ARRAY);
     glPopAttrib();
 }
 
@@ -203,10 +202,13 @@ void MabiMeGLWidget::initializeGL() {
     glDebugMessageControl       = (PFNGLDEBUGMESSAGECONTROLPROC)GetAnyGLFuncAddress("glDebugMessageControl");
 
 
-    QOpenGLDebugLogger *logger = new QOpenGLDebugLogger(this);
-    connect(logger, SIGNAL(messageLogged(QOpenGLDebugMessage)), SLOT(debugLog(QOpenGLDebugMessage)));
-    logger->initialize();
-    logger->startLogging();
+    bool isLogging = false; // openGL logging
+    if (isLogging) {
+        logger = new QOpenGLDebugLogger(this);
+        connect(logger, SIGNAL(messageLogged(QOpenGLDebugMessage)), SLOT(debugLog(QOpenGLDebugMessage)));
+        logger->initialize();
+        logger->startLogging();
+    }
 
     qglClearColor(QColor(200, 200, 200));
     glEnable(GL_DEPTH_TEST);
@@ -218,17 +220,6 @@ void MabiMeGLWidget::initializeGL() {
     glEnable(GL_ALPHA_TEST);
     glAlphaFunc(GL_GEQUAL, 1);
 
-//    glEnableClientState(GL_VERTEX_ARRAY);
-//    glEnableClientState(GL_COLOR_ARRAY);
-//    glEnableClientState(GL_NORMAL_ARRAY);
-//    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-
-//    glEnable(GL_LIGHTING);
-//    glEnable(GL_LIGHT0);
-
-//    static GLfloat lightPosition[4] = { 0, 0, 10, 1.0 };
-//    glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
-
     frmTexture = loadTexture("Images/frm.png");
     boneShader = linkShader("Shaders/bone.v", "Shaders/bone.f");
 
@@ -236,27 +227,13 @@ void MabiMeGLWidget::initializeGL() {
     glBindVertexArray(vao);
 
     glGenBuffers(1, &vbo);
-//    GLint attrib1 = 6;
     attribVertexXYZ = glGetAttribLocation(boneShader, "vertexPos");
     attribVertexNXYZ = glGetAttribLocation(boneShader, "vertexNormal");
     attribVertexRGBA = glGetAttribLocation(boneShader, "vertexRGBA");
     attribVertexUV = glGetAttribLocation(boneShader, "vertexUV");
     attribVertexBoneWeight = glGetAttribLocation(boneShader, "boneWeight");
     attribVertexBoneID = glGetAttribLocation(boneShader, "boneID");
-//    glBindAttribLocation(boneShader, 6, "vertexPos");
-//    glBindAttribLocation(boneShader, 7, "vertexNormal");
-//    glBindAttribLocation(boneShader, 8, "vertexRGBA");
-//    glBindAttribLocation(boneShader, attribVertexUV, "vertexUV");
-
-    qDebug() << attribVertexXYZ;
-    qDebug() << attribVertexNXYZ << attribVertexRGBA << attribVertexUV << attribVertexBoneWeight << attribVertexBoneID;
-
-//    checkError("glglgl1");
-//    GLint attrib2 = 6;
-//    glBindAttribLocation(boneShader, attrib2, "vertexPos");
-//    GLint attrib3 = 7;
-//    glBindAttribLocation(boneShader, attrib3, "boneID");
-
+    qDebug() << attribVertexXYZ << attribVertexNXYZ << attribVertexRGBA << attribVertexUV << attribVertexBoneWeight << attribVertexBoneID;
     emit cameraChange(camera);
 }
 
@@ -376,7 +353,7 @@ void MabiMeGLWidget::mouseMoveEvent(QMouseEvent *event) {
     if (isLeftDragging) {
         camera.x = oldCameraPos.x() + ((event->x() - drag.x()) / 4);
         camera.y = oldCameraPos.y() - ((event->y() - drag.y()) / 4);
-        getModel("human")->findBone("chest")->setY(camera.x);
+//        getModel("human")->findBone("chest")->setY(camera.x);
 //        getModel("human")->findBone("leg1l")->setX(camera.x);
 //        getModel("human")->findBone("leg1r")->setX(-camera.x);
     }
@@ -651,4 +628,11 @@ CameraInfo MabiMeGLWidget::getCameraInfo() {
 void MabiMeGLWidget::debugLog(QOpenGLDebugMessage msg) {
     if (msg.type() == QOpenGLDebugMessage::OtherType) return;
     qDebug() << "GLERROR" << msg;
+}
+
+MabiMeGLWidget::~MabiMeGLWidget() {
+    if (logger != nullptr) {
+        logger->stopLogging();
+        delete logger;
+    }
 }

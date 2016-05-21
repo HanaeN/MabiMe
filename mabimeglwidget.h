@@ -24,6 +24,7 @@
 #include <QList>
 #include <QPoint>
 #include <QOpenGLDebugMessage>
+#include <QOpenGLDebugLogger>
 #include <QVector3D>
 
 #include "model.h"
@@ -42,6 +43,7 @@ class MabiMeGLWidget : public QGLWidget
     Q_OBJECT
 public:
     explicit MabiMeGLWidget(QWidget *parent = 0);
+    ~MabiMeGLWidget();
     CameraInfo getCameraInfo();
     bool addModel(Model *model);
     void deleteModel(QString modelName);
@@ -58,6 +60,8 @@ private:
     Rotation oldCameraRotation;
     GLhandleARB boneShader;
     GLint attribVertexXYZ, attribVertexNXYZ, attribVertexRGBA, attribVertexUV, attribVertexBoneWeight, attribVertexBoneID;
+    QOpenGLDebugLogger *logger = nullptr;
+
     bool isLeftDragging = false;
     bool isRightDragging = false;
     void wheelEvent(QWheelEvent* event);
