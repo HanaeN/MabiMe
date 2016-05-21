@@ -22,6 +22,7 @@
 #include <QSettings>
 #include <QDebug>
 #include <QDir>
+#include <QStringList>
 
 PackManager::PackManager(QObject *parent) : QObject(parent)
 {
@@ -31,7 +32,11 @@ PackManager::PackManager(QObject *parent) : QObject(parent)
     } else {
         qDebug() << path;
     }
-    languagePack.localeMap = new LocaleMapHelper();
+    QStringList whiteList;
+    whiteList << "xml.characterstyle"
+              << "xml.color"
+              << "xmlcolorstyle";
+    languagePack.localeMap = new LocaleMapHelper(whiteList);
 }
 
 PackManager::PackManager(QString path, QObject *parent) : QObject(parent)
@@ -164,8 +169,8 @@ void PackManager::freePackages() {
         delete languagePack.reader;
     }
     delete languagePack.localeMap;
-    foreach (const PackXMLManager *xml, languagePack.files) delete xml;
-    languagePack.files.clear();
+    foreach (const XMLParser *xml, xmlParsers) delete xml;
+    xmlParsers.clear();
     packs.clear();
 }
 
@@ -197,6 +202,8 @@ QByteArray PackManager::extractFile(QString path, bool useLanguagePack) {
 }
 
 void PackManager::loadXMLData() {
+    QStringList xmlWhitelist;
+    xmlWhitelist << "characterstyle";
     QStringList xmlFiles = languagePack.reader->getFileNames("", ".txt");
     // load the locale look up key/pairs for the XML later
     int n = 0;
@@ -205,9 +212,14 @@ void PackManager::loadXMLData() {
         emit currentLanguagePackProgress("Parsing " + filename, n, xmlFiles.count());
         QString cleanName = filename.split(".", QString::SkipEmptyParts)[0];
         languagePack.localeMap->addLocaleFile(extractFile(filename, true), cleanName);
+    }
+    foreach (QString filename, xmlFiles) {
+        QString cleanName = filename.split(".", QString::SkipEmptyParts)[0];
         cleanName = cleanName.split("\\", QString::SkipEmptyParts).last();
+        if (xmlWhitelist.contains(cleanName)) {
+            XMLParser *m = new XMLParser(cleanName, extractFile("*" + cleanName + ".xml"));
+            xmlParsers.append(m);
+        }
     }
     emit currentLanguagePackProgress("Done.", xmlFiles.count(), xmlFiles.count());
-//    PackXMLManager *m = new PackXMLManager(cleanName, languagePack.reader);
-//    languagePack.files.append(m);
 }

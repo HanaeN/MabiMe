@@ -17,11 +17,22 @@
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <QDebug>
-#include "packxmlmanager.h"
+#ifndef PACKXMLMANAGER_H
+#define PACKXMLMANAGER_H
 
-PackXMLManager::PackXMLManager(QString name, MabiPackReader *reader)
+#include <QString>
+#include <QMap>
+#include <QDomDocument>
+
+#include "PackReader/mabipackreader.h"
+
+class XMLParser
 {
-    this->name = name;
-}
+public:
+    XMLParser(QString name, QByteArray xml);
+    QDomDocument doc;
+private:
+    QString name;
+};
 
+#endif // PACKXMLMANAGER_H

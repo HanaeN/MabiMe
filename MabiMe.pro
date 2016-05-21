@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui opengl openglextensions
+QT       += core gui opengl openglextensions xml
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -26,8 +26,8 @@ SOURCES += main.cpp\
     model.cpp \
     settingswindow.cpp \
     mabimelayerdelegate.cpp \
-    PackReader/packxmlmanager.cpp \
-    PackReader/localemaphelper.cpp
+    Parsers/localemaphelper.cpp \
+    Parsers/xmlparser.cpp
 
 HEADERS  += mainwindow.h \
     PackReader/mabipackreader.h \
@@ -40,8 +40,8 @@ HEADERS  += mainwindow.h \
     model.h \
     settingswindow.h \
     mabimelayerdelegate.h \
-    PackReader/packxmlmanager.h \
-    PackReader/localemaphelper.h
+    Parsers/localemaphelper.h \
+    Parsers/xmlparser.h
 
 FORMS    += mainwindow.ui \
     settingswindow.ui

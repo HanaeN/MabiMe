@@ -17,20 +17,17 @@
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef LOCALEMAPHELPER_H
-#define LOCALEMAPHELPER_H
+#include <QDebug>
+#include "xmlparser.h"
 
-#include <QMap>
-#include <QString>
-
-class LocaleMapHelper
+XMLParser::XMLParser(QString name, QByteArray xml)
 {
-public:
-    LocaleMapHelper();
-    QString getValue(QString key);
-    void addLocaleFile(QByteArray bytes, QString name);
-private:
-    QMap<QString, QString> keyPairs;
-};
+    this->name = name;
+    doc = QDomDocument(name);
+    if (xml.length() > 0) {
+        doc.setContent(xml);
+    } else {
+        qDebug() << "no xml found for " + name;
+    }
+}
 
-#endif // LOCALEMAPHELPER_H

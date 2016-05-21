@@ -24,8 +24,8 @@
 #include <QObject>
 
 #include "PackReader/mabipackreader.h"
-#include "PackReader/packxmlmanager.h"
-#include "PackReader/localemaphelper.h"
+#include "Parsers/xmlparser.h"
+#include "Parsers/localemaphelper.h"
 
 struct Pack {
     MabiPackReader *reader = nullptr;
@@ -37,7 +37,6 @@ struct LanguagePack {
     MabiPackReader *reader = nullptr;
     QString name = "";
     LocaleMapHelper *localeMap;
-    QList<PackXMLManager*> files;
 };
 
 class PackManager : public QObject
@@ -56,6 +55,7 @@ public:
 private:
     QString path = "";
     QList<Pack*> packs;
+    QList<XMLParser*> xmlParsers;
     LanguagePack languagePack;
     void loadXMLData();
     bool packsLoaded = false;

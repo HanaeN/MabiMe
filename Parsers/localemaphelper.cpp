@@ -24,9 +24,9 @@
 #include <QRegularExpression>
 #include <QRegularExpressionMatch>
 
-LocaleMapHelper::LocaleMapHelper()
+LocaleMapHelper::LocaleMapHelper(QStringList whitelist)
 {
-
+    whiteList = whitelist;
 }
 
 QString LocaleMapHelper::getValue(QString key) {
@@ -35,6 +35,8 @@ QString LocaleMapHelper::getValue(QString key) {
 
 void LocaleMapHelper::addLocaleFile(QByteArray bytes, QString name) {
     name = name.replace("\\", ".");
+    // if a whitelist is supplied only parse files designated in it
+    if (whiteList.count() > 0) if (!whiteList.contains(name)) return;
     if (bytes.length() > 0) {
         QTextStream txtStream(bytes);
         QString line = txtStream.readLine();
