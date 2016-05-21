@@ -24,6 +24,8 @@
 #include <QDir>
 #include <QStringList>
 
+#include "Parsers/characterstyleparser.h"
+
 PackManager::PackManager(QObject *parent) : QObject(parent)
 {
     // try to automatically find the path
@@ -202,9 +204,8 @@ QByteArray PackManager::extractFile(QString path, bool useLanguagePack) {
 }
 
 void PackManager::loadXMLData() {
-    QStringList xmlWhitelist;
-    xmlWhitelist << "characterstyle";
     QStringList xmlFiles = languagePack.reader->getFileNames("", ".txt");
+
     // load the locale look up key/pairs for the XML later
     int n = 0;
     foreach (QString filename, xmlFiles) {
@@ -213,13 +214,6 @@ void PackManager::loadXMLData() {
         QString cleanName = filename.split(".", QString::SkipEmptyParts)[0];
         languagePack.localeMap->addLocaleFile(extractFile(filename, true), cleanName);
     }
-    foreach (QString filename, xmlFiles) {
-        QString cleanName = filename.split(".", QString::SkipEmptyParts)[0];
-        cleanName = cleanName.split("\\", QString::SkipEmptyParts).last();
-        if (xmlWhitelist.contains(cleanName)) {
-            XMLParser *m = new XMLParser(cleanName, extractFile("*" + cleanName + ".xml"));
-            xmlParsers.append(m);
-        }
-    }
+    xmlParsers.append(new CharacterStyleParser("characterstyle", extractFile("*characterstyle.xml"), languagePack.localeMap));
     emit currentLanguagePackProgress("Done.", xmlFiles.count(), xmlFiles.count());
 }
