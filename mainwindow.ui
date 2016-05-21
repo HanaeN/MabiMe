@@ -500,13 +500,13 @@
          <widget class="QGroupBox" name="g_categories">
           <property name="minimumSize">
            <size>
-            <width>40</width>
+            <width>62</width>
             <height>0</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
-            <width>60</width>
+            <width>62</width>
             <height>16777215</height>
            </size>
           </property>
@@ -578,8 +578,14 @@
              <property name="frameShadow">
               <enum>QFrame::Plain</enum>
              </property>
+             <property name="horizontalScrollBarPolicy">
+              <enum>Qt::ScrollBarAlwaysOff</enum>
+             </property>
              <property name="sizeAdjustPolicy">
               <enum>QAbstractScrollArea::AdjustIgnored</enum>
+             </property>
+             <property name="autoScroll">
+              <bool>false</bool>
              </property>
              <property name="editTriggers">
               <set>QAbstractItemView::NoEditTriggers</set>
