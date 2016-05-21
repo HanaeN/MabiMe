@@ -21,12 +21,15 @@
 #define PACKXMLMANAGER_H
 
 #include <QString>
+#include <QMap>
+#include "PackReader/mabipackreader.h"
 
 class PackXMLManager
 {
 public:
-    PackXMLManager(QString name);
+    PackXMLManager(QString name, MabiPackReader *reader);
 private:
+    QMap<QString, QString> lookup;
     QString name;
 };
 

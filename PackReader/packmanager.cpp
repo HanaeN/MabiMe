@@ -199,7 +199,7 @@ void PackManager::loadXMLData() {
     foreach (QString filename, xmlFiles) {
         QString cleanName = filename.split(".", QString::SkipEmptyParts)[0];
         cleanName = cleanName.split("\\", QString::SkipEmptyParts).last();
-        PackXMLManager *m = new PackXMLManager(cleanName);
+        PackXMLManager *m = new PackXMLManager(cleanName, languagePack.reader);
         languagePack.files.append(m);
     }
 }

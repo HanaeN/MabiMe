@@ -17,10 +17,29 @@
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <QDebug>
+#include <QTextStream>
+#include <QRegularExpression>
+#include <QRegularExpressionMatch>
 #include "packxmlmanager.h"
 
-PackXMLManager::PackXMLManager(QString name)
+PackXMLManager::PackXMLManager(QString name, MabiPackReader *reader)
 {
     this->name = name;
+    QString txtFile = reader->findFile("xml\\" + name + ".*.txt");
+    if (txtFile.length() > 0) {
+        QByteArray b = reader->extractFile(txtFile);
+        QTextStream txtStream(b);
+        QString line = txtStream.readLine();
+        QRegularExpression regex("(\\S+)\\s+(.*)");
+        QRegularExpressionMatch match;
+        while (!line.isNull()) {
+            match = regex.match(line);
+            if (match.hasMatch()) lookup[match.captured(1)] = match.captured(2);
+            line = txtStream.readLine();
+        }
+    } else {
+        qDebug() << "FATAL ERROR: PackXMLManager could not find " << name << "txt";
+    }
 }
 
