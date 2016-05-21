@@ -21,6 +21,9 @@
 #include "ui_mainwindow.h"
 
 #include <QTimer>
+#include <QtConcurrent/QtConcurrent>
+#include <QFuture>
+#include <QFutureWatcher>
 #include <QMessageBox>
 
 #include "model.h"
@@ -36,6 +39,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->l_layers->header()->close();
     ui->l_layers->setIndentation(0);
     ui->l_layers->setMouseTracking(true);
+    ui->g_load->setCurrentIndex(1);
     for (int i = 0; i < ui->l_category->count(); i++) {
         ui->l_category->item(i)->setSizeHint(QSize(60, 60));
     }
@@ -47,6 +51,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->l_layers->setItemDelegate(d);
     connect(ui->glSurface, SIGNAL(cameraChange(CameraInfo)), SLOT(cameraChange(CameraInfo)));
     p = new PackManager();
+    connect(p, SIGNAL(currentLanguagePackProgress(QString,int,int)), SLOT(onLoadXMLUpdate(QString,int,int)));
     QTimer::singleShot(1, this, SLOT(startTimer()));
 }
 
@@ -65,50 +70,9 @@ void MainWindow::show() {
 }
 
 void MainWindow::loadPackages() {
-    if (p->loadPackages()) {
-
-        QString PMGpath = "gfx\\char\\human\\female\\";
-//        insertPMG("human", PMGpath + "female_default_bss", PMGpath + "female_framework");
-//        insertPMG("human", PMGpath + "face\\female_adult01_f01", PMGpath + "female_framework");
-//        insertPMG("human", PMGpath + "hair\\female_hair46_t46", PMGpath + "female_framework");
-//        insertPMG("human", PMGpath + "wear\\female_summercloth01_bss", PMGpath + "female_framework");
-//        insertPMG("human", PMGpath + "shoes\\female_summercloth02_s04", PMGpath + "female_framework");
-//        insertPMG("human", "gfx\\char\\chapter4\\human\\female\\mantle\\uni_c4_ego_swordwing01", PMGpath + "female_framework");
-//        insertPMG("human", "gfx\\char\\chapter4\\human\\female\\mantle\\female_c4_contest2014_robe_korea01", PMGpath + "female_framework");
-/*
-        QString PMGpath = "gfx\\char\\monster\\mesh\\tabhartas\\tabhartas";
-        insertPMG("tabhartas", PMGpath + "_mesh", PMGpath + "_framework");
-
-        PMGpath = "gfx\\char\\chapter4\\monster\\mesh\\golem\\";
-        insertPMG("golem", PMGpath + "mon_c4_albangolem_mesh", PMGpath + "mon_c4_albangolem_framework");
-
-        PMGpath = "gfx\\char\\pet\\mesh\\";
-        insertPMG("fox", PMGpath + "fox\\pet_star_fox_01_mesh", PMGpath + "fox\\pet_star_fox_01_mesh");
-
-        PMGpath = "gfx\\char\\pet\\mesh\\bear\\";
-        insertPMG("bear", PMGpath + "pet_ubipanda_mesh", PMGpath + "pet_redpanda_framework");
-
-        PMGpath = "gfx\\char\\human\\female\\";
-//        insertPMG("human", PMGpath + "female_default_bss", PMGpath + "female_framework");
-        insertPMG("human", PMGpath + "face\\female_adult01_f01", PMGpath + "female_framework");
-        insertPMG("human", PMGpath + "hair\\female_hair46_t46", PMGpath + "female_framework");
-        insertPMG("human", PMGpath + "wear\\female_summercloth01_bss", PMGpath + "female_framework");
-        insertPMG("human", PMGpath + "shoes\\female_summercloth02_s04", PMGpath + "female_framework");
-        insertPMG("human", "gfx\\char\\chapter4\\human\\female\\mantle\\uni_c4_ego_swordwing01", PMGpath + "female_framework");
-
-        PMGpath = "gfx\\char\\item\\mesh\\item_treasurechest01_i";
-        insertPMG("box", PMGpath, PMGpath);
-*/
-    } else {
-        QMessageBox msg(this);
-        msg.setText("Could not detect the Mabinogi client install path.");
-        msg.setInformativeText("Please check the settings and set a valid path.");
-        msg.setStandardButtons(QMessageBox::Ok);
-        msg.setWindowTitle("MabiMe - Warning");
-        msg.setIcon(QMessageBox::Warning);
-        msg.exec();
-        on_action_Options_triggered();
-    }
+    connect(&loadPackagesWatcher, SIGNAL(finished()), SLOT(onLoadPackages()));
+    loadPackagesAction = QtConcurrent::run(p, &PackManager::loadPackages);
+    loadPackagesWatcher.setFuture(loadPackagesAction);
 }
 
 void MainWindow::startTimer() {
@@ -264,4 +228,58 @@ void MainWindow::on_s_zoom_sliderMoved(int position)
 void MainWindow::on_s_zoom_valueChanged(int value)
 {
     on_s_zoom_sliderMoved(value);
+}
+
+void MainWindow::onLoadPackages() {
+    if (loadPackagesAction.result()) {
+        ui->g_load->setCurrentIndex(0);
+        QString PMGpath = "gfx\\char\\human\\female\\";
+//        insertPMG("human", PMGpath + "female_default_bss", PMGpath + "female_framework");
+//        insertPMG("human", PMGpath + "face\\female_adult01_f01", PMGpath + "female_framework");
+//        insertPMG("human", PMGpath + "hair\\female_hair46_t46", PMGpath + "female_framework");
+//        insertPMG("human", PMGpath + "wear\\female_summercloth01_bss", PMGpath + "female_framework");
+//        insertPMG("human", PMGpath + "shoes\\female_summercloth02_s04", PMGpath + "female_framework");
+//        insertPMG("human", "gfx\\char\\chapter4\\human\\female\\mantle\\uni_c4_ego_swordwing01", PMGpath + "female_framework");
+//        insertPMG("human", "gfx\\char\\chapter4\\human\\female\\mantle\\female_c4_contest2014_robe_korea01", PMGpath + "female_framework");
+/*
+        QString PMGpath = "gfx\\char\\monster\\mesh\\tabhartas\\tabhartas";
+        insertPMG("tabhartas", PMGpath + "_mesh", PMGpath + "_framework");
+
+        PMGpath = "gfx\\char\\chapter4\\monster\\mesh\\golem\\";
+        insertPMG("golem", PMGpath + "mon_c4_albangolem_mesh", PMGpath + "mon_c4_albangolem_framework");
+
+        PMGpath = "gfx\\char\\pet\\mesh\\";
+        insertPMG("fox", PMGpath + "fox\\pet_star_fox_01_mesh", PMGpath + "fox\\pet_star_fox_01_mesh");
+
+        PMGpath = "gfx\\char\\pet\\mesh\\bear\\";
+        insertPMG("bear", PMGpath + "pet_ubipanda_mesh", PMGpath + "pet_redpanda_framework");
+
+        PMGpath = "gfx\\char\\human\\female\\";
+//        insertPMG("human", PMGpath + "female_default_bss", PMGpath + "female_framework");
+        insertPMG("human", PMGpath + "face\\female_adult01_f01", PMGpath + "female_framework");
+        insertPMG("human", PMGpath + "hair\\female_hair46_t46", PMGpath + "female_framework");
+        insertPMG("human", PMGpath + "wear\\female_summercloth01_bss", PMGpath + "female_framework");
+        insertPMG("human", PMGpath + "shoes\\female_summercloth02_s04", PMGpath + "female_framework");
+        insertPMG("human", "gfx\\char\\chapter4\\human\\female\\mantle\\uni_c4_ego_swordwing01", PMGpath + "female_framework");
+
+        PMGpath = "gfx\\char\\item\\mesh\\item_treasurechest01_i";
+        insertPMG("box", PMGpath, PMGpath);
+*/
+    } else {
+        QMessageBox msg(this);
+        msg.setText("Could not detect the Mabinogi client install path.");
+        msg.setInformativeText("Please check the settings and set a valid path.");
+        msg.setStandardButtons(QMessageBox::Ok);
+        msg.setWindowTitle("MabiMe - Warning");
+        msg.setIcon(QMessageBox::Warning);
+        msg.exec();
+        on_action_Options_triggered();
+    }
+}
+
+void MainWindow::onLoadXMLUpdate(QString status, int current, int max) {
+    qDebug() << status << current << max;
+    ui->l_loadingstatus->setText("<center><b>MabiMe is loading...</b><br /><br />" + status);
+    ui->p_loadingbar->setMaximum(max);
+    ui->p_loadingbar->setValue(current);
 }

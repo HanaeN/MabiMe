@@ -22,6 +22,7 @@
 
 #include <QMainWindow>
 #include <QTreeWidgetItem>
+#include <QFuture>
 #include "mabimeglwidget.h"
 #include "PackReader/packmanager.h"
 
@@ -53,8 +54,11 @@ private slots:
     void on_s_zoom_sliderMoved(int position);
 
     void on_s_zoom_valueChanged(int value);
-
+    void onLoadPackages();
+    void onLoadXMLUpdate(QString status, int current, int max);
 private:
+    QFuture<bool> loadPackagesAction;
+    QFutureWatcher<bool> loadPackagesWatcher;
     void insertPMG(QString modelName, QString PMG, QString FRM = "");
     void loadPackages();
     PackManager *p;
