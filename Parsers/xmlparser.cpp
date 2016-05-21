@@ -18,16 +18,21 @@
 */
 
 #include <QDebug>
+
 #include "xmlparser.h"
 
-XMLParser::XMLParser(QString name, QByteArray xml)
+XMLParser::XMLParser(QString name, QByteArray xml, LocaleMapHelper *localeMap)
 {
     this->name = name;
+    this->localeMap = localeMap;
     doc = QDomDocument(name);
+    if (localeMap == nullptr) qDebug() << "XMLParser(\"" + name + "\",<xml." + QString::number(xml.length()) + ">,<nullptr>): A LocaleMapHelper was not supplied. TXT lookups will not function";
     if (xml.length() > 0) {
         doc.setContent(xml);
-    } else {
-        qDebug() << "no xml found for " + name;
-    }
+        ready = true;
+    } else qDebug() << "no xml found for " + name;
 }
 
+bool XMLParser::isReady() {
+    return ready;
+}

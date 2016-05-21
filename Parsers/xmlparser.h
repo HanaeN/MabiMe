@@ -25,14 +25,20 @@
 #include <QDomDocument>
 
 #include "PackReader/mabipackreader.h"
+#include "Parsers/localemaphelper.h"
 
 class XMLParser
 {
 public:
-    XMLParser(QString name, QByteArray xml);
+    XMLParser(QString name, QByteArray xml, LocaleMapHelper *localeMap = nullptr);
+    bool isReady();
+protected:
     QDomDocument doc;
-private:
     QString name;
+    LocaleMapHelper *localeMap = nullptr;
+    virtual void parseFile() = 0;
+private:
+    bool ready = false;
 };
 
 #endif // PACKXMLMANAGER_H
