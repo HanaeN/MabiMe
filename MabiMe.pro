@@ -26,7 +26,8 @@ SOURCES += main.cpp\
     model.cpp \
     settingswindow.cpp \
     mabimelayerdelegate.cpp \
-    PackReader/packxmlmanager.cpp
+    PackReader/packxmlmanager.cpp \
+    PackReader/localemaphelper.cpp
 
 HEADERS  += mainwindow.h \
     PackReader/mabipackreader.h \
@@ -39,7 +40,8 @@ HEADERS  += mainwindow.h \
     model.h \
     settingswindow.h \
     mabimelayerdelegate.h \
-    PackReader/packxmlmanager.h
+    PackReader/packxmlmanager.h \
+    PackReader/localemaphelper.h
 
 FORMS    += mainwindow.ui \
     settingswindow.ui

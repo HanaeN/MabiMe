@@ -17,21 +17,20 @@
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef PACKXMLMANAGER_H
-#define PACKXMLMANAGER_H
+#ifndef LOCALEMAPHELPER_H
+#define LOCALEMAPHELPER_H
 
-#include <QString>
 #include <QMap>
+#include <QString>
 
-#include "PackReader/mabipackreader.h"
-
-class PackXMLManager
+class LocaleMapHelper
 {
 public:
-    PackXMLManager(QString name, MabiPackReader *reader);
+    LocaleMapHelper();
+    QString getValue(QString key);
+    void addLocaleFile(QByteArray bytes, QString name);
 private:
-
-    QString name;
+    QMap<QString, QString> keyPairs;
 };
 
-#endif // PACKXMLMANAGER_H
+#endif // LOCALEMAPHELPER_H

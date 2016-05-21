@@ -21,9 +21,11 @@
 #define PACKMANAGER_H
 
 #include <QList>
+#include <QObject>
 
 #include "PackReader/mabipackreader.h"
 #include "PackReader/packxmlmanager.h"
+#include "PackReader/localemaphelper.h"
 
 struct Pack {
     MabiPackReader *reader = nullptr;
@@ -34,14 +36,16 @@ struct Pack {
 struct LanguagePack {
     MabiPackReader *reader = nullptr;
     QString name = "";
+    LocaleMapHelper *localeMap;
     QList<PackXMLManager*> files;
 };
 
-class PackManager
+class PackManager : public QObject
 {
+    Q_OBJECT
 public:
-    PackManager();
-    PackManager(QString path);
+    explicit PackManager(QObject *parent = 0);
+    PackManager(QString path, QObject *parent = 0);
     ~PackManager();
     void freePackages();
     QString getPath();
@@ -56,6 +60,8 @@ private:
     void loadXMLData();
     bool packsLoaded = false;
     bool findMabinogiPath();
+signals:
+    void currentLanguagePackProgress(QString status, int current, int count);
 };
 
 #endif // PACKMANAGER_H

@@ -23,7 +23,7 @@
 #include <QDebug>
 #include <QDir>
 
-PackManager::PackManager()
+PackManager::PackManager(QObject *parent) : QObject(parent)
 {
     // try to automatically find the path
     if (!findMabinogiPath()) {
@@ -31,9 +31,11 @@ PackManager::PackManager()
     } else {
         qDebug() << path;
     }
+    languagePack.localeMap = new LocaleMapHelper();
 }
 
-PackManager::PackManager(QString path) {
+PackManager::PackManager(QString path, QObject *parent) : QObject(parent)
+{
     // load from path
     if (QDir(path).exists()) {
         this->path = path;
@@ -161,6 +163,7 @@ void PackManager::freePackages() {
         languagePack.reader->closePackage();
         delete languagePack.reader;
     }
+    delete languagePack.localeMap;
     foreach (const PackXMLManager *xml, languagePack.files) delete xml;
     languagePack.files.clear();
     packs.clear();
@@ -194,12 +197,17 @@ QByteArray PackManager::extractFile(QString path, bool useLanguagePack) {
 }
 
 void PackManager::loadXMLData() {
-    QStringList xmlFiles = languagePack.reader->getFileNames("xml\\", ".txt");
-    // generate XML data objects with a clean name to load both xml and txt
+    QStringList xmlFiles = languagePack.reader->getFileNames("", ".txt");
+    // load the locale look up key/pairs for the XML later
+    int n = 0;
     foreach (QString filename, xmlFiles) {
+        n++;
+        emit currentLanguagePackProgress("Parsing " + filename, n, xmlFiles.count());
         QString cleanName = filename.split(".", QString::SkipEmptyParts)[0];
+        languagePack.localeMap->addLocaleFile(extractFile(filename, true), cleanName);
         cleanName = cleanName.split("\\", QString::SkipEmptyParts).last();
-        PackXMLManager *m = new PackXMLManager(cleanName, languagePack.reader);
-        languagePack.files.append(m);
     }
+    emit currentLanguagePackProgress("Done.", xmlFiles.count(), xmlFiles.count());
+//    PackXMLManager *m = new PackXMLManager(cleanName, languagePack.reader);
+//    languagePack.files.append(m);
 }
