@@ -33,14 +33,12 @@ namespace PMG {
         char meshName[128];
         int meshType;
     };
-    #pragma pack(1)
     struct Skin {
         int vertexID = 0;
         int a = 0;
         float boneWeight = 0.5;
         int b = 1;
     };
-    #pragma pack(1)
     struct Vertex {
         float x, y, z;
         float nx, ny, nz;
@@ -49,7 +47,6 @@ namespace PMG {
         Skin skin;
         int globalID = 0;
     };
-    #pragma pack(1)
     struct ShaderVertex {
         GLfloat xyz[3], nxyz[3];
         GLfloat rgba[4];
@@ -57,8 +54,6 @@ namespace PMG {
         GLfloat boneWeight[2];
         GLfloat boneID;
     };
-    #pragma pack(pop)
-
     struct Mesh {
         int size;
         QString boneName, boneName2, statName, normalName, meshName, textureName, colourMap;
