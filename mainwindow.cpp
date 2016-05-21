@@ -278,7 +278,6 @@ void MainWindow::onLoadPackages() {
 }
 
 void MainWindow::onLoadXMLUpdate(QString status, int current, int max) {
-    qDebug() << status << current << max;
     ui->l_loadingstatus->setText("<center><b>MabiMe is loading...</b><br /><br />" + status);
     ui->p_loadingbar->setMaximum(max);
     ui->p_loadingbar->setValue(current);
