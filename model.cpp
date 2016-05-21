@@ -69,12 +69,12 @@ void Model::addPMG(QString path) {
         QString mName;
         int mID;
         int links = 0;
-        if (hasBoneTree()) { // TO DO - multiply vertices by bone and minor matrix to work out neighbours, then the detection is done
+        if (hasBoneTree()) {
             for (int i = 0; i < m->meshes.count(); i++) {
                 Bone *b = boneTree->findBone(m->meshes[i]->boneName);
                 for (int n = 0; n < m->meshes[i]->vertexCount; n++) {
                     PMG::Vertex *v = m->meshes[i]->vertices[n];
-                    QVector3D vertexPos = QMatrix4x4(boneTree->findBone(m->meshes[i]->boneName)->getMatrix() * m->meshes[i]->minorMatrix).map(QVector3D(v->x, v->y, v->z));
+                    QVector3D vertexPos = QMatrix4x4(b->getMatrix() * m->meshes[i]->minorMatrix).map(QVector3D(v->x, v->y, v->z));
                     m->meshes[i]->shaderVertices[n].xyz[0] = vertexPos.x();
                     m->meshes[i]->shaderVertices[n].xyz[1] = vertexPos.y();
                     m->meshes[i]->shaderVertices[n].xyz[2] = vertexPos.z();
@@ -84,17 +84,20 @@ void Model::addPMG(QString path) {
                         QString otherBoneName = "";
                         for (int ii = 0; ii < m->meshes.count(); ii++) {
                             bool allowed = true;
+                            Bone *b2 = boneTree->findBone(m->meshes[ii]->boneName);
+/*
                             if (b->getParent() != nullptr) {
                                 if (m->meshes[ii]->boneName == b->getParent()->getName()) allowed = true;
                             }
                             foreach (Bone *childBone, b->getChildren()) {
                                 if (m->meshes[ii]->boneName == childBone->getName()) allowed = true;
                             }
+*/
                             if (ii == i) allowed = false;
                             if (allowed) {
                                 foreach (PMG::Vertex *v2, m->meshes[ii]->vertices) {
                                     if (v2 != v) {
-                                        QVector3D vertexPos2 = QMatrix4x4(boneTree->findBone(m->meshes[ii]->boneName)->getMatrix() * m->meshes[ii]->minorMatrix).map(QVector3D(v2->x, v2->y, v2->z));
+                                        QVector3D vertexPos2 = QMatrix4x4(b2->getMatrix() * m->meshes[ii]->minorMatrix).map(QVector3D(v2->x, v2->y, v2->z));
                                         float distance = vertexPos.distanceToPoint(vertexPos2);
                                         if (distance <= smallestDistance) {
                                             smallestDistance = distance;
