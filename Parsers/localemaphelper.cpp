@@ -30,6 +30,7 @@ LocaleMapHelper::LocaleMapHelper(QStringList whitelist)
 }
 
 QString LocaleMapHelper::getValue(QString key) {
+    if (key.startsWith("_LT[")) key = key.mid(4, key.length() - 5);
     return keyPairs.value(key, "");
 }
 
