@@ -1,14 +1,14 @@
+#extension GL_EXT_gpu_shader4 : enable
+
 uniform sampler2D textureIn;
 uniform int isOutline;
-
-attribute vec4 vertexRGBA;
-attribute vec2 vertexUV;
+uniform vec4 modifyRGB;
 
 varying vec3 N;
 varying vec3 v;
 varying vec2 tex;
 
-void main (void)  
+void main (void)
 {
   if (isOutline == 1) {
     gl_FragColor = vec4(0.0, 0.0, 0.0, texture2D(textureIn, tex.xy).a);
@@ -21,7 +21,14 @@ void main (void)
     Idiff = clamp(Idiff, 0.0, 1.0);
     vec4 Ispec = gl_FrontLightProduct[0].specular * pow(max(dot(R,E),0.0),0.3*gl_FrontMaterial.shininess);
     Ispec = clamp(Ispec, 0.0, 1.0);
-    gl_FragColor = texture2D(textureIn, tex.xy).rgba *
-    ((gl_FrontLightModelProduct.sceneColor + Iamb + Idiff + Ispec) / 2 + 0.5);
+    vec4 colour = texture2D(textureIn, tex.xy).rgba;
+    if (modifyRGB.a > 0) {
+        float intensity = 0.3 * colour.r + 0.59 * colour.g + 0.11 * colour.b;
+        intensity = intensity - 0.5;
+        if (intensity < 0) intensity = 0;
+        colour.rgb = ((colour.rgb * 2) * (modifyRGB.rgb * (1.0 - (intensity * 2)))) + (intensity * 2);
+    }
+    gl_FragColor = colour *
+    ((gl_FrontLightModelProduct.sceneColor + Iamb + Idiff + Ispec) / 10.0 + 0.90);
   }
 }
