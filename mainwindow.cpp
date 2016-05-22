@@ -240,7 +240,7 @@ void MainWindow::onLoadPackages() {
         insertPMG("human", PMGpath + "wear\\female_summercloth01_bss", PMGpath + "female_framework");
         insertPMG("human", PMGpath + "shoes\\female_summercloth02_s04", PMGpath + "female_framework");
 //        insertPMG("human", "gfx\\char\\chapter4\\human\\female\\mantle\\uni_c4_ego_swordwing01", PMGpath + "female_framework");
-//        insertPMG("human", "gfx\\char\\chapter4\\human\\female\\mantle\\female_c4_contest2014_robe_korea01", PMGpath + "female_framework");
+//        insertPMG("human", "gfx\\char\\chapter4\\human\\female\\mantle\\female_c4_contest2012_robe_china", PMGpath + "female_framework");
 /*
         QString PMGpath = "gfx\\char\\monster\\mesh\\tabhartas\\tabhartas";
         insertPMG("tabhartas", PMGpath + "_mesh", PMGpath + "_framework");
