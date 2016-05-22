@@ -7,7 +7,7 @@ attribute vec2 vertexUV;
 attribute vec2 boneWeight;
 attribute float boneID;
 
-uniform mat4 boneMatrix[8];
+uniform mat4 boneMatrix[10];
 
 void main(void)
 {
