@@ -127,6 +127,8 @@ protected:
     GLuint vao, vbo;
     void setShaderVariableInt(GLhandleARB shader, QString varname, int data);
     void setShaderVariableFloat(GLhandleARB shader, QString varname, float data);
+    void setShaderVariableFloat(GLhandleARB shader, QString varname, QVector3D vec3);
+    void setShaderVariableFloat(GLhandleARB shader, QString varname, QVector4D vec4);
     void setShaderArrayFloat(GLhandleARB shader, QString varname, float *data, int arraySize);
     void setShaderArrayInt(GLhandleARB shader, QString varname, int *data, int arraySize);
     void setShaderVariableMatrix(GLhandleARB shader, QString varname, QMatrix4x4 matrix);

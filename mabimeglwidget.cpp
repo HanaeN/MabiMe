@@ -270,18 +270,10 @@ void MabiMeGLWidget::renderPMGMesh(PMG::Mesh mesh, QList<Bone*> bones, GLuint te
     glRotatef(camera.rotation.pitch, 1.0, 0.0, 0.0);
     glRotatef(camera.rotation.yaw, 0.0, 1.0, 0.0);
     if (bones.count() > 0) {
-//        qDebug() << bones.count() << "BONES";
-//        for (int n = 0; n < mesh.vertexCount; n++) {
-//            qDebug() << mesh.shaderVertices[n].boneID;
-//        }
         for (int n = 0; n < bones.count(); n++) {
             setShaderVariableMatrix(boneShader, "boneMatrix[" + QString::number(n) + "]", bones[n]->getLocalMatrix());
-//            qDebug() << bones[n]->getLocalMatrix();
         }
-//        setShaderArrayMatrix(boneShader, "boneMatrix");
-    } else {
-        glMultMatrixf(mesh.majorMatrix.constData());
-    }
+    } else glMultMatrixf(mesh.majorMatrix.constData());
     glActiveTexture(GL_TEXTURE0);
     if (texture > 0) {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
@@ -316,6 +308,56 @@ void MabiMeGLWidget::renderPMGMesh(PMG::Mesh mesh, QList<Bone*> bones, GLuint te
         glEnableVertexAttribArray(attribVertexBoneID);
         glVertexAttribPointer(attribVertexBoneID, 1, GL_FLOAT, GL_FALSE, sizeof(PMG::ShaderVertex), (void*)(offsetof(PMG::ShaderVertex, boneID)));
     }
+    QVector4D modifyRGB(0, 0, 0, 0);
+    if (mesh.colourMap == "skin") {
+        modifyRGB.setX(255.0 / 255.0);
+        modifyRGB.setY(199.0 / 255.0);
+        modifyRGB.setZ(198.0 / 255.0);
+        modifyRGB.setW(1);
+    } else {
+        modifyRGB.setX(30.0 / 255.0);
+        modifyRGB.setY(30.0 / 255.0);
+        modifyRGB.setZ(30.0 / 255.0);
+        modifyRGB.setW(1);
+    }
+    if (mesh.colourMap == "c1") {
+        modifyRGB.setX(255.0 / 255.0);
+        modifyRGB.setY(255.0 / 255.0);
+        modifyRGB.setZ(255.0 / 255.0);
+        modifyRGB.setW(1);
+    }
+    if (mesh.colourMap == "c2") {
+        modifyRGB.setX(255.0 / 255.0);
+        modifyRGB.setY(140.0 / 255.0);
+        modifyRGB.setZ(140.0 / 255.0);
+        modifyRGB.setW(1);
+    }
+    if (mesh.colourMap == "c3" || mesh.colourMap == "s2") {
+        modifyRGB.setX(255.0 / 255.0);
+        modifyRGB.setY(120.0 / 255.0);
+        modifyRGB.setZ(120.0 / 255.0);
+        modifyRGB.setW(1);
+    }
+    if (mesh.colourMap == "s1") {
+        modifyRGB.setX(255.0 / 255.0);
+        modifyRGB.setY(255.0 / 255.0);
+        modifyRGB.setZ(255.0 / 255.0);
+        modifyRGB.setW(1);
+    }
+    if (mesh.colourMap == "e") {
+        modifyRGB.setX(255.0 / 255.0);
+        modifyRGB.setY(50.0 / 255.0);
+        modifyRGB.setZ(50.0 / 255.0);
+        modifyRGB.setW(1);
+    }
+    if (mesh.colourMap == "hair") {
+        modifyRGB.setX(255.0 / 255.0);
+        modifyRGB.setY(80.0 / 255.0);
+        modifyRGB.setZ(80.0 / 255.0);
+        modifyRGB.setW(1);
+    }
+    setShaderVariableFloat(boneShader, "modifyRGB", modifyRGB);
+
     glDrawElements(GL_TRIANGLES, mesh.faceVertexCount, GL_UNSIGNED_INT, mesh.vertexList);
     if (attribVertexXYZ != -1) glDisableVertexAttribArray(attribVertexXYZ);
     if (attribVertexNXYZ != -1) glDisableVertexAttribArray(attribVertexNXYZ);
@@ -578,6 +620,22 @@ void MabiMeGLWidget::setShaderArrayMatrix(GLhandleARB shader, QString varname) {
         glUniformMatrix4fv(id, 4, GL_FALSE, &boneMatriceBuffer[0]);
 //        free(matrix);
         checkError("glUniformMatrix4fv(id [" + varname + "], <ptr>)", true); // suppress error - there is a quirk in openGL to always return 0 for this
+    }
+}
+void MabiMeGLWidget::setShaderVariableFloat(GLhandleARB shader, QString varname, QVector3D vec3) {
+    GLint id = glGetUniformLocation(shader, varname.toLatin1());
+    checkError("glGetUniformLocation[" + varname + "]");
+    if (id != -1) {
+        glUniform3f(id, vec3.x(), vec3.y(), vec3.z());
+        checkError("glUniform3f(id [" + varname + "], )");
+    }
+}
+void MabiMeGLWidget::setShaderVariableFloat(GLhandleARB shader, QString varname, QVector4D vec4) {
+    GLint id = glGetUniformLocation(shader, varname.toLatin1());
+    checkError("glGetUniformLocation[" + varname + "]");
+    if (id != -1) {
+        glUniform4f(id, vec4.x(), vec4.y(), vec4.z(), vec4.w());
+        checkError("glUniform4f(id [" + varname + "], )");
     }
 }
 
