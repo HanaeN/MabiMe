@@ -46,7 +46,7 @@ void CharacterStyleParser::parseFile() {
             QDomNode style = styleCategory.childNodes().at(n);
             if (style.nodeName() == "CharacterStyle") {
                 QDomNamedNodeMap attributes = style.attributes();
-                CharacterStyle::Category *c = new CharacterStyle::Category;
+                CharacterStyle::Object *c = new CharacterStyle::Object;
                 c->name = localeMap->getValue(attributes.namedItem("Name").nodeValue());
                 c->categoryType = id;
                 c->entryID = attributes.namedItem("ID").nodeValue().toInt();
@@ -57,6 +57,6 @@ void CharacterStyleParser::parseFile() {
 }
 
 CharacterStyleParser::~CharacterStyleParser() {
-    foreach (CharacterStyle::Category *style, styles) delete style;
+    foreach (CharacterStyle::Object *style, styles) delete style;
     styles.clear();
 }

@@ -34,7 +34,7 @@ namespace CharacterStyle {
     const int HAIR_COLOUR = 4;
     const int EYE_COLOUR = 5;
     const int SKIN_COLOUR = 6;
-    struct Category {
+    struct Object {
         int categoryType;
         QImage icon;
         QString name = "";
@@ -46,7 +46,7 @@ class CharacterStyleParser : public XMLParser
 {
 public:
     CharacterStyleParser(QString name, QByteArray xml, LocaleMapHelper *localeMap = nullptr);
-    QList<CharacterStyle::Category*> styles;
+    QList<CharacterStyle::Object*> styles;
     ~CharacterStyleParser();
 protected:
     virtual void parseFile();
