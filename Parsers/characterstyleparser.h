@@ -22,15 +22,32 @@
 
 #include <QString>
 #include <QByteArray>
+#include <QImage>
 
 #include "Parsers/localemaphelper.h"
 #include "Parsers/xmlparser.h"
-
+namespace CharacterStyle {
+    const int MALE_HAIR_STYLE = 0;
+    const int FEMALE_HAIR_STYLE = 1;
+    const int MALE_FACE = 2;
+    const int FEMALE_FACE = 3;
+    const int HAIR_COLOUR = 4;
+    const int EYE_COLOUR = 5;
+    const int SKIN_COLOUR = 6;
+    struct Category {
+        int categoryType;
+        QImage icon;
+        QString name = "";
+        int entryID = 0;
+    };
+};
 
 class CharacterStyleParser : public XMLParser
 {
 public:
     CharacterStyleParser(QString name, QByteArray xml, LocaleMapHelper *localeMap = nullptr);
+    QList<CharacterStyle::Category*> styles;
+    ~CharacterStyleParser();
 protected:
     virtual void parseFile();
 signals:

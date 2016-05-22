@@ -20,6 +20,9 @@
 #include "characterstyleparser.h"
 
 #include <QDebug>
+#include <QDomNamedNodeMap>
+#include <QDomNode>
+#include <QDomNodeList>
 
 CharacterStyleParser::CharacterStyleParser(QString name, QByteArray xml, LocaleMapHelper *localeMap) :
     XMLParser(name, xml, localeMap)
@@ -28,5 +31,32 @@ CharacterStyleParser::CharacterStyleParser(QString name, QByteArray xml, LocaleM
 }
 
 void CharacterStyleParser::parseFile() {
-    qDebug() << "parsing";
+    QDomNodeList categories = doc.elementsByTagName("CharacterStyle").at(0).childNodes();
+    for (int i = 0; i < categories.count(); i++) {
+        QDomNode styleCategory = categories.at(i);
+        int id = 0;
+        if (styleCategory.nodeName() == "SkinColor")         id = CharacterStyle::SKIN_COLOUR;
+        if (styleCategory.nodeName() == "HairColor")         id = CharacterStyle::HAIR_COLOUR;
+        if (styleCategory.nodeName() == "EyeColor")          id = CharacterStyle::EYE_COLOUR;
+        if (styleCategory.nodeName() == "MaleFace")          id = CharacterStyle::MALE_FACE;
+        if (styleCategory.nodeName() == "FemaleFace")        id = CharacterStyle::FEMALE_FACE;
+        if (styleCategory.nodeName() == "MaleHairStyle")     id = CharacterStyle::MALE_HAIR_STYLE;
+        if (styleCategory.nodeName() == "FemaleHairStyle")   id = CharacterStyle::FEMALE_HAIR_STYLE;
+        for (int n = 0; n < styleCategory.childNodes().count(); n++) {
+            QDomNode style = styleCategory.childNodes().at(n);
+            if (style.nodeName() == "CharacterStyle") {
+                QDomNamedNodeMap attributes = style.attributes();
+                CharacterStyle::Category *c = new CharacterStyle::Category;
+                c->name = localeMap->getValue(attributes.namedItem("Name").nodeValue());
+                c->categoryType = id;
+                c->entryID = attributes.namedItem("ID").nodeValue().toInt();
+                styles.append(c);
+            }
+        }
+    }
+}
+
+CharacterStyleParser::~CharacterStyleParser() {
+    foreach (CharacterStyle::Category *style, styles) delete style;
+    styles.clear();
 }
