@@ -28,7 +28,8 @@ void main (void)
         if (intensity < 0) intensity = 0;
         colour.rgb = ((colour.rgb * 2) * (modifyRGB.rgb * (1.0 - (intensity * 2)))) + (intensity * 2);
     }
+    //gl_FrontLightModelProduct.sceneColor
     gl_FragColor = colour *
-    ((gl_FrontLightModelProduct.sceneColor + Iamb + Idiff + Ispec) / 10.0 + 0.90);
+    ((vec4(0.5, 0.4, 0.3, 1) + Iamb + Idiff + Ispec) / 3.0 + 0.66);
   }
 }
