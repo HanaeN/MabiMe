@@ -65,6 +65,7 @@ void Model::addPMG(QString path) {
     }
     m->meshes = m->pmgReader.meshes;
     bool handleLinks = true;
+    if (m->name.contains("hair")) handleLinks = false;
     if (handleLinks) {
         QString mName;
         int mID;
@@ -125,8 +126,18 @@ void Model::addPMG(QString path) {
             }
         }
         qDebug() << links << "links";
+    } else {
+        for (int i = 0; i < m->meshes.count(); i++) {
+            Bone *b = boneTree->findBone(m->meshes[i]->boneName);
+            for (int n = 0; n < m->meshes[i]->vertexCount; n++) {
+                PMG::Vertex *v = m->meshes[i]->vertices[n];
+                QVector3D vertexPos = QMatrix4x4(b->getMatrix() * m->meshes[i]->minorMatrix).map(QVector3D(v->x, v->y, v->z));
+                m->meshes[i]->shaderVertices[n].xyz[0] = vertexPos.x();
+                m->meshes[i]->shaderVertices[n].xyz[1] = vertexPos.y();
+                m->meshes[i]->shaderVertices[n].xyz[2] = vertexPos.z();
+            }
+        }
     }
-
     models.append(m);
 }
 
