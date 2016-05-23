@@ -20,15 +20,20 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+#include <typeinfo>
 #include <QTimer>
 #include <QtConcurrent/QtConcurrent>
 #include <QFuture>
 #include <QFutureWatcher>
 #include <QMessageBox>
+#include <QListWidgetItem>
 
 #include "model.h"
 #include "settingswindow.h"
 #include "mabimelayerdelegate.h"
+#include "mabimecolourdelegate.h"
+#include "Parsers/colourparser.h"
+#include "Parsers/characterstyleparser.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -43,6 +48,10 @@ MainWindow::MainWindow(QWidget *parent) :
     for (int i = 0; i < ui->l_category->count(); i++) {
         ui->l_category->item(i)->setSizeHint(QSize(60, 60));
     }
+    MabiMeColourDelegate *cd = new MabiMeColourDelegate();
+    ui->l_skin_colours->setItemDelegate(cd);
+    ui->l_hair_colours->setItemDelegate(cd);
+    ui->l_eye_colours->setItemDelegate(cd);
     MabiMeLayerDelegate *d = new MabiMeLayerDelegate();
     connect(d, SIGNAL(repaintWidget()), SLOT(repaintLayers()));
     connect(d, SIGNAL(closeButtonClicked(QTreeWidgetItem*)), SLOT(onLayerCloseButtonClicked(QTreeWidgetItem*)));
@@ -233,6 +242,7 @@ void MainWindow::on_s_zoom_valueChanged(int value)
 void MainWindow::onLoadPackages() {
     if (loadPackagesAction.result()) {
         ui->g_load->setCurrentIndex(0);
+        populateSkinColourList();
         QString PMGpath = "gfx\\char\\human\\female\\";
 //        insertPMG("human", PMGpath + "female_default_bss", PMGpath + "female_framework");
         insertPMG("human", PMGpath + "face\\female_adult01_f01", PMGpath + "female_framework");
@@ -281,4 +291,35 @@ void MainWindow::onLoadXMLUpdate(QString status, int current, int max) {
     ui->l_loadingstatus->setText("<center><b>MabiMe is loading...</b><br /><br />" + status);
     ui->p_loadingbar->setMaximum(max);
     ui->p_loadingbar->setValue(current);
+}
+
+void MainWindow::populateSkinColourList() {
+    ColourParser *colours = nullptr;
+    CharacterStyleParser *styles = nullptr;
+    for (int i = 0; i < p->xmlParsers.count(); i++) {
+        if (colours == nullptr) colours = dynamic_cast<ColourParser*>(p->xmlParsers[i]);
+        if (styles == nullptr) styles = dynamic_cast<CharacterStyleParser*>(p->xmlParsers[i]);
+    }
+    if (colours != nullptr && styles != nullptr) {
+        foreach (CharacterStyle::Object *style, styles->styles) {
+            if (style->categoryType == CharacterStyle::SKIN_COLOUR || style->categoryType == CharacterStyle::HAIR_COLOUR || style->categoryType == CharacterStyle::EYE_COLOUR) {
+                foreach (ColourParser::Object *colour, colours->colours) {
+                    if (colour->colourID == style->entryID) {
+                        QListWidgetItem *i = new QListWidgetItem();
+                        i->setData(0x100, colour->argb.red());
+                        i->setData(0x101, colour->argb.green());
+                        i->setData(0x102, colour->argb.blue());
+                        i->setToolTip(style->name);
+                        i->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+                        if (style->categoryType == CharacterStyle::SKIN_COLOUR) ui->l_skin_colours->addItem(i);
+                        if (style->categoryType == CharacterStyle::HAIR_COLOUR) ui->l_hair_colours->addItem(i);
+                        if (style->categoryType == CharacterStyle::EYE_COLOUR) ui->l_eye_colours->addItem(i);
+                        break;
+                    }
+                }
+            }
+        }
+    } else {
+        qDebug() << "populateSkinColourList: COLOURS OR STYLES IS NULL";
+    }
 }

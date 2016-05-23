@@ -61,6 +61,7 @@ private:
     QFutureWatcher<bool> loadPackagesWatcher;
     void insertPMG(QString modelName, QString PMG, QString FRM = "");
     void loadPackages();
+    void populateSkinColourList();
     PackManager *p;
     QTreeWidgetItem *selectedLayer;
     Ui::MainWindow *ui;
