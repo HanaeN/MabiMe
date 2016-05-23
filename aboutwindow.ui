@@ -7,19 +7,19 @@
     <x>0</x>
     <y>0</y>
     <width>641</width>
-    <height>336</height>
+    <height>350</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
     <width>641</width>
-    <height>336</height>
+    <height>350</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
     <width>641</width>
-    <height>336</height>
+    <height>350</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -71,9 +71,10 @@ Written by Yai (Sophie N)&lt;/center&gt;</string>
       <string>&lt;center&gt;&lt;b&gt;Special Thanks:&lt;/b&gt;&lt;/center&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;b&gt;XCelled &amp; Kadalyn&lt;/b&gt; - for forcing me to continue onwards through the fires of hell when I wanted to turn and run.&lt;/li&gt;
+&lt;li&gt;&lt;b&gt;John Chadwick&lt;/b&gt; - for helping me out with some openGL and GLSL complications.
 &lt;li&gt;&lt;b&gt;Kapra (Psy)&lt;/b&gt; - for helping me understand how meshes hide/show parts based on state.&lt;/li&gt;
 &lt;li&gt;&lt;b&gt;Park, Jeongmin&lt;/b&gt; - for helping me out with bone skinning.&lt;/li&gt;
-&lt;li&gt;&lt;b&gt;John Chadwick&lt;/b&gt; - for helping me out with some openGL and GLSL complications.
+&lt;li&gt;&lt;b&gt;Snowie Stormflower&lt;/b&gt; - for supporting me and pulling me away from the coding when it was getting all a bit too much.&lt;/li&gt;
 &lt;/ul&gt;</string>
      </property>
     </widget>
