@@ -82,7 +82,10 @@ void Model::addPMG(QString path) {
         int links = 0;
         if (hasBoneTree()) {
             for (int i = 0; i < m->meshes.count(); i++) {
+                // grab the bone linked to this mesh
                 Bone *b = boneTree->findBone(m->meshes[i]->boneName);
+                // if the main bone could not be found, try the second bone name
+                if (b == nullptr) b = boneTree->findBone(m->meshes[i]->boneName2);
                 for (int n = 0; n < m->meshes[i]->vertexCount; n++) {
                     PMG::Vertex *v = m->meshes[i]->vertices[n];
                     QVector3D vertexPos = QMatrix4x4(b->getMatrix() * m->meshes[i]->minorMatrix).map(QVector3D(v->x, v->y, v->z));
@@ -95,7 +98,10 @@ void Model::addPMG(QString path) {
                         QString otherBoneName = "";
                         for (int ii = 0; ii < m->meshes.count(); ii++) {
                             bool allowed = true;
+                            // grab the bone linked to this mesh
                             Bone *b2 = boneTree->findBone(m->meshes[ii]->boneName);
+                            // if the main bone could not be found, try the second bone name
+                            if (b2 == nullptr) b2 = boneTree->findBone(m->meshes[ii]->boneName2);
 /*
                             if (b->getParent() != nullptr) {
                                 if (m->meshes[ii]->boneName == b->getParent()->getName()) allowed = true;
@@ -137,14 +143,19 @@ void Model::addPMG(QString path) {
         }
         qDebug() << links << "links";
     } else {
-        for (int i = 0; i < m->meshes.count(); i++) {
-            Bone *b = boneTree->findBone(m->meshes[i]->boneName);
-            for (int n = 0; n < m->meshes[i]->vertexCount; n++) {
-                PMG::Vertex *v = m->meshes[i]->vertices[n];
-                QVector3D vertexPos = QMatrix4x4(b->getMatrix() * m->meshes[i]->minorMatrix).map(QVector3D(v->x, v->y, v->z));
-                m->meshes[i]->shaderVertices[n].xyz[0] = vertexPos.x();
-                m->meshes[i]->shaderVertices[n].xyz[1] = vertexPos.y();
-                m->meshes[i]->shaderVertices[n].xyz[2] = vertexPos.z();
+        if (hasBoneTree()) {
+            for (int i = 0; i < m->meshes.count(); i++) {
+                // grab the bone linked to this mesh
+                Bone *b = boneTree->findBone(m->meshes[i]->boneName);
+                // if the main bone could not be found, try the second bone name
+                if (b == nullptr) b = boneTree->findBone(m->meshes[i]->boneName2);
+                for (int n = 0; n < m->meshes[i]->vertexCount; n++) {
+                    PMG::Vertex *v = m->meshes[i]->vertices[n];
+                    QVector3D vertexPos = QMatrix4x4(b->getMatrix() * m->meshes[i]->minorMatrix).map(QVector3D(v->x, v->y, v->z));
+                    m->meshes[i]->shaderVertices[n].xyz[0] = vertexPos.x();
+                    m->meshes[i]->shaderVertices[n].xyz[1] = vertexPos.y();
+                    m->meshes[i]->shaderVertices[n].xyz[2] = vertexPos.z();
+                }
             }
         }
     }
