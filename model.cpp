@@ -119,7 +119,7 @@ void Model::addPMG(QString path) {
                                         if (distance <= smallestDistance) {
                                             smallestDistance = distance;
                                             closestVertex = v2;
-                                            otherBoneName = m->meshes[ii]->boneName;
+                                            otherBoneName = b2->getName();
                                         }
                                     }
                                 }
