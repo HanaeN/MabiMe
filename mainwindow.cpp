@@ -324,3 +324,18 @@ void MainWindow::populateSkinColourList() {
         qDebug() << "populateSkinColourList: COLOURS OR STYLES IS NULL";
     }
 }
+
+void MainWindow::on_action_About_MabiMe_triggered()
+{
+    QMessageBox msg(this);
+    msg.setWindowTitle("MabiMe - About");
+    msg.setIcon(QMessageBox::Information);
+    msg.setText("MabiMe - Mabinogi Character Viewer & Simulator\nWritten by Yai (Sophie N)");
+    QString txt = "Special thanks:\n\n"
+                  "XCelled & Kadalyn - for forcing me to continue onwards through the fires of hell when I wanted to turn and run."
+                  "\n\nKapra (Psy) - for helping me understand how meshes hide/show parts based on state."
+                  "\n\nPark, Jeongmin - for helping me out with bone skinning."
+                  "\n\nJohn (nmn) - for helping me out with some openGL and GLSL complications.";
+    msg.setInformativeText(txt);
+    msg.exec();
+}

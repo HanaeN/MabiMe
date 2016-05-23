@@ -56,6 +56,8 @@ private slots:
     void on_s_zoom_valueChanged(int value);
     void onLoadPackages();
     void onLoadXMLUpdate(QString status, int current, int max);
+    void on_action_About_MabiMe_triggered();
+
 private:
     QFuture<bool> loadPackagesAction;
     QFutureWatcher<bool> loadPackagesWatcher;
