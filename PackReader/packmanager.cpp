@@ -25,6 +25,7 @@
 #include <QStringList>
 
 #include "Parsers/characterstyleparser.h"
+#include "Parsers/colourparser.h"
 
 PackManager::PackManager(QObject *parent) : QObject(parent)
 {
@@ -215,5 +216,6 @@ void PackManager::loadXMLData() {
         languagePack.localeMap->addLocaleFile(extractFile(filename, true), cleanName);
     }
     xmlParsers.append(new CharacterStyleParser("characterstyle", extractFile("*characterstyle.xml"), languagePack.localeMap));
+    xmlParsers.append(new ColourParser("color", extractFile("*\\color.xml"), languagePack.localeMap));
     emit currentLanguagePackProgress("Done.", xmlFiles.count(), xmlFiles.count());
 }

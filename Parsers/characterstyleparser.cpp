@@ -34,7 +34,7 @@ void CharacterStyleParser::parseFile() {
     QDomNodeList categories = doc.elementsByTagName("CharacterStyle").at(0).childNodes();
     for (int i = 0; i < categories.count(); i++) {
         QDomNode styleCategory = categories.at(i);
-        int id = 0;
+        int id = CharacterStyle::UNKNOWN_COLOUR;
         if (styleCategory.nodeName() == "SkinColor")         id = CharacterStyle::SKIN_COLOUR;
         if (styleCategory.nodeName() == "HairColor")         id = CharacterStyle::HAIR_COLOUR;
         if (styleCategory.nodeName() == "EyeColor")          id = CharacterStyle::EYE_COLOUR;

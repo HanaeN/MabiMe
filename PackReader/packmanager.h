@@ -52,10 +52,10 @@ public:
     QString findTexture(QString name);
     bool fileExists(QString path, bool useLanguagePack = false);
     QByteArray extractFile(QString path, bool useLanguagePack = false);
+    QList<XMLParser*> xmlParsers;
 private:
     QString path = "";
     QList<Pack*> packs;
-    QList<XMLParser*> xmlParsers;
     LanguagePack languagePack;
     void loadXMLData();
     bool packsLoaded = false;

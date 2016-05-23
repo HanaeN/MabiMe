@@ -28,7 +28,9 @@ SOURCES += main.cpp\
     mabimelayerdelegate.cpp \
     Parsers/localemaphelper.cpp \
     Parsers/xmlparser.cpp \
-    Parsers/characterstyleparser.cpp
+    Parsers/characterstyleparser.cpp \
+    Parsers/colourparser.cpp \
+    mabimecolourdelegate.cpp
 
 HEADERS  += mainwindow.h \
     PackReader/mabipackreader.h \
@@ -43,7 +45,9 @@ HEADERS  += mainwindow.h \
     mabimelayerdelegate.h \
     Parsers/localemaphelper.h \
     Parsers/xmlparser.h \
-    Parsers/characterstyleparser.h
+    Parsers/characterstyleparser.h \
+    Parsers/colourparser.h \
+    mabimecolourdelegate.h
 
 FORMS    += mainwindow.ui \
     settingswindow.ui
