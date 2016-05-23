@@ -151,7 +151,7 @@ bool MabiMeLayerDelegate::editorEvent(QEvent *event, QAbstractItemModel *model, 
         }
         t->setData(0, LayerRole::BUTTON_HOVER, buttonHover);
         t->setData(0, LayerRole::BUTTON_HOVER_VISIBLE, buttonHover2);
-        if (event->type() == QEvent::MouseButtonPress) {
+        if (event->type() == QEvent::MouseButtonPress || event->type() == QEvent::MouseButtonDblClick) {
             if (e->buttons() == Qt::LeftButton && (buttonHover || buttonHover2)) {
                 buttonDown = true;
                 t->setData(0, LayerRole::BUTTON_DOWN, buttonDown);
