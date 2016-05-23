@@ -54,7 +54,6 @@ bool PMGReader::loadPMG(QByteArray stream, PMG::MeshType meshType) {
             header = *(PMG::FileHeader*)&data[0];
             uint32_t pos = sizeof(PMG::FileHeader) + 64;
             if (strcmp(header.magic, "pmg\x00") == 0 && header.version == 258) { // check if valid
-//                int meshCount = *(int*)&data[pos];
                 pos = header.headSize;
                 while (true) {
                     if (memcmp(&data[pos], "pm!\x00", 4) != 0) break;

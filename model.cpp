@@ -47,7 +47,6 @@ Bone* Model::findBone(QString boneName) {
 void Model::addPMG(QString path) {
     // resolve the path to check what category it is in
     path = packManager->resolvePath(path + ".pmg");
-
     PMGModel *m = new PMGModel();
     PMG::MeshType meshType = PMG::MeshType::none;
     if (path.contains("mantle", Qt::CaseInsensitive)) meshType = PMG::MeshType::Robe;
@@ -57,7 +56,7 @@ void Model::addPMG(QString path) {
     if (path.contains("shoes", Qt::CaseInsensitive)) meshType = PMG::MeshType::Shoes;
     if (path.contains("wear", Qt::CaseInsensitive)) meshType = PMG::MeshType::Chest;
     if (path.contains("helmet", Qt::CaseInsensitive)) meshType = PMG::MeshType::Hat;
-    m->pmgReader.loadPMG(packManager->extractFile(path + ".pmg"), meshType);
+    m->pmgReader.loadPMG(packManager->extractFile(path), meshType);
     m->name = path;
 
     // load textures ready for rendering
