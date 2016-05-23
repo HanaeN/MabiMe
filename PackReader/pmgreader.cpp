@@ -45,7 +45,8 @@ void PMGReader::freePMG() {
     textures.clear();
 }
 
-bool PMGReader::loadPMG(QByteArray stream) {
+bool PMGReader::loadPMG(QByteArray stream, PMG::MeshType meshType) {
+    this->meshType = meshType;
     if (hasLoaded) freePMG();
     char *data = stream.data();
     try {
@@ -53,13 +54,10 @@ bool PMGReader::loadPMG(QByteArray stream) {
             header = *(PMG::FileHeader*)&data[0];
             uint32_t pos = sizeof(PMG::FileHeader) + 64;
             if (strcmp(header.magic, "pmg\x00") == 0 && header.version == 258) { // check if valid
-                int meshCount = *(int*)&data[pos];
+//                int meshCount = *(int*)&data[pos];
                 pos = header.headSize;
-                for (int i = 0; i < meshCount; i++) {
-                    if (memcmp(&data[pos], "pm!\x00", 4) != 0) {
-                        qDebug() << "pm type not supported";
-                        break;
-                    }
+                while (true) {
+                    if (memcmp(&data[pos], "pm!\x00", 4) != 0) break;
                     char pmVersion[2];
                     memcpy(&pmVersion, &data[pos + 4], 2);
                     if ((pmVersion[0] != 1 && pmVersion[1] != 7) && (pmVersion[0] != 2 && pmVersion[1] != 0)) {
@@ -217,6 +215,14 @@ bool PMGReader::loadPMG(QByteArray stream) {
                                    d[8],  d[9],  d[10], d[11],
                                    d[12], d[13], d[14], d[15]);
                     memcpy(mesh->minorMatrix.data(), m.data(), 64);
+
+                    qDebug() << mesh->meshName;
+                    // hide things we dont want
+                    if (mesh->meshName.endsWith("_fistl_") || mesh->meshName.endsWith("_fistr_")) mesh->showMesh = false;
+                    if (meshType == PMG::MeshType::Robe && (mesh->meshName.endsWith("_f1_"))) mesh->showMesh = false;
+                    if (meshType == PMG::MeshType::Robe && (mesh->meshName.endsWith("_f2_") || mesh->meshName.endsWith("_uncover_"))) mesh->showMesh = false;
+                    if (meshType == PMG::MeshType::Hair && (!mesh->meshName.endsWith("_h1_"))) mesh->showMesh = false;
+
                     meshes.append(mesh);
                 }
                 return true;

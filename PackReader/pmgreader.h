@@ -25,6 +25,10 @@
 #include <GL/gl.h>
 
 namespace PMG {
+    enum MeshType {
+        none, Hair, Hat, Robe, Chest, Shoes, Gloves, Head
+    };
+
     #pragma pack(1)
     struct FileHeader {
         char magic[4];
@@ -68,6 +72,7 @@ namespace PMG {
         int stripFaceCount       = 0;
         int vertexCount          = 0;
         int skinCount            = 0;
+        bool showMesh            = true;
         GLuint *vertexList;
         QList<short> stripVertexList = QList<short>();
         QList<Vertex*> vertices = QList<Vertex*>();
@@ -89,9 +94,10 @@ public:
     QStringList textures;
     QList<PMG::Vertex*> vertices = QList<PMG::Vertex*>();
     QList<PMG::Mesh*> meshes;
+    PMG::MeshType meshType = PMG::MeshType::none;
     PMGReader();
     ~PMGReader();
-    bool loadPMG(QByteArray stream);
+    bool loadPMG(QByteArray stream, PMG::MeshType meshType);
 };
 
 #endif // PMGREADER_H

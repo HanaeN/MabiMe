@@ -245,12 +245,13 @@ void MainWindow::onLoadPackages() {
         populateSkinColourList();
         QString PMGpath = "gfx\\char\\human\\female\\";
 //        insertPMG("human", PMGpath + "female_default_bss", PMGpath + "female_framework");
-        insertPMG("human", PMGpath + "face\\female_adult01_f01", PMGpath + "female_framework");
-        insertPMG("human", PMGpath + "hair\\female_shana_hair02", PMGpath + "female_framework");
-        insertPMG("human", "gfx\\char\\chapter4\\human\\female\\wear\\female_c4_2012openschool_bms", PMGpath + "female_framework");
-        insertPMG("human", PMGpath + "shoes\\female_summercloth02_s04", PMGpath + "female_framework");
+
+//        insertPMG("human", PMGpath + "face\\female_adult01_f01", "*\\female_framework");
+//        insertPMG("human", "*\\female_c4_hair23_t23", PMGpath + "female_framework");
+//        insertPMG("human", "gfx\\char\\chapter4\\human\\female\\wear\\female_c4_2012openschool_bms", PMGpath + "female_framework");
+//        insertPMG("human", PMGpath + "shoes\\female_summercloth02_s04", PMGpath + "female_framework");
 //        insertPMG("human", "gfx\\char\\chapter4\\human\\female\\mantle\\uni_c4_ego_swordwing01", PMGpath + "female_framework");
-//        insertPMG("human", "gfx\\char\\chapter4\\human\\female\\mantle\\female_c4_contest2012_robe_china", PMGpath + "female_framework");
+        insertPMG("human", "gfx\\char\\chapter4\\human\\female\\mantle\\female_c4_contest2012_robe_china", PMGpath + "female_framework");
 /*
         QString PMGpath = "gfx\\char\\monster\\mesh\\tabhartas\\tabhartas";
         insertPMG("tabhartas", PMGpath + "_mesh", PMGpath + "_framework");

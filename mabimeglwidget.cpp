@@ -266,6 +266,7 @@ void MabiMeGLWidget::resizeGL(int width, int height) {
 }
 
 void MabiMeGLWidget::renderPMGMesh(PMG::Mesh mesh, QList<Bone*> bones, GLuint texture) {
+    if (!mesh.showMesh) return;
     glPushMatrix();
     glRotatef(camera.rotation.pitch, 1.0, 0.0, 0.0);
     glRotatef(camera.rotation.yaw, 0.0, 1.0, 0.0);
