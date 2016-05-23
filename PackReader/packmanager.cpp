@@ -219,3 +219,11 @@ void PackManager::loadXMLData() {
     xmlParsers.append(new ColourParser("color", extractFile("*\\color.xml"), languagePack.localeMap));
     emit currentLanguagePackProgress("Done.", xmlFiles.count(), xmlFiles.count());
 }
+
+QString PackManager::resolvePath(QString path) {
+    foreach (const Pack *pack, packs) {
+        QString f = pack->reader->findFile(path);
+        if (f.length() > 0) return f;
+    }
+    return path;
+}
