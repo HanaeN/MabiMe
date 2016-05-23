@@ -23,6 +23,7 @@
 #include <QImage>
 
 #include <QtOpenGL>
+#include <QColor>
 
 #include "PackReader/packmanager.h"
 #include "PackReader/pmgreader.h"
@@ -36,10 +37,20 @@ struct PMGTexture {
     bool loaded = false;
 };
 
+struct ModelColours {
+    QColor hair, eye, skin;
+};
+
+struct PMGColours {
+    QColor shoe1, shoe2, shoe3;
+    QColor cloth1, cloth2, cloth3;
+};
+
 struct PMGModel {
     QList<PMG::Mesh*> meshes;
     QString name;
     PMGReader pmgReader;
+    PMGColours colours;
 };
 
 class Model
@@ -58,6 +69,7 @@ public:
     QString getName();
     bool isVisible = true;
     Bone *getRootBone();
+    ModelColours colours;
 private:
     PackManager *packManager;
     FRMReader frmReader;

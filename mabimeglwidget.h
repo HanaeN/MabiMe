@@ -61,7 +61,6 @@ private:
     GLhandleARB boneShader;
     GLint attribVertexXYZ, attribVertexNXYZ, attribVertexRGBA, attribVertexUV, attribVertexBoneWeight, attribVertexBoneID;
     QOpenGLDebugLogger *logger = nullptr;
-
     bool isLeftDragging = false;
     bool isRightDragging = false;
     void wheelEvent(QWheelEvent* event);
@@ -120,7 +119,7 @@ protected:
     void paintGL();
     void draw();
     void resizeGL(int width, int height);
-    void renderPMGMesh(PMG::Mesh mesh, QList<Bone *> bones = QList<Bone*>(), GLuint texture = 0);
+    void renderPMGMesh(PMG::Mesh mesh, ModelColours *colours = nullptr, PMGColours *pmgColours = nullptr, QList<Bone *> bones = QList<Bone*>(), GLuint texture = 0);
     GLhandleARB linkShader(QString vp_str, QString fp_str);
     void useShader(GLhandleARB shader);
     void endShader();

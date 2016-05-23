@@ -25,6 +25,7 @@
 #include <QFuture>
 #include "mabimeglwidget.h"
 #include "PackReader/packmanager.h"
+#include "model.h"
 
 namespace Ui {
 class MainWindow;
@@ -58,14 +59,28 @@ private slots:
     void onLoadXMLUpdate(QString status, int current, int max);
     void on_action_About_MabiMe_triggered();
 
+    void on_l_skin_colours_itemClicked(QListWidgetItem *item);
+
+    void on_l_eye_colours_itemClicked(QListWidgetItem *item);
+
+    void on_l_hair_colours_itemClicked(QListWidgetItem *item);
+
+    void on_b_set_skin_colour_clicked();
+
+    void on_b_set_eye_colour_clicked();
+
+    void on_b_set_hair_colour_clicked();
+
 private:
     QFuture<bool> loadPackagesAction;
     QFutureWatcher<bool> loadPackagesWatcher;
     void insertPMG(QString modelName, QString PMG, QString FRM = "");
     void loadPackages();
     void populateSkinColourList();
+    void updateSelectedColours();
     PackManager *p;
     QTreeWidgetItem *selectedLayer;
+    Model *selectedModel = nullptr;
     Ui::MainWindow *ui;
 };
 

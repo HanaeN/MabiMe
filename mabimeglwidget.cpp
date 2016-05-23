@@ -105,7 +105,7 @@ void MabiMeGLWidget::draw() {
                             bones.append(b != nullptr ? b : o->getRootBone());
                         }
                     }
-                    renderPMGMesh(*pmgModel->meshes[n], bones, t.texture);
+                    renderPMGMesh(*pmgModel->meshes[n], &o->colours, &pmgModel->colours, bones, t.texture);
                 }
             }
         }
@@ -267,7 +267,7 @@ void MabiMeGLWidget::resizeGL(int width, int height) {
     glMatrixMode(GL_MODELVIEW);
 }
 
-void MabiMeGLWidget::renderPMGMesh(PMG::Mesh mesh, QList<Bone*> bones, GLuint texture) {
+void MabiMeGLWidget::renderPMGMesh(PMG::Mesh mesh, ModelColours *colours, PMGColours *pmgColours, QList<Bone*> bones, GLuint texture) {
     if (!mesh.showMesh) return;
     glPushMatrix();
     glRotatef(camera.rotation.pitch, 1.0, 0.0, 0.0);
@@ -311,13 +311,19 @@ void MabiMeGLWidget::renderPMGMesh(PMG::Mesh mesh, QList<Bone*> bones, GLuint te
         glEnableVertexAttribArray(attribVertexBoneID);
         glVertexAttribPointer(attribVertexBoneID, 1, GL_FLOAT, GL_FALSE, sizeof(PMG::ShaderVertex), (void*)(offsetof(PMG::ShaderVertex, boneID)));
     }
+    // map dye parts
     QVector4D modifyRGB(0, 0, 0, 0);
-    if (mesh.colourMap == "skin") {
-        modifyRGB.setX(255.0 / 255.0);
-        modifyRGB.setY(199.0 / 255.0);
-        modifyRGB.setZ(198.0 / 255.0);
-        modifyRGB.setW(1);
-    } else {
+    QColor colourGrab = QColor(0, 0, 0, 0);
+    if (mesh.colourMap == "skin") colourGrab = colours->skin;
+    if (mesh.colourMap == "hair" || mesh.colourMap == "h") colourGrab = colours->hair;
+    if (mesh.colourMap == "e") colourGrab = colours->eye;
+
+    modifyRGB.setX(colourGrab.red() / 255.0);
+    modifyRGB.setY(colourGrab.green() / 255.0);
+    modifyRGB.setZ(colourGrab.blue() / 255.0);
+    modifyRGB.setW(colourGrab.alpha() / 255.0);
+/*
+} else {
         modifyRGB.setX(30.0 / 255.0);
         modifyRGB.setY(30.0 / 255.0);
         modifyRGB.setZ(30.0 / 255.0);
@@ -359,6 +365,7 @@ void MabiMeGLWidget::renderPMGMesh(PMG::Mesh mesh, QList<Bone*> bones, GLuint te
         modifyRGB.setZ(80.0 / 255.0);
         modifyRGB.setW(1);
     }
+*/
     setShaderVariableFloat(boneShader, "modifyRGB", modifyRGB);
 
     glDrawElements(GL_TRIANGLES, mesh.faceVertexCount, GL_UNSIGNED_INT, mesh.vertexList);

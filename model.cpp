@@ -25,6 +25,9 @@ Model::Model()
 
 Model::Model(PackManager *packManager, QString PMGpath, QString FRMpath)
 {
+    colours.skin = QColor(255, 199, 198);
+    colours.hair = QColor(30, 30, 30);
+    colours.eye = QColor(255, 180, 0);
     this->packManager = packManager;
     frmReader.loadFRM(packManager->extractFile(FRMpath + ".frm"));
     // loop through and find parent bone

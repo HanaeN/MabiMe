@@ -27,8 +27,8 @@
 #include <QFutureWatcher>
 #include <QMessageBox>
 #include <QListWidgetItem>
+#include <QColorDialog>
 
-#include "model.h"
 #include "settingswindow.h"
 #include "aboutwindow.h"
 #include "mabimelayerdelegate.h"
@@ -103,11 +103,12 @@ void MainWindow::insertPMG(QString modelName, QString PMG, QString FRM) {
         ui->l_layers->setRootIsDecorated(false);
         i->setExpanded(true);
         m = new Model(p, PMG, FRM);
+        m->setName(modelName);
+        ui->glSurface->addModel(m);
         i->setData(0, LayerRole::LAYER_VISIBLE, true);
         i->setText(0, "$MODEL$" + modelName);
         i->setData(0, LayerRole::HAS_BONES, m->hasBoneTree());
         ui->l_layers->setCurrentItem(i);
-        m->setName(modelName);
         if (m->hasBoneTree()) {
             i = new QTreeWidgetItem();
             i->setFlags(Qt::NoItemFlags);
@@ -122,7 +123,6 @@ void MainWindow::insertPMG(QString modelName, QString PMG, QString FRM) {
         i->setText(0, PMG.split("\\", QString::SkipEmptyParts).last());
         i->setData(0, LayerRole::HAS_BONES, false);
         ui->l_layers->findItems("$MODEL$" + modelName, Qt::MatchExactly)[0]->addChild(i);
-        ui->glSurface->addModel(m);
     } else {
         QTreeWidgetItem *i = new QTreeWidgetItem();
         i->setText(0, PMG.split("\\", QString::SkipEmptyParts).last());
@@ -193,6 +193,7 @@ void MainWindow::onLayerVisibilityButtonClicked(QTreeWidgetItem *i) {
 
 void MainWindow::onLayerItemChanged(QTreeWidgetItem *current, QTreeWidgetItem *previous) {
     selectedLayer = nullptr;
+    selectedModel = nullptr;
     if (current != nullptr) {
         if (current->text(0).startsWith("$MODEL$")) selectedLayer = current;
     }
@@ -200,6 +201,13 @@ void MainWindow::onLayerItemChanged(QTreeWidgetItem *current, QTreeWidgetItem *p
     ui->b_duplicate_layer->setEnabled(enableButtons);
     ui->b_move_layer_up->setEnabled((ui->l_layers->indexOfTopLevelItem(current) > 0) ? enableButtons : false);
     ui->b_move_layer_down->setEnabled((ui->l_layers->indexOfTopLevelItem(current) < ui->l_layers->topLevelItemCount() - 1) ? enableButtons : false);
+    if (selectedLayer != nullptr) {
+        QString modelName = selectedLayer->text(0);
+        modelName.remove("$MODEL$");
+        Model *m = ui->glSurface->getModel(modelName);
+        selectedModel = m;
+    }
+    updateSelectedColours();
 }
 
 void MainWindow::on_b_move_layer_up_clicked()
@@ -248,7 +256,7 @@ void MainWindow::onLoadPackages() {
 //        insertPMG("human", PMGpath + "female_default_bss", PMGpath + "female_framework");
 
         insertPMG("human", PMGpath + "face\\female_adult01_f01", "*\\female_framework");
-        insertPMG("human", "*\\female_c4_hair10_t10", PMGpath + "female_framework");
+        insertPMG("human", "*human\\female\\hair\\female_c4_renewal_hair25_t25", PMGpath + "female_framework");
         insertPMG("human", "*human\\female\\wear\\female_c4_2012openschool_bms", PMGpath + "female_framework");
 //        insertPMG("human", PMGpath + "shoes\\female_summercloth02_s04", PMGpath + "female_framework");
 //        insertPMG("human", "gfx\\char\\chapter4\\human\\female\\mantle\\uni_c4_ego_swordwing01", PMGpath + "female_framework");
@@ -321,6 +329,26 @@ void MainWindow::populateSkinColourList() {
                 }
             }
         }
+        // manual lookup for skin colour change items
+        foreach (ColourParser::Object *colour, colours->colours) {
+            QString colName;
+            bool allow = false;
+            if (colour->colourID == 99) { allow = true; colName = "Ice Crown Effect"; }
+            if (colour->colourID == 252) { allow = true; colName = "Solar Crown Effect"; }
+            if (colour->colourID == 122) { allow = true; colName = "Bat Crown Effect"; }
+            if (colour->colourID == 240) { allow = true; colName = "Pumpkin Crown Effect"; }
+            if (colour->colourID == 95) { allow = true; colName = "Ogre Crown Effect"; }
+            if (allow) {
+                QListWidgetItem *i = new QListWidgetItem();
+                i->setData(0x100, colour->argb.red());
+                i->setData(0x101, colour->argb.green());
+                i->setData(0x102, colour->argb.blue());
+                i->setToolTip(colName);
+                i->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+                ui->l_skin_colours->addItem(i);
+            }
+        }
+
     } else {
         qDebug() << "populateSkinColourList: COLOURS OR STYLES IS NULL";
     }
@@ -331,4 +359,84 @@ void MainWindow::on_action_About_MabiMe_triggered()
     AboutWindow *about = new AboutWindow(this);
     about->setWindowModality(Qt::WindowModal);
     about->show();
+}
+
+void MainWindow::updateSelectedColours() {
+    QString eyeColour = "transparent";
+    QString hairColour = "transparent";
+    QString skinColour = "transparent";
+    if (selectedModel != nullptr) {
+        eyeColour = selectedModel->colours.eye.name();
+        skinColour = selectedModel->colours.skin.name();
+        hairColour = selectedModel->colours.hair.name();
+    }
+    ui->c_eye_colour->setStyleSheet("QLabel { border: 1px solid #CCCCCC; background-color: " + eyeColour + ";}");
+    ui->c_skin_colour->setStyleSheet("QLabel { border: 1px solid #CCCCCC; background-color: " + skinColour + ";}");
+    ui->c_hair_colour->setStyleSheet("QLabel { border: 1px solid #CCCCCC; background-color: " + hairColour + ";}");
+}
+
+void MainWindow::on_l_skin_colours_itemClicked(QListWidgetItem *item)
+{
+    QColor colour(item->data(0x100).toInt(), item->data(0x101).toInt(), item->data(0x102).toInt());
+    if (selectedModel != nullptr) {
+        selectedModel->colours.skin = colour;
+        ui->glSurface->repaint();
+        updateSelectedColours();
+    }
+}
+
+void MainWindow::on_l_eye_colours_itemClicked(QListWidgetItem *item)
+{
+    QColor colour(item->data(0x100).toInt(), item->data(0x101).toInt(), item->data(0x102).toInt());
+    if (selectedModel != nullptr) {
+        selectedModel->colours.eye = colour;
+        ui->glSurface->repaint();
+        updateSelectedColours();
+    }
+}
+
+void MainWindow::on_l_hair_colours_itemClicked(QListWidgetItem *item)
+{
+    QColor colour(item->data(0x100).toInt(), item->data(0x101).toInt(), item->data(0x102).toInt());
+    if (selectedModel != nullptr) {
+        selectedModel->colours.hair = colour;
+        ui->glSurface->repaint();
+        updateSelectedColours();
+    }
+}
+
+void MainWindow::on_b_set_skin_colour_clicked()
+{
+    if (selectedModel != nullptr) {
+        QColor colour = QColorDialog::getColor(selectedModel->colours.skin, this, "Select skin colour", QColorDialog::DontUseNativeDialog);
+        if (colour.isValid()) {
+            selectedModel->colours.skin = colour;
+            ui->glSurface->repaint();
+            updateSelectedColours();
+        }
+    }
+}
+
+void MainWindow::on_b_set_eye_colour_clicked()
+{
+    if (selectedModel != nullptr) {
+        QColor colour = QColorDialog::getColor(selectedModel->colours.eye, this, "Select eye colour", QColorDialog::DontUseNativeDialog);
+        if (colour.isValid()) {
+            selectedModel->colours.eye = colour;
+            ui->glSurface->repaint();
+            updateSelectedColours();
+        }
+    }
+}
+
+void MainWindow::on_b_set_hair_colour_clicked()
+{
+    if (selectedModel != nullptr) {
+        QColor colour = QColorDialog::getColor(selectedModel->colours.skin, this, "Select hair colour", QColorDialog::DontUseNativeDialog);
+        if (colour.isValid()) {
+            selectedModel->colours.hair = colour;
+            ui->glSurface->repaint();
+            updateSelectedColours();
+        }
+    }
 }
