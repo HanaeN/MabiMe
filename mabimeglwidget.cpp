@@ -100,6 +100,8 @@ void MabiMeGLWidget::draw() {
                     if (o->hasBoneTree()) {
                         for (int i = 0; i < pmgModel->meshes[n]->boneNames.count(); i++) {
                             Bone *b = o->findBone(pmgModel->meshes[n]->boneNames[i]);
+                            // first entry is always boneName - if it fails, try boneName2, similar to bone link detection (why devCAT??)
+                            if (i == 0 && b == nullptr) b = o->findBone(pmgModel->meshes[n]->boneName2);
                             bones.append(b != nullptr ? b : o->getRootBone());
                         }
                     }
