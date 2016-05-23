@@ -30,7 +30,8 @@ SOURCES += main.cpp\
     Parsers/xmlparser.cpp \
     Parsers/characterstyleparser.cpp \
     Parsers/colourparser.cpp \
-    mabimecolourdelegate.cpp
+    mabimecolourdelegate.cpp \
+    aboutwindow.cpp
 
 HEADERS  += mainwindow.h \
     PackReader/mabipackreader.h \
@@ -47,10 +48,12 @@ HEADERS  += mainwindow.h \
     Parsers/xmlparser.h \
     Parsers/characterstyleparser.h \
     Parsers/colourparser.h \
-    mabimecolourdelegate.h
+    mabimecolourdelegate.h \
+    aboutwindow.h
 
 FORMS    += mainwindow.ui \
-    settingswindow.ui
+    settingswindow.ui \
+    aboutwindow.ui
 
 win32:LIBS += -lopengl32
 unix:LIBS += -lGL
