@@ -177,7 +177,9 @@ bool PMGReader::loadPMG(QByteArray stream, PMG::MeshType meshType) {
                     QVector2D uv;
                     QVector3D xyz;
                     QVector4D rgba;
-
+                    // trim out hide/show references in bone names (these really aren't supposed to be in there...)
+                    mesh->boneName = mesh->boneName.split("_", QString::SkipEmptyParts)[0];
+                    mesh->boneName2 = mesh->boneName2.split("_", QString::SkipEmptyParts)[0];
                     for (int n = 0; n < mesh->skinCount; n++) {
                         PMG::Skin *s = new PMG::Skin();
                         memcpy(s, &data[pos], sizeof(PMG::Skin));
