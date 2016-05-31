@@ -49,6 +49,7 @@ MainWindow::MainWindow(QWidget *parent) :
     for (int i = 0; i < ui->l_category->count(); i++) {
         ui->l_category->item(i)->setSizeHint(QSize(60, 60));
     }
+    ui->l_category->setCurrentRow(0);
     MabiMeColourDelegate *cd = new MabiMeColourDelegate();
     ui->l_skin_colours->setItemDelegate(cd);
     ui->l_hair_colours->setItemDelegate(cd);
@@ -439,4 +440,9 @@ void MainWindow::on_b_set_hair_colour_clicked()
             updateSelectedColours();
         }
     }
+}
+
+void MainWindow::on_l_category_currentItemChanged(QListWidgetItem *current, QListWidgetItem *previous)
+{
+    if (current != nullptr) ui->t_categories->setCurrentIndex(ui->l_category->row(current));
 }

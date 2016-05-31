@@ -71,6 +71,8 @@ private slots:
 
     void on_b_set_hair_colour_clicked();
 
+    void on_l_category_currentItemChanged(QListWidgetItem *current, QListWidgetItem *previous);
+
 private:
     QFuture<bool> loadPackagesAction;
     QFutureWatcher<bool> loadPackagesWatcher;
