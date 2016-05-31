@@ -131,7 +131,8 @@ bool PackManager::loadPackages() {
             n++;
             if (n > 50000) {
                 qDebug() << "WARNING: COULD NOT FIND ALL PACKS";
-                break;
+                emit currentLanguagePackProgress("Could not find Mabinogi pack files.", 0, 1);
+                return false;
             }
         }
         int id = 0;
@@ -205,19 +206,24 @@ QByteArray PackManager::extractFile(QString path, bool useLanguagePack) {
 }
 
 void PackManager::loadXMLData() {
-    QStringList xmlFiles = languagePack.reader->getFileNames("", ".txt");
+    if (languagePack.reader != nullptr) {
+        QStringList xmlFiles = languagePack.reader->getFileNames("", ".txt");
 
-    // load the locale look up key/pairs for the XML later
-    int n = 0;
-    foreach (QString filename, xmlFiles) {
-        n++;
-        emit currentLanguagePackProgress("Parsing " + filename, n, xmlFiles.count());
-        QString cleanName = filename.split(".", QString::SkipEmptyParts)[0];
-        languagePack.localeMap->addLocaleFile(extractFile(filename, true), cleanName);
+        // load the locale look up key/pairs for the XML later
+        int n = 0;
+        foreach (QString filename, xmlFiles) {
+            n++;
+            emit currentLanguagePackProgress("Parsing " + filename, n, xmlFiles.count());
+            QString cleanName = filename.split(".", QString::SkipEmptyParts)[0];
+            languagePack.localeMap->addLocaleFile(extractFile(filename, true), cleanName);
+        }
+        xmlParsers.append(new CharacterStyleParser("characterstyle", extractFile("*characterstyle.xml"), languagePack.localeMap));
+        xmlParsers.append(new ColourParser("color", extractFile("*\\color.xml"), languagePack.localeMap));
+        emit currentLanguagePackProgress("Done.", xmlFiles.count(), xmlFiles.count());
+    } else {
+        qDebug() << "PackManager::loadXMLData - no language pack was found.";
+        return;
     }
-    xmlParsers.append(new CharacterStyleParser("characterstyle", extractFile("*characterstyle.xml"), languagePack.localeMap));
-    xmlParsers.append(new ColourParser("color", extractFile("*\\color.xml"), languagePack.localeMap));
-    emit currentLanguagePackProgress("Done.", xmlFiles.count(), xmlFiles.count());
 }
 
 QString PackManager::resolvePath(QString path) {
