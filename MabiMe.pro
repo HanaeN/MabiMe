@@ -31,7 +31,8 @@ SOURCES += main.cpp\
     Parsers/characterstyleparser.cpp \
     Parsers/colourparser.cpp \
     mabimecolourdelegate.cpp \
-    aboutwindow.cpp
+    aboutwindow.cpp \
+    Parsers/faceemotionparser.cpp
 
 HEADERS  += mainwindow.h \
     PackReader/mabipackreader.h \
@@ -49,7 +50,8 @@ HEADERS  += mainwindow.h \
     Parsers/characterstyleparser.h \
     Parsers/colourparser.h \
     mabimecolourdelegate.h \
-    aboutwindow.h
+    aboutwindow.h \
+    Parsers/faceemotionparser.h
 
 FORMS    += mainwindow.ui \
     settingswindow.ui \

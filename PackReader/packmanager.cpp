@@ -26,6 +26,7 @@
 
 #include "Parsers/characterstyleparser.h"
 #include "Parsers/colourparser.h"
+#include "Parsers/faceemotionparser.h"
 
 PackManager::PackManager(QObject *parent) : QObject(parent)
 {
@@ -38,6 +39,7 @@ PackManager::PackManager(QObject *parent) : QObject(parent)
     QStringList whiteList;
     whiteList << "xml.characterstyle"
               << "xml.color"
+              << "xml.faceemotion2"
               << "xmlcolorstyle";
     languagePack.localeMap = new LocaleMapHelper(whiteList);
 }
@@ -219,6 +221,7 @@ void PackManager::loadXMLData() {
         }
         xmlParsers.append(new CharacterStyleParser("characterstyle", extractFile("*characterstyle.xml"), languagePack.localeMap));
         xmlParsers.append(new ColourParser("color", extractFile("*\\color.xml"), languagePack.localeMap));
+        xmlParsers.append(new FaceEmotionParser("faceemotion2", extractFile("*\\faceemotion2.xml"), languagePack.localeMap));
         emit currentLanguagePackProgress("Done.", xmlFiles.count(), xmlFiles.count());
     } else {
         qDebug() << "PackManager::loadXMLData - no language pack was found.";
