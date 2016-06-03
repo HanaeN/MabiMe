@@ -40,7 +40,7 @@ PackManager::PackManager(QObject *parent) : QObject(parent)
     whiteList << "xml.characterstyle"
               << "xml.color"
               << "xml.faceemotion2"
-              << "xmlcolorstyle";
+              << "xml.colorstyle";
     languagePack.localeMap = new LocaleMapHelper(whiteList);
 }
 
