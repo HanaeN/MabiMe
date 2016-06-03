@@ -42,6 +42,7 @@ namespace EyeMouthStyle {
         QImage icon;
         QString name = "";
         int entryID = 0;
+        QList<int> allowedHeads;
     };
 };
 

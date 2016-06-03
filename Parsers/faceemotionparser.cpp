@@ -19,6 +19,7 @@
 
 #include "faceemotionparser.h"
 #include <QDebug>
+#include <QStringList>
 
 FaceEmotionParser::FaceEmotionParser(QString name, QByteArray xml, LocaleMapHelper *localeMap) :
     XMLParser(name, xml, localeMap)
@@ -42,7 +43,19 @@ void FaceEmotionParser::parseFile() {
                     c->name = localeMap->getValue(attributes.namedItem("Name").nodeValue());
                     c->categoryType = id;
                     c->entryID = attributes.namedItem("ID").nodeValue().toInt();
-                    qDebug() << id << c->name << c->entryID << attributes.namedItem("integer44").nodeValue().toInt();
+                    qDebug() << id << c->name << c->entryID << attributes.namedItem("Icon").nodeValue() << attributes.namedItem("FaceId").nodeValue();
+                    QStringList args = attributes.namedItem("FaceId").nodeValue().split(",", QString::SkipEmptyParts);
+                    foreach (QString arg, args) {
+                        if (arg.contains("~")) {
+                            QStringList argLowHigh = arg.split("~");
+                            int argLow = argLowHigh[0].toInt();
+                            int argHigh = argLowHigh[1].toInt();
+                            for (int i = argLow; i <= argHigh; i++) {
+                                c->allowedHeads.append(i);
+                            }
+                        } else if (arg != "*") c->allowedHeads.append(arg.toInt());
+                    }
+                    qDebug() << c->allowedHeads;
                     styles.append(c);
                 }
             }
