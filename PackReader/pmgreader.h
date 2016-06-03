@@ -26,7 +26,7 @@
 
 namespace PMG {
     enum MeshType {
-        none, Hair, Hat, Robe, Chest, Shoes, Gloves, Head
+        none, Hair, Hat, Robe, Chest, Shoes, Gloves, Head, Tool
     };
 
     #pragma pack(1)

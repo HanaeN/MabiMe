@@ -223,6 +223,7 @@ bool PMGReader::loadPMG(QByteArray stream, PMG::MeshType meshType) {
                     if (meshType == PMG::MeshType::Robe && (mesh->meshName.endsWith("_f1_"))) mesh->showMesh = false;
                     if (meshType == PMG::MeshType::Robe && (mesh->meshName.endsWith("_f2_") || mesh->meshName.endsWith("_uncover_"))) mesh->showMesh = false;
                     if (meshType == PMG::MeshType::Hair && (!mesh->meshName.endsWith("_h1_"))) mesh->showMesh = false;
+                    if (meshType == PMG::MeshType::Tool && (!mesh->meshName.endsWith("_r_"))) mesh->showMesh = false;
 
                     meshes.append(mesh);
                 }
