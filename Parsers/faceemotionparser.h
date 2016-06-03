@@ -26,6 +26,7 @@
 
 #include "Parsers/localemaphelper.h"
 #include "Parsers/xmlparser.h"
+#include "PackReader/packmanager.h"
 
 namespace EyeMouthStyle {
     const int EYE_STYLE             = 0;
@@ -50,10 +51,11 @@ namespace EyeMouthStyle {
 class FaceEmotionParser : public XMLParser
 {
 public:
-    FaceEmotionParser(QString name, QByteArray xml, LocaleMapHelper *localeMap = nullptr);
+    FaceEmotionParser(QString name, QByteArray xml, LocaleMapHelper *localeMap = nullptr, PackManager *packManager = nullptr);
     QList<EyeMouthStyle::Object*> styles;
     ~FaceEmotionParser();
 protected:
+    PackManager *packManager;
     virtual void parseFile();
 };
 

@@ -18,12 +18,15 @@
 */
 
 #include "faceemotionparser.h"
+#include <QByteArray>
 #include <QDebug>
+#include <QPixmap>
 #include <QStringList>
 
-FaceEmotionParser::FaceEmotionParser(QString name, QByteArray xml, LocaleMapHelper *localeMap) :
+FaceEmotionParser::FaceEmotionParser(QString name, QByteArray xml, LocaleMapHelper *localeMap, PackManager *packManager) :
     XMLParser(name, xml, localeMap)
 {
+    this->packManager = packManager;
     if (isReady()) parseFile();
 }
 
@@ -32,18 +35,32 @@ void FaceEmotionParser::parseFile() {
     for (int i = 0; i < categories.count(); i++) {
         QDomNode styleCategory = categories.at(i);
         int id = EyeMouthStyle::UNKNOWN;
-        if (styleCategory.nodeName() == "EyeEmotionList")    id = EyeMouthStyle::EYE_STYLE;
-        if (styleCategory.nodeName() == "MouthEmotionList")  id = EyeMouthStyle::MOUTH_STYLE;
+        QString typeString;
+        if (styleCategory.nodeName() == "EyeEmotionList") {
+            id = EyeMouthStyle::EYE_STYLE;
+            typeString = "eye";
+        }
+        if (styleCategory.nodeName() == "MouthEmotionList") {
+            id = EyeMouthStyle::MOUTH_STYLE;
+            typeString = "mouth";
+        }
         if (id != EyeMouthStyle::UNKNOWN) {
+            int totalItems = 0;
+            for (int n = 0; n < styleCategory.childNodes().count(); n++) {
+                if (styleCategory.childNodes().at(n).nodeName() == "Emotion") totalItems++;
+            }
+
+            int currentItem = 0;
             for (int n = 0; n < styleCategory.childNodes().count(); n++) {
                 QDomNode style = styleCategory.childNodes().at(n);
                 if (style.nodeName() == "Emotion") {
+                    packManager->currentLanguagePackProgress("Parsing " + typeString + " icons", currentItem, totalItems);
+                    currentItem++;
                     QDomNamedNodeMap attributes = style.attributes();
                     EyeMouthStyle::Object *c = new EyeMouthStyle::Object;
                     c->name = localeMap->getValue(attributes.namedItem("Name").nodeValue());
                     c->categoryType = id;
                     c->entryID = attributes.namedItem("ID").nodeValue().toInt();
-                    qDebug() << id << c->name << c->entryID << attributes.namedItem("Icon").nodeValue() << attributes.namedItem("FaceId").nodeValue();
                     QStringList args = attributes.namedItem("FaceId").nodeValue().split(",", QString::SkipEmptyParts);
                     foreach (QString arg, args) {
                         if (arg.contains("~")) {
@@ -55,7 +72,13 @@ void FaceEmotionParser::parseFile() {
                             }
                         } else if (arg != "*") c->allowedHeads.append(arg.toInt());
                     }
-                    qDebug() << c->allowedHeads;
+                    QPixmap pix;
+                    QByteArray bytes = packManager->extractFile("material\\char\\face\\" + typeString + "_" + QString::number(c->entryID) + ".dds");
+                    if (bytes.length() > 0) {
+                        pix.loadFromData(bytes);
+                        QImage img = pix.toImage();
+                        c->icon = img;
+                    }
                     styles.append(c);
                 }
             }
