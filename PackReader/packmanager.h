@@ -52,7 +52,7 @@ public:
     QString findTexture(QString name);
     QString resolvePath(QString path);
     bool fileExists(QString path, bool useLanguagePack = false);
-    QByteArray extractFile(QString path, bool useLanguagePack = false);
+    QByteArray extractFile(QString path, bool useLanguagePack = false, bool useBasePackFirst = false);
     QList<XMLParser*> xmlParsers;
 private:
     QString path = "";

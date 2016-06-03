@@ -198,8 +198,13 @@ bool PackManager::fileExists(QString path, bool useLanguagePack) {
     return false;
 }
 
-QByteArray PackManager::extractFile(QString path, bool useLanguagePack) {
+QByteArray PackManager::extractFile(QString path, bool useLanguagePack, bool useBasePackFirst) {
     if (useLanguagePack) return languagePack.reader->extractFile(path);
+    if (useBasePackFirst) {
+        QByteArray f = packs.at(packs.count() - 1)->reader->extractFile(path);
+        if (f.length() > 0) return f;
+        qDebug() << "no";
+    }
     foreach (const Pack *pack, packs) {
         QByteArray f = pack->reader->extractFile(path);
         if (f.length() > 0) return f;
@@ -221,7 +226,7 @@ void PackManager::loadXMLData() {
         }
         xmlParsers.append(new CharacterStyleParser("characterstyle", extractFile("*characterstyle.xml"), languagePack.localeMap));
         xmlParsers.append(new ColourParser("color", extractFile("*\\color.xml"), languagePack.localeMap));
-        xmlParsers.append(new FaceEmotionParser("faceemotion2", extractFile("*\\faceemotion2.xml"), languagePack.localeMap));
+        xmlParsers.append(new FaceEmotionParser("faceemotion2", extractFile("*\\faceemotion2.xml"), languagePack.localeMap, this));
         emit currentLanguagePackProgress("Done.", xmlFiles.count(), xmlFiles.count());
     } else {
         qDebug() << "PackManager::loadXMLData - no language pack was found.";
