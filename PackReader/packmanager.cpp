@@ -144,6 +144,9 @@ bool PackManager::loadPackages() {
             p->name = packName;
             p->reader = new MabiPackReader();
             p->reader->openPackage(path + packName);
+            foreach (QString packFilename, p->reader->getFileNames()) {
+                if (this->entryMap.value(packFilename, nullptr) == nullptr) this->entryMap[packFilename] = p->reader;
+            }
             id++;
             packs.append(p);
         }
@@ -198,17 +201,11 @@ bool PackManager::fileExists(QString path, bool useLanguagePack) {
     return false;
 }
 
-QByteArray PackManager::extractFile(QString path, bool useLanguagePack, bool useBasePackFirst) {
+QByteArray PackManager::extractFile(QString path, bool useLanguagePack) {
     if (useLanguagePack) return languagePack.reader->extractFile(path);
-    if (useBasePackFirst) {
-        QByteArray f = packs.at(packs.count() - 1)->reader->extractFile(path);
-        if (f.length() > 0) return f;
-        qDebug() << "no";
-    }
-    foreach (const Pack *pack, packs) {
-        QByteArray f = pack->reader->extractFile(path);
-        if (f.length() > 0) return f;
-    }
+    if (path.contains("*")) path = this->resolvePath(path);
+    MabiPackReader *reader = entryMap.value(path, nullptr);
+    if (reader != nullptr) return reader->extractFile(path);
     return QByteArray();
 }
 
@@ -235,9 +232,14 @@ void PackManager::loadXMLData() {
 }
 
 QString PackManager::resolvePath(QString path) {
-    foreach (const Pack *pack, packs) {
-        QString f = pack->reader->findFile(path);
-        if (f.length() > 0) return f;
+    if (path.contains("*")) {
+        QStringList s = path.split("*", QString::KeepEmptyParts);
+        if (s.count() == 2) {
+            foreach (QString key, entryMap.keys()) {
+                if (key.startsWith(s[0]) && key.endsWith(s[1])) return key;
+            }
+        } else qDebug() << "could not use wildcard, invalid count" << path;
+    } else {
+        return path;
     }
-    return path;
 }

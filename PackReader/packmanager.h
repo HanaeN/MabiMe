@@ -21,6 +21,7 @@
 #define PACKMANAGER_H
 
 #include <QList>
+#include <QMap>
 #include <QObject>
 
 #include "PackReader/mabipackreader.h"
@@ -52,11 +53,12 @@ public:
     QString findTexture(QString name);
     QString resolvePath(QString path);
     bool fileExists(QString path, bool useLanguagePack = false);
-    QByteArray extractFile(QString path, bool useLanguagePack = false, bool useBasePackFirst = false);
+    QByteArray extractFile(QString path, bool useLanguagePack = false);
     QList<XMLParser*> xmlParsers;
 private:
     QString path = "";
     QList<Pack*> packs;
+    QMap<QString, MabiPackReader*> entryMap;
     LanguagePack languagePack;
     void loadXMLData();
     bool packsLoaded = false;
