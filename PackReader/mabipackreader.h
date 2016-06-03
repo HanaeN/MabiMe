@@ -84,12 +84,12 @@ private:
     bool readPackageInfos();
     QByteArray extractFile(MabiPack::PackageEntry *file);
     MabiPack::PackageEntry* findInternalFile(QString filename);
-    QMap<QString, MabiPack::PackageEntry*> entryMap;
 public:
     bool fileExists(QString filename);
     QString findFile(QString filename);
     QByteArray extractFile(QString filename);
     QStringList getFileNames(QString beginsWith = "", QString endsWith = "");
+    QMap<QString, MabiPack::PackageEntry*> entryMap;
     bool openPackage(QString filename);
     QString findTexture(QString texture);
     void closePackage();
