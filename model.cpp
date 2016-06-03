@@ -59,6 +59,7 @@ void Model::addPMG(QString path) {
     if (path.contains("shoes", Qt::CaseInsensitive)) meshType = PMG::MeshType::Shoes;
     if (path.contains("wear", Qt::CaseInsensitive)) meshType = PMG::MeshType::Chest;
     if (path.contains("helmet", Qt::CaseInsensitive)) meshType = PMG::MeshType::Hat;
+    if (path.contains("tool", Qt::CaseInsensitive)) meshType = PMG::MeshType::Tool;
     m->pmgReader.loadPMG(packManager->extractFile(path), meshType);
     m->name = path;
 
