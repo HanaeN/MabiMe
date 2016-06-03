@@ -119,6 +119,7 @@ bool MabiPackReader::readPackageInfos() {
                 e->info = info;
                 e->name = name;
                 packageEntries.append(e);
+                entryMap[e->name] = e;
             }
             ptr += sizeof(MabiPack::PackageItemInfo);
         }
@@ -157,9 +158,7 @@ MabiPack::PackageEntry* MabiPackReader::findInternalFile(QString filename) {
             }
         } else qDebug() << "could not use wildcard, invalid count" << filename;
     } else {
-        foreach(MabiPack::PackageEntry *entry, packageEntries) {
-            if (entry->name.compare(filename, Qt::CaseInsensitive) == 0) return entry;
-        }
+        return entryMap.value(filename, nullptr);
     }
     return nullptr;
 }

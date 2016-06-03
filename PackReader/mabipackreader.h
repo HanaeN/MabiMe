@@ -24,6 +24,7 @@
 #include <QDataStream>
 #include <Qfile>
 #include <QList>
+#include <QMap>
 #include <random>
 
 namespace MabiPack {
@@ -83,6 +84,7 @@ private:
     bool readPackageInfos();
     QByteArray extractFile(MabiPack::PackageEntry *file);
     MabiPack::PackageEntry* findInternalFile(QString filename);
+    QMap<QString, MabiPack::PackageEntry*> entryMap;
 public:
     bool fileExists(QString filename);
     QString findFile(QString filename);
