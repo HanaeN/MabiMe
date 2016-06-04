@@ -47,7 +47,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->l_layers->setMouseTracking(true);
     ui->g_load->setCurrentIndex(1);
     for (int i = 0; i < ui->l_category->count(); i++) {
-        ui->l_category->item(i)->setSizeHint(QSize(60, 60));
+        ui->l_category->item(i)->setSizeHint(QSize(60, 72));
     }
     ui->l_category->setCurrentRow(0);
     MabiMeColourDelegate *cd = new MabiMeColourDelegate();
@@ -256,15 +256,15 @@ void MainWindow::onLoadPackages() {
         QString PMGpath = "gfx\\char\\human\\female\\";
 //        insertPMG("human", PMGpath + "female_default_bss", PMGpath + "female_framework");
 
-//        insertPMG("human", PMGpath + "face\\female_adult01_f01", "*\\female_framework");
-//        insertPMG("human", "*human\\female\\hair\\female_c4_renewal_hair25_t25", PMGpath + "female_framework");
+        insertPMG("human", PMGpath + "face\\female_adult01_f01", "*\\female_framework");
+        insertPMG("human", "*human\\female\\hair\\female_c4_renewal_hair25_t25", PMGpath + "female_framework");
 //        insertPMG("human", "*human\\female\\wear\\female_c4_2012openschool_bms", PMGpath + "female_framework");
-//        insertPMG("human", "*human\\female\\shoes\\uni_c4_slipper04_s05", PMGpath + "female_framework");
+        insertPMG("human", "*human\\female\\shoes\\uni_c4_slipper04_s05", PMGpath + "female_framework");
 
 //          insertPMG("human", "*\\weapon_c4_dgcshield01", PMGpath + "female_framework");
 
 //        insertPMG("human", "gfx\\char\\chapter4\\human\\female\\mantle\\uni_c4_ego_swordwing01", PMGpath + "female_framework");
-//        insertPMG("human", "gfx\\char\\chapter4\\human\\female\\mantle\\female_c4_contest2012_robe_china", PMGpath + "female_framework");
+        insertPMG("human", "gfx\\char\\chapter4\\human\\female\\mantle\\female_c4_contest2012_robe_china", PMGpath + "female_framework");
 /*
         QString PMGpath = "gfx\\char\\monster\\mesh\\tabhartas\\tabhartas";
         insertPMG("tabhartas", PMGpath + "_mesh", PMGpath + "_framework");
