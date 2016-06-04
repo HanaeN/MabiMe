@@ -19,5 +19,10 @@
         <file>Images/button-small-no-bones.png</file>
         <file>Images/search-small.png</file>
         <file>Images/full-logo.png</file>
+        <file>Images/button-elf.png</file>
+        <file>Images/button-giant.png</file>
+        <file>Images/button-human.png</file>
+        <file>Images/button-female.png</file>
+        <file>Images/button-male.png</file>
     </qresource>
 </RCC>
