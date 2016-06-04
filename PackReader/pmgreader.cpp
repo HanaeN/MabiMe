@@ -221,7 +221,7 @@ bool PMGReader::loadPMG(QByteArray stream, PMG::MeshType meshType) {
                     // hide things we dont want
                     if (mesh->meshName.endsWith("_fistl_") || mesh->meshName.endsWith("_fistr_")) mesh->showMesh = false;
                     if (meshType == PMG::MeshType::Robe && (mesh->meshName.endsWith("_f1_"))) mesh->showMesh = false;
-                    if (meshType == PMG::MeshType::Robe && (mesh->meshName.endsWith("_f2_") || mesh->meshName.endsWith("_uncover_"))) mesh->showMesh = false;
+                    if (meshType == PMG::MeshType::Robe && (mesh->meshName.endsWith("_f2_") || mesh->meshName.endsWith("_cover_"))) mesh->showMesh = false;
                     if (meshType == PMG::MeshType::Hair && (!mesh->meshName.endsWith("_h1_"))) mesh->showMesh = false;
                     if (meshType == PMG::MeshType::Tool && (!mesh->meshName.endsWith("_r_"))) mesh->showMesh = false;
 
