@@ -47,7 +47,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->l_layers->setMouseTracking(true);
     ui->g_load->setCurrentIndex(1);
     for (int i = 0; i < ui->l_category->count(); i++) {
-        ui->l_category->item(i)->setSizeHint(QSize(60, 72));
+        ui->l_category->item(i)->setSizeHint(QSize(60, 80));
     }
     ui->l_category->setCurrentRow(0);
     MabiMeColourDelegate *cd = new MabiMeColourDelegate();

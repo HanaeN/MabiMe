@@ -1563,7 +1563,7 @@
               </property>
               <property name="icon">
                <iconset resource="images.qrc">
-                <normaloff>:/images/Images/cog.png</normaloff>:/images/Images/cog.png</iconset>
+                <normaloff>:/images/Images/icon-character.png</normaloff>:/images/Images/icon-character.png</iconset>
               </property>
              </item>
              <item>
@@ -1572,7 +1572,7 @@
               </property>
               <property name="icon">
                <iconset resource="images.qrc">
-                <normaloff>:/images/Images/cog.png</normaloff>:/images/Images/cog.png</iconset>
+                <normaloff>:/images/Images/icon-colours.png</normaloff>:/images/Images/icon-colours.png</iconset>
               </property>
              </item>
              <item>
@@ -1581,27 +1581,43 @@
               </property>
               <property name="icon">
                <iconset resource="images.qrc">
-                <normaloff>:/images/Images/cog.png</normaloff>:/images/Images/cog.png</iconset>
+                <normaloff>:/images/Images/icon-hat.png</normaloff>:/images/Images/icon-hat.png</iconset>
               </property>
              </item>
              <item>
               <property name="text">
                <string>Body</string>
               </property>
+              <property name="icon">
+               <iconset resource="images.qrc">
+                <normaloff>:/images/Images/icon-body.png</normaloff>:/images/Images/icon-body.png</iconset>
+              </property>
              </item>
              <item>
               <property name="text">
                <string>Robe</string>
+              </property>
+              <property name="icon">
+               <iconset resource="images.qrc">
+                <normaloff>:/images/Images/icon-robe.png</normaloff>:/images/Images/icon-robe.png</iconset>
               </property>
              </item>
              <item>
               <property name="text">
                <string>Gloves</string>
               </property>
+              <property name="icon">
+               <iconset resource="images.qrc">
+                <normaloff>:/images/Images/icon-gloves.png</normaloff>:/images/Images/icon-gloves.png</iconset>
+              </property>
              </item>
              <item>
               <property name="text">
                <string>Shoes</string>
+              </property>
+              <property name="icon">
+               <iconset resource="images.qrc">
+                <normaloff>:/images/Images/icon-shoes.png</normaloff>:/images/Images/icon-shoes.png</iconset>
               </property>
              </item>
             </widget>

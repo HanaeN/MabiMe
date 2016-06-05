@@ -24,5 +24,12 @@
         <file>Images/button-human.png</file>
         <file>Images/button-female.png</file>
         <file>Images/button-male.png</file>
+        <file>Images/icon-character.png</file>
+        <file>Images/icon-colours.png</file>
+        <file>Images/icon-hat.png</file>
+        <file>Images/icon-body.png</file>
+        <file>Images/icon-robe.png</file>
+        <file>Images/icon-gloves.png</file>
+        <file>Images/icon-shoes.png</file>
     </qresource>
 </RCC>
