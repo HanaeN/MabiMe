@@ -31,5 +31,6 @@
         <file>Images/icon-robe.png</file>
         <file>Images/icon-gloves.png</file>
         <file>Images/icon-shoes.png</file>
+        <file>Images/icon-colours-cropped.png</file>
     </qresource>
 </RCC>
