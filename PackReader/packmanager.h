@@ -63,6 +63,7 @@ private:
     void loadXMLData();
     bool packsLoaded = false;
     bool findMabinogiPath();
+    void setupPackManager();
 signals:
     void currentLanguagePackProgress(QString status, int current, int count);
 };

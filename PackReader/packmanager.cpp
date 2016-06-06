@@ -36,12 +36,7 @@ PackManager::PackManager(QObject *parent) : QObject(parent)
     } else {
         qDebug() << path;
     }
-    QStringList whiteList;
-    whiteList << "xml.characterstyle"
-              << "xml.color"
-              << "xml.faceemotion2"
-              << "xml.colorstyle";
-    languagePack.localeMap = new LocaleMapHelper(whiteList);
+    setupPackManager();
 }
 
 PackManager::PackManager(QString path, QObject *parent) : QObject(parent)
@@ -50,6 +45,16 @@ PackManager::PackManager(QString path, QObject *parent) : QObject(parent)
     if (QDir(path).exists()) {
         this->path = path;
     }
+    setupPackManager();
+}
+
+void PackManager::setupPackManager() {
+    QStringList whiteList;
+    whiteList << "xml.characterstyle"
+              << "xml.color"
+              << "xml.faceemotion2"
+              << "xml.colorstyle";
+    languagePack.localeMap = new LocaleMapHelper(whiteList);
 }
 
 QString PackManager::getPath() {
