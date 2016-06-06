@@ -119,13 +119,13 @@
                  <property name="minimumSize">
                   <size>
                    <width>0</width>
-                   <height>72</height>
+                   <height>80</height>
                   </size>
                  </property>
                  <property name="maximumSize">
                   <size>
                    <width>16777215</width>
-                   <height>72</height>
+                   <height>80</height>
                   </size>
                  </property>
                  <property name="styleSheet">
@@ -156,218 +156,186 @@
                    <number>0</number>
                   </property>
                   <item>
-                   <widget class="QToolButton" name="b_human">
+                   <widget class="QListWidget" name="l_race">
                     <property name="minimumSize">
                      <size>
-                      <width>50</width>
-                      <height>72</height>
-                     </size>
-                    </property>
-                    <property name="maximumSize">
-                     <size>
-                      <width>16777215</width>
-                      <height>72</height>
-                     </size>
-                    </property>
-                    <property name="text">
-                     <string>Human</string>
-                    </property>
-                    <property name="icon">
-                     <iconset resource="images.qrc">
-                      <normaloff>:/images/Images/button-human.png</normaloff>:/images/Images/button-human.png</iconset>
-                    </property>
-                    <property name="iconSize">
-                     <size>
-                      <width>45</width>
-                      <height>45</height>
-                     </size>
-                    </property>
-                    <property name="checkable">
-                     <bool>true</bool>
-                    </property>
-                    <property name="checked">
-                     <bool>true</bool>
-                    </property>
-                    <property name="toolButtonStyle">
-                     <enum>Qt::ToolButtonTextUnderIcon</enum>
-                    </property>
-                    <property name="autoRaise">
-                     <bool>true</bool>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QToolButton" name="b_elf">
-                    <property name="minimumSize">
-                     <size>
-                      <width>50</width>
-                      <height>72</height>
-                     </size>
-                    </property>
-                    <property name="maximumSize">
-                     <size>
-                      <width>16777215</width>
-                      <height>72</height>
-                     </size>
-                    </property>
-                    <property name="text">
-                     <string>Elf</string>
-                    </property>
-                    <property name="icon">
-                     <iconset resource="images.qrc">
-                      <normaloff>:/images/Images/button-elf.png</normaloff>:/images/Images/button-elf.png</iconset>
-                    </property>
-                    <property name="iconSize">
-                     <size>
-                      <width>45</width>
-                      <height>45</height>
-                     </size>
-                    </property>
-                    <property name="checkable">
-                     <bool>true</bool>
-                    </property>
-                    <property name="toolButtonStyle">
-                     <enum>Qt::ToolButtonTextUnderIcon</enum>
-                    </property>
-                    <property name="autoRaise">
-                     <bool>true</bool>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QToolButton" name="b_giant">
-                    <property name="minimumSize">
-                     <size>
-                      <width>50</width>
-                      <height>72</height>
-                     </size>
-                    </property>
-                    <property name="maximumSize">
-                     <size>
-                      <width>16777215</width>
-                      <height>72</height>
-                     </size>
-                    </property>
-                    <property name="text">
-                     <string>Giant</string>
-                    </property>
-                    <property name="icon">
-                     <iconset resource="images.qrc">
-                      <normaloff>:/images/Images/button-giant.png</normaloff>:/images/Images/button-giant.png</iconset>
-                    </property>
-                    <property name="iconSize">
-                     <size>
-                      <width>45</width>
-                      <height>45</height>
-                     </size>
-                    </property>
-                    <property name="checkable">
-                     <bool>true</bool>
-                    </property>
-                    <property name="toolButtonStyle">
-                     <enum>Qt::ToolButtonTextUnderIcon</enum>
-                    </property>
-                    <property name="autoRaise">
-                     <bool>true</bool>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QLabel" name="l_b_sep">
-                    <property name="sizePolicy">
-                     <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                     </sizepolicy>
-                    </property>
-                    <property name="minimumSize">
-                     <size>
-                      <width>1</width>
+                      <width>170</width>
                       <height>0</height>
                      </size>
                     </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>170</width>
+                      <height>16777215</height>
+                     </size>
+                    </property>
                     <property name="styleSheet">
-                     <string notr="true">background-color: #CCCCCC;</string>
+                     <string notr="true">QListWidget {
+	border: 0px solid #CCCCCC;
+	border-right-width: 1px;
+	background-color: #EEEEEE;
+}</string>
                     </property>
-                    <property name="text">
-                     <string/>
+                    <property name="verticalScrollBarPolicy">
+                     <enum>Qt::ScrollBarAlwaysOff</enum>
                     </property>
+                    <property name="horizontalScrollBarPolicy">
+                     <enum>Qt::ScrollBarAlwaysOff</enum>
+                    </property>
+                    <property name="editTriggers">
+                     <set>QAbstractItemView::NoEditTriggers</set>
+                    </property>
+                    <property name="showDropIndicator" stdset="0">
+                     <bool>false</bool>
+                    </property>
+                    <property name="iconSize">
+                     <size>
+                      <width>50</width>
+                      <height>50</height>
+                     </size>
+                    </property>
+                    <property name="textElideMode">
+                     <enum>Qt::ElideMiddle</enum>
+                    </property>
+                    <property name="movement">
+                     <enum>QListView::Static</enum>
+                    </property>
+                    <property name="flow">
+                     <enum>QListView::LeftToRight</enum>
+                    </property>
+                    <property name="isWrapping" stdset="0">
+                     <bool>false</bool>
+                    </property>
+                    <property name="resizeMode">
+                     <enum>QListView::Fixed</enum>
+                    </property>
+                    <property name="spacing">
+                     <number>0</number>
+                    </property>
+                    <property name="viewMode">
+                     <enum>QListView::IconMode</enum>
+                    </property>
+                    <property name="uniformItemSizes">
+                     <bool>true</bool>
+                    </property>
+                    <property name="currentRow">
+                     <number>0</number>
+                    </property>
+                    <item>
+                     <property name="text">
+                      <string>Human</string>
+                     </property>
+                     <property name="icon">
+                      <iconset resource="images.qrc">
+                       <normaloff>:/images/Images/button-human.png</normaloff>:/images/Images/button-human.png</iconset>
+                     </property>
+                    </item>
+                    <item>
+                     <property name="text">
+                      <string>Elf</string>
+                     </property>
+                     <property name="icon">
+                      <iconset resource="images.qrc">
+                       <normaloff>:/images/Images/button-elf.png</normaloff>:/images/Images/button-elf.png</iconset>
+                     </property>
+                    </item>
+                    <item>
+                     <property name="text">
+                      <string>Giant</string>
+                     </property>
+                     <property name="icon">
+                      <iconset resource="images.qrc">
+                       <normaloff>:/images/Images/button-giant.png</normaloff>:/images/Images/button-giant.png</iconset>
+                     </property>
+                    </item>
                    </widget>
                   </item>
                   <item>
-                   <widget class="QToolButton" name="b_male">
+                   <widget class="ScrollingDisabledQListWidget" name="l_gender">
                     <property name="minimumSize">
                      <size>
-                      <width>24</width>
-                      <height>72</height>
+                      <width>28</width>
+                      <height>0</height>
                      </size>
                     </property>
                     <property name="maximumSize">
                      <size>
-                      <width>24</width>
-                      <height>72</height>
+                      <width>28</width>
+                      <height>16777215</height>
                      </size>
                     </property>
                     <property name="styleSheet">
-                     <string notr="true"/>
+                     <string notr="true">QListWidget {
+	border: 0px solid #CCCCCC;
+	background-color: #EEEEEE;
+}</string>
                     </property>
-                    <property name="text">
-                     <string>...</string>
+                    <property name="verticalScrollBarPolicy">
+                     <enum>Qt::ScrollBarAlwaysOff</enum>
                     </property>
-                    <property name="icon">
-                     <iconset resource="images.qrc">
-                      <normaloff>:/images/Images/button-male.png</normaloff>:/images/Images/button-male.png</iconset>
+                    <property name="horizontalScrollBarPolicy">
+                     <enum>Qt::ScrollBarAlwaysOff</enum>
                     </property>
-                    <property name="iconSize">
-                     <size>
-                      <width>20</width>
-                      <height>40</height>
-                     </size>
+                    <property name="autoScroll">
+                     <bool>false</bool>
                     </property>
-                    <property name="checkable">
-                     <bool>true</bool>
+                    <property name="autoScrollMargin">
+                     <number>0</number>
                     </property>
-                    <property name="autoRaise">
-                     <bool>true</bool>
+                    <property name="editTriggers">
+                     <set>QAbstractItemView::NoEditTriggers</set>
                     </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QToolButton" name="b_female">
-                    <property name="minimumSize">
-                     <size>
-                      <width>24</width>
-                      <height>72</height>
-                     </size>
-                    </property>
-                    <property name="maximumSize">
-                     <size>
-                      <width>24</width>
-                      <height>72</height>
-                     </size>
-                    </property>
-                    <property name="text">
-                     <string>...</string>
-                    </property>
-                    <property name="icon">
-                     <iconset resource="images.qrc">
-                      <normaloff>:/images/Images/button-female.png</normaloff>:/images/Images/button-female.png</iconset>
+                    <property name="showDropIndicator" stdset="0">
+                     <bool>false</bool>
                     </property>
                     <property name="iconSize">
                      <size>
-                      <width>20</width>
-                      <height>40</height>
+                      <width>24</width>
+                      <height>37</height>
                      </size>
                     </property>
-                    <property name="checkable">
+                    <property name="textElideMode">
+                     <enum>Qt::ElideMiddle</enum>
+                    </property>
+                    <property name="movement">
+                     <enum>QListView::Static</enum>
+                    </property>
+                    <property name="flow">
+                     <enum>QListView::TopToBottom</enum>
+                    </property>
+                    <property name="isWrapping" stdset="0">
+                     <bool>false</bool>
+                    </property>
+                    <property name="resizeMode">
+                     <enum>QListView::Adjust</enum>
+                    </property>
+                    <property name="viewMode">
+                     <enum>QListView::ListMode</enum>
+                    </property>
+                    <property name="uniformItemSizes">
                      <bool>true</bool>
                     </property>
-                    <property name="checked">
-                     <bool>true</bool>
+                    <property name="currentRow">
+                     <number>1</number>
                     </property>
-                    <property name="autoRaise">
-                     <bool>true</bool>
-                    </property>
+                    <item>
+                     <property name="text">
+                      <string/>
+                     </property>
+                     <property name="icon">
+                      <iconset resource="images.qrc">
+                       <normaloff>:/images/Images/button-male.png</normaloff>:/images/Images/button-male.png</iconset>
+                     </property>
+                    </item>
+                    <item>
+                     <property name="text">
+                      <string/>
+                     </property>
+                     <property name="icon">
+                      <iconset resource="images.qrc">
+                       <normaloff>:/images/Images/button-female.png</normaloff>:/images/Images/button-female.png</iconset>
+                     </property>
+                    </item>
                    </widget>
                   </item>
                  </layout>
@@ -710,12 +678,21 @@
                       <height>26</height>
                      </size>
                     </property>
+                    <property name="toolTip">
+                     <string>Click to select a custom colour</string>
+                    </property>
                     <property name="text">
                      <string/>
                     </property>
                     <property name="icon">
                      <iconset resource="images.qrc">
-                      <normaloff>:/images/Images/new-layer.png</normaloff>:/images/Images/new-layer.png</iconset>
+                      <normaloff>:/images/Images/icon-colours-cropped.png</normaloff>:/images/Images/icon-colours-cropped.png</iconset>
+                    </property>
+                    <property name="iconSize">
+                     <size>
+                      <width>20</width>
+                      <height>20</height>
+                     </size>
                     </property>
                     <property name="popupMode">
                      <enum>QToolButton::DelayedPopup</enum>
@@ -860,7 +837,7 @@
                      </size>
                     </property>
                     <property name="toolTip">
-                     <string>Current colour. Click to select a custom colour</string>
+                     <string/>
                     </property>
                     <property name="styleSheet">
                      <string notr="true">QLabel {
@@ -887,12 +864,21 @@
                       <height>26</height>
                      </size>
                     </property>
+                    <property name="toolTip">
+                     <string>Click to select a custom colour</string>
+                    </property>
                     <property name="text">
                      <string>...</string>
                     </property>
                     <property name="icon">
                      <iconset resource="images.qrc">
-                      <normaloff>:/images/Images/new-layer.png</normaloff>:/images/Images/new-layer.png</iconset>
+                      <normaloff>:/images/Images/icon-colours-cropped.png</normaloff>:/images/Images/icon-colours-cropped.png</iconset>
+                    </property>
+                    <property name="iconSize">
+                     <size>
+                      <width>20</width>
+                      <height>20</height>
+                     </size>
                     </property>
                     <property name="autoRaise">
                      <bool>true</bool>
@@ -1055,12 +1041,21 @@
                       <height>26</height>
                      </size>
                     </property>
+                    <property name="toolTip">
+                     <string>Click to select a custom colour</string>
+                    </property>
                     <property name="text">
                      <string/>
                     </property>
                     <property name="icon">
                      <iconset resource="images.qrc">
-                      <normaloff>:/images/Images/new-layer.png</normaloff>:/images/Images/new-layer.png</iconset>
+                      <normaloff>:/images/Images/icon-colours-cropped.png</normaloff>:/images/Images/icon-colours-cropped.png</iconset>
+                    </property>
+                    <property name="iconSize">
+                     <size>
+                      <width>20</width>
+                      <height>20</height>
+                     </size>
                     </property>
                     <property name="autoRaise">
                      <bool>true</bool>
@@ -2110,7 +2105,7 @@ QTreeWidget::branch:open:has-children:!has-siblings,QTreeWidget::branch:open:has
  <customwidgets>
   <customwidget>
    <class>MabiMeGLWidget</class>
-   <extends>QWidget</extends>
+   <extends>QListWidget</extends>
    <header>mabimeglwidget.h</header>
    <container>1</container>
   </customwidget>

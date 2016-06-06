@@ -49,6 +49,17 @@ MainWindow::MainWindow(QWidget *parent) :
     for (int i = 0; i < ui->l_category->count(); i++) {
         ui->l_category->item(i)->setSizeHint(QSize(60, 80));
     }
+    for (int i = 0; i < ui->l_race->count(); i++) {
+        ui->l_race->item(i)->setSizeHint(QSize(56, 80));
+    }
+    QListWidgetItem *i = new QListWidgetItem(QIcon(":/images/Images/button-male.png"),"");
+    i->setSizeHint(QSize(30, 39));
+    ui->l_gender->addItem(i);
+    i = new QListWidgetItem(QIcon(":/images/Images/button-female.png"),"");
+    i->setSizeHint(QSize(30, 40));
+    ui->l_gender->addItem(i);
+    ui->l_gender->setVerticalScrollBar(nullptr);
+    ui->l_gender->setCurrentRow(1);
     ui->l_category->setCurrentRow(0);
     MabiMeColourDelegate *cd = new MabiMeColourDelegate();
     ui->l_skin_colours->setItemDelegate(cd);
@@ -258,13 +269,13 @@ void MainWindow::onLoadPackages() {
 
         insertPMG("human", PMGpath + "face\\female_adult01_f01", "*\\female_framework");
         insertPMG("human", "*human\\female\\hair\\female_c4_renewal_hair25_t25", PMGpath + "female_framework");
-//        insertPMG("human", "*human\\female\\wear\\female_c4_2012openschool_bms", PMGpath + "female_framework");
+        insertPMG("human", "*human\\female\\wear\\female_c4_2012openschool_bms", PMGpath + "female_framework");
         insertPMG("human", "*human\\female\\shoes\\uni_c4_slipper04_s05", PMGpath + "female_framework");
 
 //          insertPMG("human", "*\\weapon_c4_dgcshield01", PMGpath + "female_framework");
 
 //        insertPMG("human", "gfx\\char\\chapter4\\human\\female\\mantle\\uni_c4_ego_swordwing01", PMGpath + "female_framework");
-        insertPMG("human", "gfx\\char\\chapter4\\human\\female\\mantle\\female_c4_contest2012_robe_china", PMGpath + "female_framework");
+//        insertPMG("human", "gfx\\char\\chapter4\\human\\female\\mantle\\female_c4_contest2012_robe_china", PMGpath + "female_framework");
 /*
         QString PMGpath = "gfx\\char\\monster\\mesh\\tabhartas\\tabhartas";
         insertPMG("tabhartas", PMGpath + "_mesh", PMGpath + "_framework");
