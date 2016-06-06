@@ -1,6 +1,30 @@
-#include "scrollingdisabledqlistwidget.h"
+/*
+ MabiMe Character Simulator - by Yai (Sophie N)
+ Email: sinoc300@gmail.com
+ Copyright (C) 2016
 
-ScrollingDisabledQListWidget::ScrollingDisabledQListWidget(QWidget *parent) : QWidget(parent)
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+#include "scrollingdisabledqlistwidget.h"
+#include <QWheelEvent>
+
+ScrollingDisabledQListWidget::ScrollingDisabledQListWidget(QWidget *parent) : QListWidget(parent)
 {
 
+}
+
+void ScrollingDisabledQListWidget::wheelEvent(QWheelEvent *event) {
+    event->ignore();
 }

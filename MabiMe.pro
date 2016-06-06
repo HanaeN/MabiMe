@@ -32,7 +32,8 @@ SOURCES += main.cpp\
     Parsers/colourparser.cpp \
     mabimecolourdelegate.cpp \
     aboutwindow.cpp \
-    Parsers/faceemotionparser.cpp
+    Parsers/faceemotionparser.cpp \
+    scrollingdisabledqlistwidget.cpp
 
 HEADERS  += mainwindow.h \
     PackReader/mabipackreader.h \
@@ -51,7 +52,8 @@ HEADERS  += mainwindow.h \
     Parsers/colourparser.h \
     mabimecolourdelegate.h \
     aboutwindow.h \
-    Parsers/faceemotionparser.h
+    Parsers/faceemotionparser.h \
+    scrollingdisabledqlistwidget.h
 
 FORMS    += mainwindow.ui \
     settingswindow.ui \
