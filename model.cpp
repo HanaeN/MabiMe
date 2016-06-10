@@ -50,6 +50,7 @@ Bone* Model::findBone(QString boneName) {
 void Model::addPMG(QString path) {
     // resolve the path to check what category it is in
     path = packManager->resolvePath(path + ".pmg");
+    if (path.length() == 0) return;
     PMGModel *m = new PMGModel();
     PMG::MeshType meshType = PMG::MeshType::none;
     if (path.contains("mantle", Qt::CaseInsensitive)) meshType = PMG::MeshType::Robe;

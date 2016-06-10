@@ -243,6 +243,8 @@ QString PackManager::resolvePath(QString path) {
             foreach (QString key, entryMap.keys()) {
                 if (key.startsWith(s[0]) && key.endsWith(s[1])) return key;
             }
+            qDebug() << "PackManager;:resolvePath(" + path + " ) failed";
+            return "";
         } else qDebug() << "could not use wildcard, invalid count" << path;
     } else {
         return path;
